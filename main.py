@@ -1,45 +1,69 @@
 from fastapi import FastAPI
 import uvicorn
-from pydantic import BaseModel
-from typing import Optional, List
 
 app = FastAPI()
 
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "Immersio AI running"}
 
 
-@app.get("/vocabularies")
-async def get_vocabularies():
-    return {"message": "vocabs"}
+@app.get("/languages/{lan}/vocabularies")
+async def get_vocabularies(lan: str):
+    return {
+        "language": lan,
+        "message": "vocabs"
+    }
 
 
-@app.get("/chats")
-async def get_chats():
-    return {"message": "chats"}
+@app.get("/languages/{lan}/media")
+async def get_media(lan: str):
+    return {
+        "language": lan,
+        "message": "media"
+    }
 
 
-@app.post("/chats/{chat_id}")
-async def post_chat(chat_id: int):
-    return {"message": "chat"}
+@app.post("/languages/{lan}/media")
+async def post_media(lan: str):
+    return {
+        "language": lan,
+        "message": "media uploaded"
+    }
 
 
-@app.get("/media")
-async def get_media():
-    return {"message": "media"}
+@app.get("/languages/{lan}/chats")
+async def get_chats(lan: str):
+    return {
+        "language": lan,
+        "message": "chats"
+    }
 
 
-@app.post("/media")
-async def post_media():
-    return {"message": "media"}
+@app.post("/languages/{lan}/chats/{chat_id}")
+async def post_chat(
+    lan: str,
+    chat_id: int
+):
+    return {
+        "language": lan,
+        "chat_id": chat_id,
+        "message": "chat"
+    }
 
 
-@app.get("/progress")
-async def get_progress():
-    return {"message": "progress"}
+@app.get("/languages/{lan}/progress")
+async def get_progress(lan: str):
+    return {
+        "language": lan,
+        "message": "progress"
+    }
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(
+        app,
+        host="0.0.0.0",
+        port=8000,
+    )
