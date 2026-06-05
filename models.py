@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, UniqueConstraint
 from sqlalchemy.orm import relationship
 from database import Base
 from datetime import datetime, timezone
@@ -26,6 +26,13 @@ class LanguageLearning(Base):
     user = relationship("User", back_populates="language_learnings")
     media = relationship("Media", back_populates="language_learning")
     vocabularies = relationship("Vocabulary", back_populates="language_learning")
+
+    __table_args__ = (
+        UniqueConstraint(
+            "user_id",
+            "learning_language"
+        ),
+    )
 
 
 class Media(Base):
@@ -81,6 +88,13 @@ class Chat(Base):
     media = relationship("Media", back_populates="chats")
     user = relationship("User", back_populates="chats")
     chat_histories = relationship("ChatHistory", back_populates="chat")
+
+    __table_args__ = (
+        UniqueConstraint(
+            "user_id",
+            "user_chat_id"
+        ),
+    )
 
 
 class ChatHistory(Base):
