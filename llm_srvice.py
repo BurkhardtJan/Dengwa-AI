@@ -8,70 +8,82 @@ from openai import OpenAI
 load_dotenv()
 
 
-def openai_client():
-    client = OpenAI()
-
-    model = "gpt-5-nano"
-
-    user_prompt = "Was ist GenAI?"
-
-    response = client.responses.create(
-        model=model,
-        input=[
-            {"role": "system", "content": "Du bist ein hilfreicher Assistent."},
-            {"role": "user", "content": user_prompt},
-            {"role": "assistant", "content": "GenAI ist ein Gemüse!"},
-            {"role": "user", "content": "Bist du sicher? Wie bist du darauf gekommen?"},
-        ],
-        max_output_tokens=1500,
-    )
-
-    print("Generierter Text:\n", response.output_text)
-
-
-def gemini_client():
+def gemini_client(
+        messages: list[dict],
+        system_prompt: str,
+        model: str = "gemini-2.5-flash-lite",
+        temperature: float = 1.0,
+        max_tokens: int = 1000,
+) -> str:
     client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+    gemini_messages = []
+    for msg in messages:
+        role = "model" if msg["role"] == "assistant" else msg["role"]
+        gemini_messages.append(
+            types.Content(role=role, parts=[types.Part(text=msg["content"])])
+        )
 
     resp = client.models.generate_content(
-        model="gemini-2.5-flash-lite",
-        contents="PLEASE SPEAK ENGLISH?!",
+        model=model,
+        contents=gemini_messages,
         config=types.GenerateContentConfig(
-            system_instruction=(
-                "You are Italian and must answer only in Italian. "
-                "You cannot speak any other language."
-            ),
-            temperature=0.2,
-            max_output_tokens=80,
+            system_instruction=(system_prompt),
+            temperature=temperature,
+            max_output_tokens=max_tokens,
         ),
     )
-    print(resp.text)
+    return resp.text
 
-def groq_client():
-    # Initialize the Groq client
+
+def groq_client(
+        messages: list[dict],
+        system_prompt: str,
+        model: str = "llama-3.3-70b-versatile",
+        temperature: float = 1.0,
+        max_tokens: int = 1000,
+) -> str:
     client = Groq(api_key=os.environ["GROQ_API_KEY"])
 
-    # Specify the model to use
-    model = "llama-3.3-70b-versatile"
-
-    # System's task
-    system_prompt = "You are a helpful assistant."
-
-    # User's request
-    user_prompt = "What is GenAI?"
-
-    # Generate a response using the Groq API
     response = client.chat.completions.create(
         model=model,
         messages=[
             {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt},
+            *messages,
         ],
+        temperature=temperature,
+        max_tokens=max_tokens,
     )
+    return response.choices[0].message.content
 
-    # Display the generated text
-    print("Generated text:\n", response.choices[0].message.content)
+
+def openai_client(
+        messages: list[dict],
+        system_prompt: str,
+        model: str = "gpt-5-nano",
+        temperature: float = 1.0,
+        max_tokens: int = 5000,
+) -> str:
+    client = OpenAI()
+
+    response = client.responses.create(
+        model=model,
+        input=[
+            {"role": "system", "content": system_prompt},
+            *messages,
+        ],
+        temperature=temperature,
+        max_output_tokens=max_tokens,
+    )
+    return response.output_text
+
 
 if __name__ == "__main__":
-    gemini_client()
-    #groq_client()
-    openai_client()
+    gemini_answer = gemini_client(messages=[{"role": "user", "content": "Was ist ein LLM?"}],
+                                  system_prompt="Sprich wie ein baby")
+    print(gemini_answer)
+    groq_answer = groq_client(messages=[{"role": "user", "content": "Was ist ein LLM?"}],
+                              system_prompt="Sprich wie ein baby")
+    print(groq_answer)
+    openai_answer = openai_client(messages=[{"role": "user", "content": "Was ist ein LLM?"}],
+                                  system_prompt="Sprich wie ein baby")
+    print(openai_answer)
