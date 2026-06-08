@@ -4,6 +4,7 @@ from typing import List
 import uvicorn
 import os
 import shutil
+from media_processing import extract_content
 
 from database import get_db
 from models import LanguageLearning, Media, Vocabulary, MediaVocabulary, Chat, ChatHistory, LearningProgress
@@ -96,10 +97,12 @@ async def post_media(
         raise HTTPException(status_code=500, detail=f"Fehler beim Speichern der Datei: {str(e)}")
     finally:
         await file.close()  #
+
     media = Media(
         title=title,
         content_type=file.content_type,
         file_path=file_path,
+        extracted_content=extract_content(file.content_type, file_path),
         learning_id=learning.id
     )
     db.add(media)
@@ -152,7 +155,7 @@ async def get_chat_history(
 
 
 @app.post("/media/{media_id}/chats", response_model=ChatCreate)
-async def post_media(
+async def create_chat(
         media_id: int,
         db: Session = Depends(get_db),
         current_user=Depends(get_current_user)

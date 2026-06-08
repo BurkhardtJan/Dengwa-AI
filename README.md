@@ -14,7 +14,6 @@ conversation, and track your progress.
 | `POST`  | `/languages/{lan}/media`             | Upload a medium (SRT, TXT)     |
 | `GET`   | `/languages/{lan}/media`             | Get all media for a language   |
 | `GET`   | `/languages/{lan}/vocabularies`      | Get vocabulary list            |
-| `PATCH` | `/languages/{lan}/vocabularies/{id}` | Update vocabulary status       |
 | `GET`   | `/languages/{lan}/chats`             | Get all chats for a language   |
 | `GET`   | `/languages/{lan}/progress`          | Get learning progress          |
 | `POST`  | `/media/{media_id}/chats`            | Create a new chat for a medium |
@@ -148,6 +147,12 @@ python main.py
 ```
 
 ## Roadmap
-- Integrate AI to Endpoints
-- Add Tests
-- Deploy with Docker
+- [ ] Vocabulary generation — auto-generate vocab list from media via LLM
+- [ ] LLM integration in chat endpoint — load conversation history from DB and pass to LLM
+- [ ] Progress endpoint — implement actual logic (currently stub)
+- [ ] RAG — inject vocabulary context into chat prompts
+- [ ] JWT login/register endpoints
+- [ ] Replace `get_current_user()` stub with real auth dependency
+- [ ] Progress endpoint — implement actual logic (currently stub)
+- [ ] Docker Deployment
+- [ ] Tests (pytest)
