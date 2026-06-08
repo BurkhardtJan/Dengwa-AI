@@ -3,12 +3,13 @@ from sqlalchemy.orm import Session
 from typing import List
 import uvicorn
 import os
+import shutil
 
 from database import get_db
 from models import LanguageLearning, Media, Vocabulary, MediaVocabulary, Chat, ChatHistory, LearningProgress
 from schemas import (
     MediaResponse,
-    VocabularyResponse, VocabularyUpdate,
+    VocabularyResponse,
     ChatCreate, ChatResponse,
     ChatMessageRequest, ChatMessageResponse,
     ProgressResponse
@@ -40,6 +41,34 @@ def get_learning_or_404(db: Session, lan: str, user_id: int):
     return learning
 
 
+def get_or_create_learning(db: Session, lan: str, user_id: int) -> LanguageLearning:
+    """
+    Sucht nach dem LanguageLearning-Eintrag.
+    Falls nicht vorhanden, wird er automatisch neu angelegt.
+    """
+    learning = (
+        db.query(LanguageLearning)
+        .filter(
+            LanguageLearning.learning_language == lan,
+            LanguageLearning.user_id == user_id
+        )
+        .first()
+    )
+
+    if not learning:
+        # Sprache existiert für den User noch nicht -> Neu anlegen
+        learning = LanguageLearning(
+            user_id=user_id,
+            learning_language=lan,
+            proficiency_level="A1"  # Standard-Einstiegswert
+        )
+        db.add(learning)
+        db.commit()
+        db.refresh(learning)
+
+    return learning
+
+
 @app.get("/health")
 async def root():
     return {"message": "Immersio AI running"}
@@ -51,12 +80,37 @@ async def get_media(lan: str, db: Session = Depends(get_db), current_user=Depend
     return db.query(Media).filter(Media.learning_id == learning.id).all()
 
 
-@app.post("/languages/{lan}/media")
-async def post_media(lan: str):
-    return {
-        "language": lan,
-        "message": "media uploaded"
-    }
+@app.post("/languages/{lan}/media", response_model=MediaResponse)
+async def post_media(
+        lan: str,
+        title: str = Form(...),
+        file: UploadFile = File(...),
+        db: Session = Depends(get_db),
+        current_user=Depends(get_current_user)
+):
+    learning = get_or_create_learning(db, lan, current_user["id"])
+    user_lan_dir = os.path.join("uploads", str(current_user["id"]), lan)
+    os.makedirs(user_lan_dir, exist_ok=True)
+
+    file_path = os.path.join(user_lan_dir, file.filename)
+
+    try:
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Fehler beim Speichern der Datei: {str(e)}")
+    finally:
+        await file.close()  #
+    media = Media(
+        title=title,
+        content_type=file.content_type,
+        file_path=file_path,
+        learning_id=learning.id
+    )
+    db.add(media)
+    db.commit()
+    db.refresh(media)
+    return media
 
 
 @app.get("/languages/{lan}/vocabularies", response_model=List[VocabularyResponse])
@@ -71,14 +125,24 @@ async def get_vocabularies(lan: str, status: int | None = None, db: Session = De
 
 
 @app.get("/languages/{lan}/chats", response_model=List[ChatResponse])
-async def get_chats(lan: str, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+async def get_language_chats(lan: str, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     learning = get_learning_or_404(db, lan, current_user["id"])
-    return db.query(Chat).filter(Chat.learning_id == learning.user_id).all()
+
+    return (
+        db.query(Chat)
+        .join(Media, Chat.media_id == Media.id)
+        .filter(Chat.user_id == current_user["id"], Media.learning_id == learning.id)
+        .all()
+    )
 
 
-@app.get("/languages/{lan}/chats/{chat_id}", response_model=List[ChatMessageResponse])
+@app.get("/chats", response_model=List[ChatResponse])
+async def get_chats(db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    return db.query(Chat).filter(Chat.user_id == current_user["id"]).all()
+
+
+@app.get("/chats/{chat_id}", response_model=List[ChatMessageResponse])
 async def get_chat_history(
-        lan: str,
         chat_id: int,
         db: Session = Depends(get_db)
 ):
@@ -91,15 +155,13 @@ async def get_chat_history(
     ).order_by(ChatHistory.timestamp).all()
 
 
-@app.post("/languages/{lan}/chats/{chat_id}", response_model=List[ChatMessageResponse])
+@app.post("/chats/{chat_id}", response_model=List[ChatMessageResponse])
 async def post_chat_message(
-        lan: str,
         chat_id: int,
         request: ChatMessageRequest,
         db: Session = Depends(get_db),
         current_user=Depends(get_current_user)
 ):
-    learning = get_learning_or_404(db, lan, current_user["id"])
     chat = db.query(Chat).filter(Chat.user_chat_id == chat_id).first()
     if not chat:
         raise HTTPException(status_code=404, detail="Chat not found")
