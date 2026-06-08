@@ -42,10 +42,6 @@ def get_learning_or_404(db: Session, lan: str, user_id: int):
 
 
 def get_or_create_learning(db: Session, lan: str, user_id: int) -> LanguageLearning:
-    """
-    Sucht nach dem LanguageLearning-Eintrag.
-    Falls nicht vorhanden, wird er automatisch neu angelegt.
-    """
     learning = (
         db.query(LanguageLearning)
         .filter(
@@ -56,11 +52,10 @@ def get_or_create_learning(db: Session, lan: str, user_id: int) -> LanguageLearn
     )
 
     if not learning:
-        # Sprache existiert für den User noch nicht -> Neu anlegen
         learning = LanguageLearning(
             user_id=user_id,
             learning_language=lan,
-            proficiency_level="A1"  # Standard-Einstiegswert
+            proficiency_level="A0"
         )
         db.add(learning)
         db.commit()
@@ -144,15 +139,45 @@ async def get_chats(db: Session = Depends(get_db), current_user=Depends(get_curr
 @app.get("/chats/{chat_id}", response_model=List[ChatMessageResponse])
 async def get_chat_history(
         chat_id: int,
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_db),
+        current_user=Depends(get_current_user)
 ):
-    chat = db.query(Chat).filter(Chat.user_chat_id == chat_id).first()
+    chat = db.query(Chat).filter(Chat.user_chat_id == chat_id, Chat.user_id == current_user["id"]).first()
     if not chat:
         raise HTTPException(status_code=404, detail="Chat not found")
 
     return db.query(ChatHistory).filter(
-        ChatHistory.chat_id == chat_id
+        ChatHistory.chat_id == chat.id
     ).order_by(ChatHistory.timestamp).all()
+
+
+@app.post("/media/{media_id}/chats", response_model=ChatCreate)
+async def post_media(
+        media_id: int,
+        db: Session = Depends(get_db),
+        current_user=Depends(get_current_user)
+):
+    media = db.query(Media).filter(Media.id == media_id).first()
+    if not media:
+        raise HTTPException(
+            status_code=404,
+            detail="Medium nicht gefunden oder Zugriff verweigert."
+        )
+
+    last_chat_id = db.query(Chat).filter(Chat.user_id == current_user["id"]).order_by(Chat.user_chat_id.desc()).first()
+    user_chat_id = (last_chat_id.user_chat_id + 1) if last_chat_id else 1
+
+    new_chat = Chat(
+        media_id=media_id,
+        user_id=current_user["id"],
+        user_chat_id=user_chat_id
+    )
+
+    db.add(new_chat)
+    db.commit()
+    db.refresh(new_chat)
+
+    return new_chat
 
 
 @app.post("/chats/{chat_id}", response_model=List[ChatMessageResponse])
@@ -162,7 +187,7 @@ async def post_chat_message(
         db: Session = Depends(get_db),
         current_user=Depends(get_current_user)
 ):
-    chat = db.query(Chat).filter(Chat.user_chat_id == chat_id).first()
+    chat = db.query(Chat).filter(Chat.user_chat_id == chat_id, Chat.user_id == current_user["id"]).first()
     if not chat:
         raise HTTPException(status_code=404, detail="Chat not found")
 
