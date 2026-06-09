@@ -7,6 +7,7 @@ from openai import OpenAI
 
 load_dotenv()
 
+DEFAULT_PROVIDER = "gemini"
 
 def gemini_client(
         messages: list[dict],
@@ -77,7 +78,46 @@ def openai_client(
     return response.output_text
 
 
+def call_llm(
+        messages: list[dict],
+        system_prompt: str,
+        provider: str | None = None,
+        model: str | None = None,
+        temperature: float = 1.0,
+        max_tokens: int = 1000,
+) -> str:
+    if not provider:
+        provider = DEFAULT_PROVIDER
+    if provider == "groq":
+        return groq_client(
+            messages=messages,
+            system_prompt=system_prompt,
+            model=model or "llama-3.3-70b-versatile",
+            temperature=temperature,
+            max_tokens=max_tokens,
+        )
+    elif provider == "gemini":
+        return gemini_client(
+            messages=messages,
+            system_prompt=system_prompt,
+            model=model or "gemini-2.5-flash-lite",
+            temperature=temperature,
+            max_tokens=max_tokens,
+        )
+    elif provider == "openai":
+        return openai_client(
+            messages=messages,
+            system_prompt=system_prompt,
+            model=model or "gpt-5-nano",
+            temperature=temperature,
+            max_tokens=max_tokens,
+        )
+    else:
+        raise ValueError(f"Unknown provider '{provider}'. Available: groq, gemini")
+
+
 if __name__ == "__main__":
+    """
     gemini_answer = gemini_client(messages=[{"role": "user", "content": "Was ist ein LLM?"}],
                                   system_prompt="Sprich wie ein baby")
     print(gemini_answer)
@@ -87,3 +127,6 @@ if __name__ == "__main__":
     openai_answer = openai_client(messages=[{"role": "user", "content": "Was ist ein LLM?"}],
                                   system_prompt="Sprich wie ein baby")
     print(openai_answer)
+    """
+    print(call_llm(messages=[{"role": "user", "content": "Was ist ein LLM?"}],
+                   system_prompt="Sprich wie ein baby"))

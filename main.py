@@ -5,6 +5,8 @@ import uvicorn
 import os
 import shutil
 from media_processing import extract_content
+from llm_service import call_llm
+from prompts import build_system_prompt_language_chat
 
 from database import get_db
 from models import LanguageLearning, Media, Vocabulary, MediaVocabulary, Chat, ChatHistory, LearningProgress
@@ -187,6 +189,8 @@ async def create_chat(
 async def post_chat_message(
         chat_id: int,
         request: ChatMessageRequest,
+        provider: str | None = None,
+        model: str | None = None,
         db: Session = Depends(get_db),
         current_user=Depends(get_current_user)
 ):
@@ -194,10 +198,28 @@ async def post_chat_message(
     if not chat:
         raise HTTPException(status_code=404, detail="Chat not found")
 
+    history = (
+        db.query(ChatHistory)
+        .filter(ChatHistory.chat_id == chat.id)
+        .order_by(ChatHistory.timestamp.desc())
+        .limit(20)
+        .all()
+    )
+    messages = [{"role": h.role, "content": h.message} for h in reversed(history)]
+    messages.append({"role": "user", "content": request.message})
+
+    system_prompt = build_system_prompt_language_chat(chat)
+
     user_message = ChatHistory(chat_id=chat.id, role="user", message=request.message)
     db.add(user_message)
 
     ai_response = (f"You asked about: {request.message}")
+    ai_response = call_llm(
+        messages=messages,
+        system_prompt=system_prompt,
+        provider=provider,
+        model=model,
+    )
 
     assistant_message = ChatHistory(chat_id=chat.id, role="assistant", message=ai_response)
     db.add(assistant_message)

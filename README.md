@@ -148,11 +148,9 @@ python main.py
 
 ## Roadmap
 - [ ] Vocabulary generation — auto-generate vocab list from media via LLM
-- [ ] LLM integration in chat endpoint — load conversation history from DB and pass to LLM
 - [ ] Progress endpoint — implement actual logic (currently stub)
 - [ ] RAG — inject vocabulary context into chat prompts
 - [ ] JWT login/register endpoints
 - [ ] Replace `get_current_user()` stub with real auth dependency
-- [ ] Progress endpoint — implement actual logic (currently stub)
 - [ ] Docker Deployment
 - [ ] Tests (pytest)
