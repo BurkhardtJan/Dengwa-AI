@@ -2,6 +2,7 @@ from models import Chat
 
 
 def build_system_prompt_language_chat(chat: Chat) -> str:
+    """Build system prompt for language chat"""
     learning = chat.media.language_learning
     user = learning.user
 

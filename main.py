@@ -22,10 +22,13 @@ app = FastAPI()
 
 
 def get_current_user():
+    """Gets id of current user by Auth"""
+    # TODO: AUTH
     return {"id": 1}
 
 
 def get_learning_or_404(db: Session, lan: str, user_id: int):
+    """Gets learning info by user and language. Creates 404 if not found."""
     learning = (
         db.query(LanguageLearning)
         .filter(
@@ -45,6 +48,7 @@ def get_learning_or_404(db: Session, lan: str, user_id: int):
 
 
 def get_or_create_learning(db: Session, lan: str, user_id: int) -> LanguageLearning:
+    """Gets learning info by user and language. Creates new learning id if not found."""
     learning = (
         db.query(LanguageLearning)
         .filter(
@@ -69,6 +73,7 @@ def get_or_create_learning(db: Session, lan: str, user_id: int) -> LanguageLearn
 
 @app.get("/health")
 async def root():
+    """Health check of the Website"""
     return {"message": "Immersio AI running"}
 
 
@@ -86,6 +91,7 @@ async def post_media(
         db: Session = Depends(get_db),
         current_user=Depends(get_current_user)
 ):
+    """Upload a Medium"""
     learning = get_or_create_learning(db, lan, current_user["id"])
     user_lan_dir = os.path.join("uploads", str(current_user["id"]), lan)
     os.makedirs(user_lan_dir, exist_ok=True)
@@ -116,6 +122,7 @@ async def post_media(
 @app.get("/languages/{lan}/vocabularies", response_model=List[VocabularyResponse])
 async def get_vocabularies(lan: str, status: int | None = None, db: Session = Depends(get_db),
                            current_user=Depends(get_current_user)):
+    """Get vocabulary list"""
     learning = get_learning_or_404(db, lan, current_user["id"])
 
     query = db.query(Vocabulary).filter(Vocabulary.learning_id == learning.id)
@@ -126,6 +133,7 @@ async def get_vocabularies(lan: str, status: int | None = None, db: Session = De
 
 @app.get("/languages/{lan}/chats", response_model=List[ChatResponse])
 async def get_language_chats(lan: str, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    """Get all chats for a language"""
     learning = get_learning_or_404(db, lan, current_user["id"])
 
     return (
@@ -138,6 +146,7 @@ async def get_language_chats(lan: str, db: Session = Depends(get_db), current_us
 
 @app.get("/chats", response_model=List[ChatResponse])
 async def get_chats(db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    """Get all chats for current user"""
     return db.query(Chat).filter(Chat.user_id == current_user["id"]).all()
 
 
@@ -147,6 +156,7 @@ async def get_chat_history(
         db: Session = Depends(get_db),
         current_user=Depends(get_current_user)
 ):
+    """Get chat history"""
     chat = db.query(Chat).filter(Chat.user_chat_id == chat_id, Chat.user_id == current_user["id"]).first()
     if not chat:
         raise HTTPException(status_code=404, detail="Chat not found")
@@ -162,6 +172,7 @@ async def create_chat(
         db: Session = Depends(get_db),
         current_user=Depends(get_current_user)
 ):
+    """Create a new chat for a medium"""
     media = db.query(Media).filter(Media.id == media_id).first()
     if not media:
         raise HTTPException(
@@ -194,6 +205,7 @@ async def post_chat_message(
         db: Session = Depends(get_db),
         current_user=Depends(get_current_user)
 ):
+    """Send a message to the AI"""
     chat = db.query(Chat).filter(Chat.user_chat_id == chat_id, Chat.user_id == current_user["id"]).first()
     if not chat:
         raise HTTPException(status_code=404, detail="Chat not found")
@@ -230,6 +242,8 @@ async def post_chat_message(
 
 @app.get("/languages/{lan}/progress")
 async def get_progress(lan: str):
+    """Get learning progress"""
+    # TODO
     return {
         "language": lan,
         "message": "progress"
