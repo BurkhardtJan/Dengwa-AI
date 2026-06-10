@@ -144,22 +144,6 @@ async def post_media(lan: str, title: str = Form(...), file: UploadFile = File(.
     db.commit()
     db.refresh(media)
 
-    system_prompt = build_vocab_extract_prompt(media)
-    messages = []
-
-    response_structured = call_llm(
-        messages=messages,
-        system_prompt=system_prompt,
-        provider="openai",  # Oder "gemini" / "groq"
-        temperature=0.2,  # Niedrige Temp für maximale Fakten-Treue und Struktur-Stabilität
-        response_schema=VocabularyExtraction
-    )
-
-    print("Erfolgreich extrahierte Vokabeln:")
-    for item in response_structured.vocabularies:
-        print(f"Wort: {item.word} | Übersetzung: {item.translation}")
-        create_media_vocab(db, media.id, learning.id, item.word, item.translation, item.context_sentence, lan)
-
     return media
 
 
@@ -365,6 +349,38 @@ async def post_chat_message(
     db.commit()
 
     return [user_message, assistant_message]
+
+
+@app.post("/media/{media_id}/vocabulary")
+async def extract_media_vocabulary(
+        media_id: int,
+        db: Session = Depends(get_db),
+        current_user=Depends(get_current_user)
+):
+    """Create a new chat for a medium"""
+    media = db.query(Media).filter(Media.id == media_id).first()
+    if not media:
+        raise HTTPException(
+            status_code=404,
+            detail="Medium nicht gefunden oder Zugriff verweigert."
+        )
+
+
+    system_prompt = build_vocab_extract_prompt(media)
+    messages = [{"role": "user", "content": "Gib zwischen 10 und 20 Vokabeln zurück"}]
+
+    response_structured = call_llm(
+        messages=messages,
+        system_prompt=system_prompt,
+        provider="openai",
+        temperature=0.2,
+        response_schema=VocabularyExtraction
+    )
+    for item in response_structured.vocabularies:
+        create_media_vocab(db, media.id, media.learning.id, item.word, item.translation, item.context_sentence, media.learning.learning_language)
+
+    return response_structured
+
 
 
 @app.get("/languages/{lan}/progress")
