@@ -83,10 +83,10 @@ python main.py
 
 ## Roadmap
 
-- [ ] Vocabulary generation — auto-generate vocab list from media via LLM
+- [ ] Add CRUD to media, chats and languages
+- [ ] RAG — inject vocabulary context into chat prompts
 - [ ] Switch to langraph as AI wrapper
 - [ ] Progress endpoint — implement actual logic (currently stub)
-- [ ] RAG — inject vocabulary context into chat prompts
 - [ ] JWT login/register endpoints
 - [ ] Replace `get_current_user()` stub with real auth dependency
 - [ ] Docker Deployment

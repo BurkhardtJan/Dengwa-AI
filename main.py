@@ -367,7 +367,7 @@ async def extract_media_vocabulary(
 
 
     system_prompt = build_vocab_extract_prompt(media)
-    messages = [{"role": "user", "content": "Gib zwischen 10 und 20 Vokabeln zurück"}]
+    messages = [{"role": "user", "content": "Gib zwischen 10 Vokabeln zurück"}]
 
     response_structured = call_llm(
         messages=messages,
@@ -377,7 +377,7 @@ async def extract_media_vocabulary(
         response_schema=VocabularyExtraction
     )
     for item in response_structured.vocabularies:
-        create_media_vocab(db, media.id, media.learning.id, item.word, item.translation, item.context_sentence, media.learning.learning_language)
+        create_media_vocab(db, media.id, media.learning_id, item.word, item.translation, item.context_sentence, media.language_learning.learning_language)
 
     return response_structured
 
