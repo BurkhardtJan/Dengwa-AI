@@ -71,7 +71,12 @@ class VocabularyCreate(BaseModel):
     word: str
     translation: Optional[str] = None
     context_sentence: Optional[str] = None
-    language: Optional[str] = None
+
+
+class VocabularyUpdate(BaseModel):
+    word: Optional[str] = None
+    translation: Optional[str] = None
+    context_sentence: Optional[str] = None
 
 
 class ChatCreate(BaseModel):

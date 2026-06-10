@@ -8,18 +8,21 @@ conversation, and track your progress.
 
 ## Endpoints
 
-| Method | Endpoint                        | Description                    |
-|--------|---------------------------------|--------------------------------|
-| `GET`  | `/health`                       | Health check                   |
-| `POST` | `/languages/{lan}/media`        | Upload a medium (SRT, TXT)     |
-| `GET`  | `/languages/{lan}/media`        | Get all media for a language   |
-| `GET`  | `/languages/{lan}/vocabularies` | Get vocabulary list            |
-| `GET`  | `/languages/{lan}/chats`        | Get all chats for a language   |
-| `GET`  | `/languages/{lan}/progress`     | Get learning progress          |
-| `POST` | `/media/{media_id}/chats`       | Create a new chat for a medium |
-| `GET`  | `/chats`                        | Get all chats for current user |
-| `GET`  | `/chats/{chat_id}`              | Get chat history               |
-| `POST` | `/chats/{chat_id}`              | Send a message to the AI       |
+| Method | Endpoint                             | Description                    |
+|--------|--------------------------------------|--------------------------------|
+| `GET`  | `/health`                            | Health check                   |
+| `POST` | `/languages/{lan}/media`             | Upload a medium (SRT, TXT)     |
+| `GET`  | `/languages/{lan}/media`             | Get all media for a language   |
+| `GET`  | `/languages/{lan}/vocabularies`      | Get vocabulary list            |
+| `POST` | `/languages/{lan}/vocabularies`      | Post new vocabulary            |
+| `GET`  | `/languages/{lan}/vocabularies/{id}` | Get vocabulary by ID           |
+| `PUT`  | `/languages/{lan}/vocabularies/{id}` | Update vocabulary by ID        |
+| `GET`  | `/languages/{lan}/chats`             | Get all chats for a language   |
+| `GET`  | `/languages/{lan}/progress`          | Get learning progress          |
+| `POST` | `/media/{media_id}/chats`            | Create a new chat for a medium |
+| `GET`  | `/chats`                             | Get all chats for current user |
+| `GET`  | `/chats/{chat_id}`                   | Get chat history               |
+| `POST` | `/chats/{chat_id}`                   | Send a message to the AI       |
 
 ---
 
@@ -139,74 +142,89 @@ graph TB
 
 ```mermaid
 erDiagram
-    chat_histories }o--|| chats: references
-    chats }o--|| media: references
-    language_learning }o--|| users: references
-    language_learning ||--o{ media: references
-    learning_progress }o--|| media: references
-    media_vocabularies }o--|| media: references
-    vocabularies ||--o{ media_vocabularies: references
-    vocabularies }o--|| language_learning: references
-    chats }o--|| users: references
+    chat_histories }o--|| chats : references
+    chats }o--|| media : references
+    language_learning }o--|| users : references
+    language_learning ||--o{ media : references
+    learning_progress }o--|| media : references
+    media_vocabularies }o--|| media : references
+    vocabularies ||--o{ media_vocabularies : references
+    vocabularies }o--|| language_learning : references
+    chats }o--|| users : references
+
+    %% Neue Verknüpfung für das SRS/LLM-Tracking
+    vocabulary_progress ||--|| vocabularies : tracks
 
     users {
-        INTEGER id
-        TEXT username
-        TEXT native_language
+       INTEGER id
+       TEXT username
+       TEXT native_language
     }
 
     media {
-        INTEGER id
-        TEXT title
-        TEXT content_type
-        TEXT file_path
-        TEXT extracted_content
-        INTEGER learning_id
+       INTEGER id
+       TEXT title
+       TEXT content_type
+       TEXT file_path
+       TEXT extracted_content
+       INTEGER learning_id
     }
 
     vocabularies {
-        INTEGER id
-        INTEGER learning_id
-        TEXT word
-        TEXT translation
-        TEXT context_sentence
-        INTEGER status
-        TEXT language
+       INTEGER id
+       INTEGER learning_id
+       TEXT word
+       TEXT translation
+       TEXT context_sentence
+       TEXT language
+       TIMESTAMP created_at
+    }
+
+    vocabulary_progress {
+       INTEGER id
+       INTEGER vocabulary_id
+       TIMESTAMP due
+       INTEGER interval_days
+       FLOAT ease_factor
+       INTEGER repetitions
+       INTEGER lapses
+       FLOAT llm_mastery_score
+       TEXT llm_notes
+       TIMESTAMP last_interaction
     }
 
     chats {
-        INTEGER id
-        INTEGER media_id
-        INTEGER user_id
-        INTEGER user_chat_id
-
+       INTEGER id
+       INTEGER media_id
+       INTEGER user_id
+       INTEGER user_chat_id
     }
 
     chat_histories {
-        INTEGER id
-        INTEGER chat_id
-        TEXT message
-        TIMESTAMP timestamp
-        TEXT role
+       INTEGER id
+       INTEGER chat_id
+       TEXT message
+       TIMESTAMP timestamp
+       TEXT role
     }
 
     language_learning {
-        INTEGER id
-        INTEGER user_id
-        TEXT learning_language
-        TEXT proficiency_level
+       INTEGER id
+       INTEGER user_id
+       TEXT learning_language
+       TEXT proficiency_level
     }
 
     learning_progress {
-        INTEGER id
-        INTEGER media_id
-        TEXT proficiency_level
-        TEXT comment
+       INTEGER id
+       INTEGER media_id
+       TEXT proficiency_level
+       TEXT comment
     }
 
     media_vocabularies {
-        INTEGER id
-        INTEGER media_id
-        INTEGER vocabulary_id
+       INTEGER id
+       INTEGER media_id
+       INTEGER vocabulary_id
     }
 ```

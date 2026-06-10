@@ -13,7 +13,7 @@ from database import get_db, Base, engine
 from models import LanguageLearning, Media, Vocabulary, MediaVocabulary, Chat, ChatHistory, LearningProgress, User
 from schemas import (
     MediaResponse,
-    VocabularyResponse, VocabularyCreate,
+    VocabularyResponse, VocabularyCreate, VocabularyUpdate,
     ChatCreate, ChatResponse,
     ChatMessageRequest, ChatMessageResponse,
     ProgressResponse
@@ -77,6 +77,7 @@ async def root():
     """Health check of the Website"""
     return {"message": "Immersio AI running"}
 
+
 @app.post("/register")
 async def register(username: str, native_language: str = "de", db: Session = Depends(get_db)):
     new_user = User(username=username, native_language=native_language)
@@ -137,11 +138,89 @@ async def get_vocabularies(lan: str, db: Session = Depends(get_db), current_user
     query = db.query(Vocabulary).options(joinedload(Vocabulary.progress)).filter(Vocabulary.learning_id == learning.id)
     return query.all()
 
+
 @app.post("/languages/{lan}/vocabularies", response_model=VocabularyResponse)
-async def create_vocabulary_endpoint(lan: str, payload: VocabularyCreate, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+async def create_vocabulary_endpoint(lan: str, payload: VocabularyCreate, db: Session = Depends(get_db),
+                                     current_user=Depends(get_current_user)):
     learning = get_or_create_learning(db, lan, current_user["id"])
-    vocab = get_or_create_vocab(db=db, learning_id=learning.id, word=payload.word, translation=payload.translation, context_sentence=payload.context_sentence, language=lan)
+    vocab = get_or_create_vocab(db=db, learning_id=learning.id, word=payload.word, translation=payload.translation,
+                                context_sentence=payload.context_sentence, language=lan)
     return vocab
+
+
+@app.get("/languages/{lan}/vocabularies/{vocab_id}", response_model=VocabularyResponse)
+async def get_vocabulary(lan: str, vocab_id: int, db: Session = Depends(get_db),
+                         current_user=Depends(get_current_user)):
+    learning = get_learning_or_404(db, lan, current_user["id"])
+
+    vocab = (
+        db.query(Vocabulary)
+        .options(joinedload(Vocabulary.progress))
+        .filter(
+            Vocabulary.id == vocab_id,
+            Vocabulary.learning_id == learning.id
+        )
+        .first()
+    )
+
+    if not vocab:
+        raise HTTPException(status_code=404, detail="Vocabulary not found")
+
+    return vocab
+
+
+@app.put("/languages/{lan}/vocabularies/{vocab_id}", response_model=VocabularyResponse)
+async def update_vocabulary(lan: str, vocab_id: int, payload: VocabularyUpdate, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    learning = get_learning_or_404(db, lan, current_user["id"])
+
+    vocab = (
+        db.query(Vocabulary)
+        .options(joinedload(Vocabulary.progress))
+        .filter(
+            Vocabulary.id == vocab_id,
+            Vocabulary.learning_id == learning.id
+        )
+        .first()
+    )
+
+    if not vocab:
+        raise HTTPException(status_code=404, detail="Vocabulary not found")
+
+    if payload.word is not None:
+        vocab.word = payload.word
+
+    if payload.translation is not None:
+        vocab.translation = payload.translation
+
+    if payload.context_sentence is not None:
+        vocab.context_sentence = payload.context_sentence
+
+    db.commit()
+    db.refresh(vocab)
+
+    return vocab
+
+
+@app.delete("/languages/{lan}/vocabularies/{vocab_id}")
+async def delete_vocabulary(lan: str, vocab_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    learning = get_learning_or_404(db, lan, current_user["id"])
+    vocab = (
+        db.query(Vocabulary)
+        .options(joinedload(Vocabulary.progress))
+        .filter(
+            Vocabulary.id == vocab_id,
+            Vocabulary.learning_id == learning.id
+        )
+        .first()
+    )
+    if not vocab:
+        raise HTTPException(status_code=404, detail="Vocabulary not found")
+
+    db.delete(vocab)
+    db.commit()
+
+    return {"status": "deleted"}
+
 
 @app.get("/languages/{lan}/chats", response_model=List[ChatResponse])
 async def get_language_chats(lan: str, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
