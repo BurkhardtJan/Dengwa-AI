@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from sqlalchemy import func
 from sqlalchemy.orm import Session
-from models import Vocabulary, MediaVocabulary, VocabularyProgress
+from models import Vocabulary, MediaVocabulary
 
 
 def create_vocab(
@@ -12,7 +12,7 @@ def create_vocab(
         context_sentence: str | None = None,
         language: str | None = None,
 ) -> Vocabulary:
-    """Create a new vocabulary entry and initialize vocabulary progress."""
+    """Create a new vocabulary entry"""
     vocab = Vocabulary(
         learning_id=learning_id,
         word=word.strip(),
@@ -20,13 +20,6 @@ def create_vocab(
         context_sentence=context_sentence,
         language=language,
         created_at=datetime.now(timezone.utc),
-    )
-
-    db.add(vocab)
-    db.flush()
-
-    progress = VocabularyProgress(
-        vocabulary_id=vocab.id,
         due=datetime.now(timezone.utc),
         interval_days=0,
         ease_factor=2.5,
@@ -37,7 +30,7 @@ def create_vocab(
         llm_context=None,
     )
 
-    db.add(progress)
+    db.add(vocab)
     db.commit()
     db.refresh(vocab)
 
@@ -45,12 +38,12 @@ def create_vocab(
 
 
 def get_or_create_vocab(
-    db: Session,
-    learning_id: int,
-    word: str,
-    translation: str | None = None,
-    context_sentence: str | None = None,
-    language: str | None = None,
+        db: Session,
+        learning_id: int,
+        word: str,
+        translation: str | None = None,
+        context_sentence: str | None = None,
+        language: str | None = None,
 ) -> Vocabulary:
     """
     Get existing vocabulary or create it.
@@ -80,36 +73,3 @@ def get_or_create_vocab(
         language=language,
     )
 
-
-def create_media_vocab(
-    db: Session,
-    media_id: int,
-    vocabulary_id: int,
-) -> MediaVocabulary:
-    """
-    Create media <-> vocabulary mapping
-    if it does not already exist.
-    """
-
-    existing_mapping = (
-        db.query(MediaVocabulary)
-        .filter(
-            MediaVocabulary.media_id == media_id,
-            MediaVocabulary.vocabulary_id == vocabulary_id,
-        )
-        .first()
-    )
-
-    if existing_mapping:
-        return existing_mapping
-
-    mapping = MediaVocabulary(
-        media_id=media_id,
-        vocabulary_id=vocabulary_id,
-    )
-
-    db.add(mapping)
-    db.commit()
-    db.refresh(mapping)
-
-    return mapping

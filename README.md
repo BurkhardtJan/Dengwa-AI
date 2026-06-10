@@ -8,21 +8,22 @@ conversation, and track your progress.
 
 ## Endpoints
 
-| Method | Endpoint                             | Description                    |
-|--------|--------------------------------------|--------------------------------|
-| `GET`  | `/health`                            | Health check                   |
-| `POST` | `/languages/{lan}/media`             | Upload a medium (SRT, TXT)     |
-| `GET`  | `/languages/{lan}/media`             | Get all media for a language   |
-| `GET`  | `/languages/{lan}/vocabularies`      | Get vocabulary list            |
-| `POST` | `/languages/{lan}/vocabularies`      | Post new vocabulary            |
-| `GET`  | `/languages/{lan}/vocabularies/{id}` | Get vocabulary by ID           |
-| `PUT`  | `/languages/{lan}/vocabularies/{id}` | Update vocabulary by ID        |
-| `GET`  | `/languages/{lan}/chats`             | Get all chats for a language   |
-| `GET`  | `/languages/{lan}/progress`          | Get learning progress          |
-| `POST` | `/media/{media_id}/chats`            | Create a new chat for a medium |
-| `GET`  | `/chats`                             | Get all chats for current user |
-| `GET`  | `/chats/{chat_id}`                   | Get chat history               |
-| `POST` | `/chats/{chat_id}`                   | Send a message to the AI       |
+| Method   | Endpoint                             | Description                    |
+|----------|--------------------------------------|--------------------------------|
+| `GET`    | `/health`                            | Health check                   |
+| `POST`   | `/languages/{lan}/media`             | Upload a medium (SRT, TXT)     |
+| `GET`    | `/languages/{lan}/media`             | Get all media for a language   |
+| `GET`    | `/languages/{lan}/vocabularies`      | Get vocabulary list            |
+| `POST`   | `/languages/{lan}/vocabularies`      | Post new vocabulary            |
+| `GET`    | `/languages/{lan}/vocabularies/{id}` | Get vocabulary by ID           |
+| `PUT`    | `/languages/{lan}/vocabularies/{id}` | Update vocabulary by ID        |
+| `DELETE` | `/languages/{lan}/vocabularies/{id}` | Delete vocabulary by ID        |
+| `GET`    | `/languages/{lan}/chats`             | Get all chats for a language   |
+| `POST`   | `/media/{media_id}/chats`            | Create a new chat for a medium |
+| `GET`    | `/chats`                             | Get all chats for current user |
+| `GET`    | `/chats/{chat_id}`                   | Get chat history               |
+| `POST`   | `/chats/{chat_id}`                   | Send a message to the AI       |
+| `GET`    | `/languages/{lan}/progress`          | Get learning progress          |
 
 ---
 
@@ -152,8 +153,6 @@ erDiagram
     vocabularies }o--|| language_learning : references
     chats }o--|| users : references
 
-    %% Neue Verknüpfung für das SRS/LLM-Tracking
-    vocabulary_progress ||--|| vocabularies : tracks
 
     users {
        INTEGER id
@@ -178,11 +177,7 @@ erDiagram
        TEXT context_sentence
        TEXT language
        TIMESTAMP created_at
-    }
 
-    vocabulary_progress {
-       INTEGER id
-       INTEGER vocabulary_id
        TIMESTAMP due
        INTEGER interval_days
        FLOAT ease_factor

@@ -61,18 +61,6 @@ class Vocabulary(Base):
     context_sentence = Column(Text)
     language = Column(String)
     created_at = Column(DateTime)
-
-    language_learning = relationship("LanguageLearning", back_populates="vocabularies")
-    media_vocabularies = relationship("MediaVocabulary", back_populates="vocabulary")
-    progress = relationship(
-        "VocabularyProgress", back_populates="vocabulary", uselist=False)
-
-
-class VocabularyProgress(Base):
-    __tablename__ = "vocabulary_progress"
-
-    id = Column(Integer, primary_key=True)
-    vocabulary_id = Column(Integer, ForeignKey("vocabularies.id"), unique=True)
     due = Column(DateTime)
     interval_days = Column(Integer, default=0)
     ease_factor = Column(Float, default=2.5)
@@ -81,7 +69,11 @@ class VocabularyProgress(Base):
     llm_mastery_score = Column(Float, default=0.0)
     last_interaction = Column(DateTime)
     llm_context = Column(Text)
-    vocabulary = relationship("Vocabulary", back_populates="progress")
+
+    language_learning = relationship("LanguageLearning", back_populates="vocabularies")
+    media_vocabularies = relationship("MediaVocabulary", back_populates="vocabulary")
+
+
 
 
 class MediaVocabulary(Base):

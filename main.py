@@ -15,8 +15,7 @@ from schemas import (
     MediaResponse,
     VocabularyResponse, VocabularyCreate, VocabularyUpdate,
     ChatCreate, ChatResponse,
-    ChatMessageRequest, ChatMessageResponse,
-    ProgressResponse
+    ChatMessageRequest, ChatMessageResponse
 )
 
 app = FastAPI()
@@ -80,6 +79,7 @@ async def root():
 
 @app.post("/register")
 async def register(username: str, native_language: str = "de", db: Session = Depends(get_db)):
+    """Register a new user"""
     new_user = User(username=username, native_language=native_language)
     db.add(new_user)
     db.commit()
@@ -95,13 +95,8 @@ async def get_media(lan: str, db: Session = Depends(get_db), current_user=Depend
 
 
 @app.post("/languages/{lan}/media", response_model=MediaResponse)
-async def post_media(
-        lan: str,
-        title: str = Form(...),
-        file: UploadFile = File(...),
-        db: Session = Depends(get_db),
-        current_user=Depends(get_current_user)
-):
+async def post_media(lan: str, title: str = Form(...), file: UploadFile = File(...), db: Session = Depends(get_db),
+                     current_user=Depends(get_current_user)):
     """Upload a Medium"""
     learning = get_or_create_learning(db, lan, current_user["id"])
     user_lan_dir = os.path.join("uploads", str(current_user["id"]), lan)
@@ -135,13 +130,14 @@ async def get_vocabularies(lan: str, db: Session = Depends(get_db), current_user
     """Get vocabulary list"""
     learning = get_learning_or_404(db, lan, current_user["id"])
 
-    query = db.query(Vocabulary).options(joinedload(Vocabulary.progress)).filter(Vocabulary.learning_id == learning.id)
+    query = db.query(Vocabulary).filter(Vocabulary.learning_id == learning.id)
     return query.all()
 
 
 @app.post("/languages/{lan}/vocabularies", response_model=VocabularyResponse)
 async def create_vocabulary_endpoint(lan: str, payload: VocabularyCreate, db: Session = Depends(get_db),
                                      current_user=Depends(get_current_user)):
+    """Post new vocabulary"""
     learning = get_or_create_learning(db, lan, current_user["id"])
     vocab = get_or_create_vocab(db=db, learning_id=learning.id, word=payload.word, translation=payload.translation,
                                 context_sentence=payload.context_sentence, language=lan)
@@ -151,11 +147,11 @@ async def create_vocabulary_endpoint(lan: str, payload: VocabularyCreate, db: Se
 @app.get("/languages/{lan}/vocabularies/{vocab_id}", response_model=VocabularyResponse)
 async def get_vocabulary(lan: str, vocab_id: int, db: Session = Depends(get_db),
                          current_user=Depends(get_current_user)):
+    """Get vocabulary by ID"""
     learning = get_learning_or_404(db, lan, current_user["id"])
 
     vocab = (
         db.query(Vocabulary)
-        .options(joinedload(Vocabulary.progress))
         .filter(
             Vocabulary.id == vocab_id,
             Vocabulary.learning_id == learning.id
@@ -170,12 +166,13 @@ async def get_vocabulary(lan: str, vocab_id: int, db: Session = Depends(get_db),
 
 
 @app.put("/languages/{lan}/vocabularies/{vocab_id}", response_model=VocabularyResponse)
-async def update_vocabulary(lan: str, vocab_id: int, payload: VocabularyUpdate, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+async def update_vocabulary(lan: str, vocab_id: int, payload: VocabularyUpdate, db: Session = Depends(get_db),
+                            current_user=Depends(get_current_user)):
+    """Update Vocabulary by ID"""
     learning = get_learning_or_404(db, lan, current_user["id"])
 
     vocab = (
         db.query(Vocabulary)
-        .options(joinedload(Vocabulary.progress))
         .filter(
             Vocabulary.id == vocab_id,
             Vocabulary.learning_id == learning.id
@@ -202,11 +199,12 @@ async def update_vocabulary(lan: str, vocab_id: int, payload: VocabularyUpdate, 
 
 
 @app.delete("/languages/{lan}/vocabularies/{vocab_id}")
-async def delete_vocabulary(lan: str, vocab_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+async def delete_vocabulary(lan: str, vocab_id: int, db: Session = Depends(get_db),
+                            current_user=Depends(get_current_user)):
+    """Delete Vocabulary by id"""
     learning = get_learning_or_404(db, lan, current_user["id"])
     vocab = (
         db.query(Vocabulary)
-        .options(joinedload(Vocabulary.progress))
         .filter(
             Vocabulary.id == vocab_id,
             Vocabulary.learning_id == learning.id

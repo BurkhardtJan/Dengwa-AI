@@ -61,7 +61,9 @@ class VocabularyResponse(BaseModel):
     context_sentence: Optional[str] = None
     language: Optional[str] = None
 
-    progress: Optional[VocabularyProgressResponse] = None
+    proficiency_level: Optional[str] = None
+    comment: Optional[str] = None
+    created_at: datetime
 
     class Config:
         from_attributes = True
@@ -106,14 +108,3 @@ class ChatMessageResponse(BaseModel):
     class Config:
         from_attributes = True
 
-
-class ProgressResponse(BaseModel):
-    id: int
-    media_id: int
-    user_id: int
-    proficiency_level: Optional[str] = None
-    comment: Optional[str] = None
-    created_at: datetime
-
-    class Config:
-        from_attributes = True
