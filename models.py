@@ -61,11 +61,13 @@ class Vocabulary(Base):
     context_sentence = Column(Text)
     language = Column(String)
     created_at = Column(DateTime)
+
     due = Column(DateTime)
     interval_days = Column(Integer, default=0)
     ease_factor = Column(Float, default=2.5)
     repetitions = Column(Integer, default=0)
     lapses = Column(Integer, default=0)
+
     llm_mastery_score = Column(Float, default=0.0)
     last_interaction = Column(DateTime)
     llm_context = Column(Text)

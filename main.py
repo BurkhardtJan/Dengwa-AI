@@ -12,6 +12,7 @@ from vocabulary import create_vocab, get_or_create_vocab, create_vocab
 from database import get_db, Base, engine
 from models import LanguageLearning, Media, Vocabulary, MediaVocabulary, Chat, ChatHistory, LearningProgress, User
 from schemas import (
+    LanguageLearningResponse,
     MediaResponse,
     VocabularyResponse, VocabularyCreate, VocabularyUpdate,
     ChatCreate, ChatResponse,
@@ -86,6 +87,23 @@ async def register(username: str, native_language: str = "de", db: Session = Dep
     db.refresh(new_user)
     return new_user
 
+
+@app.get("/languages", response_model=List[LanguageLearningResponse])
+async def get_languages(db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    """Returns list of language"""
+    learning = (
+        db.query(LanguageLearning)
+        .filter(
+            LanguageLearning.user_id == current_user["id"]
+        )
+    ).all()
+    return learning
+
+@app.get("/languages/{lan}", response_model=LanguageLearningResponse)
+async def get_language(lan: str, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    """Returns language info"""
+    learning = get_learning_or_404(db, lan, current_user["id"])
+    return learning
 
 @app.get("/languages/{lan}/media", response_model=List[MediaResponse])
 async def get_media(lan: str, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
