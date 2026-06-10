@@ -8,18 +8,18 @@ conversation, and track your progress.
 
 ## Endpoints
 
-| Method  | Endpoint                             | Description                    |
-|---------|--------------------------------------|--------------------------------|
-| `GET`   | `/health`                            | Health check                   |
-| `POST`  | `/languages/{lan}/media`             | Upload a medium (SRT, TXT)     |
-| `GET`   | `/languages/{lan}/media`             | Get all media for a language   |
-| `GET`   | `/languages/{lan}/vocabularies`      | Get vocabulary list            |
-| `GET`   | `/languages/{lan}/chats`             | Get all chats for a language   |
-| `GET`   | `/languages/{lan}/progress`          | Get learning progress          |
-| `POST`  | `/media/{media_id}/chats`            | Create a new chat for a medium |
-| `GET`   | `/chats`                             | Get all chats for current user |
-| `GET`   | `/chats/{chat_id}`                   | Get chat history               |
-| `POST`  | `/chats/{chat_id}`                   | Send a message to the AI       |
+| Method | Endpoint                        | Description                    |
+|--------|---------------------------------|--------------------------------|
+| `GET`  | `/health`                       | Health check                   |
+| `POST` | `/languages/{lan}/media`        | Upload a medium (SRT, TXT)     |
+| `GET`  | `/languages/{lan}/media`        | Get all media for a language   |
+| `GET`  | `/languages/{lan}/vocabularies` | Get vocabulary list            |
+| `GET`  | `/languages/{lan}/chats`        | Get all chats for a language   |
+| `GET`  | `/languages/{lan}/progress`     | Get learning progress          |
+| `POST` | `/media/{media_id}/chats`       | Create a new chat for a medium |
+| `GET`  | `/chats`                        | Get all chats for current user |
+| `GET`  | `/chats/{chat_id}`              | Get chat history               |
+| `POST` | `/chats/{chat_id}`              | Send a message to the AI       |
 
 ---
 
@@ -32,78 +32,6 @@ conversation, and track your progress.
 | LLM 1     | Groq (llama-3.3-70b)    |
 | LLM 2     | Gemini (2.5-flash-lite) |
 | LLM 3     | OpenAI (gpt-5-nano)     |
-
----
-
-## Database
-
-### Diagram
-
-```mermaid
-erDiagram
-	chat_histories }o--|| chats : references
-	chats }o--|| media : references
-	language_learning }o--|| users : references
-	language_learning ||--o{ media : references
-	learning_progress }o--|| media : references
-	media_vocabularies }o--|| media : references
-	vocabularies ||--o{ media_vocabularies : references
-	vocabularies }o--|| language_learning : references
-	chats }o--|| users : references
-
-	users {
-		INTEGER id
-		TEXT username
-		TEXT native_language
-	}
-	media {
-		INTEGER id
-		TEXT title
-		TEXT content_type
-		TEXT file_path
-		TEXT extracted_content
-		INTEGER learning_id
-	}
-	vocabularies {
-		INTEGER id
-		INTEGER learning_id
-		TEXT word
-		TEXT translation
-		TEXT context_sentence
-		INTEGER status
-		TEXT language
-	}
-	chats {
-		INTEGER id
-		INTEGER media_id
-		INTEGER user_id
-		INTEGER user_chat_id
-	}
-	chat_histories {
-		INTEGER id
-		INTEGER chat_id
-		TEXT message
-		TIMESTAMP timestamp
-		TEXT role
-	}
-	language_learning {
-		INTEGER id
-		INTEGER user_id
-		TEXT learning_language
-		TEXT proficiency_level
-	}
-	learning_progress {
-		INTEGER id
-		INTEGER media_id
-		TEXT proficiency_level
-		TEXT comment
-	}
-	media_vocabularies {
-		INTEGER id
-		INTEGER media_id
-		INTEGER vocabulary_id
-	}
-```
 
 ---
 
@@ -147,10 +75,136 @@ python main.py
 ```
 
 ## Roadmap
+
 - [ ] Vocabulary generation — auto-generate vocab list from media via LLM
+- [ ] Switch to langraph as AI wrapper
 - [ ] Progress endpoint — implement actual logic (currently stub)
 - [ ] RAG — inject vocabulary context into chat prompts
 - [ ] JWT login/register endpoints
 - [ ] Replace `get_current_user()` stub with real auth dependency
 - [ ] Docker Deployment
 - [ ] Tests (pytest)
+
+## Architecture
+
+```mermaid
+graph TB
+    subgraph Client["Client layer"]
+        HTTP["HTTP client (curl / Postman)"]
+        Swagger["FastAPI Swagger UI (/docs)"]
+    end
+
+    subgraph Backend["Backend layer (FastAPI)"]
+        Controller["Controller — main.py"]
+        Schemas["View / Schemas — schemas.py"]
+        Models["Model — models.py"]
+
+        subgraph Services["Service layer"]
+            LLM["llm_service.py"]
+            Media["media_processing.py"]
+            Prompts["prompts.py"]
+        end
+
+        Controller <-->|validation| Schemas
+        Controller <-->|Data| Models
+        Controller --> LLM
+        Controller --> Media
+        Controller --> Prompts
+    end
+
+    subgraph DB["Database layer"]
+        Postgres[("PostgreSQL · SQLAlchemy")]
+    end
+
+    subgraph AI["External AI APIs"]
+        Groq["Groq · llama-3.3-70b"]
+        Gemini["Google Gemini 2.5 flash lite"]
+        OpenAI["OpenAI · gpt-5-nano"]
+    end
+
+    HTTP -->|HTTP / JSON| Controller
+    Swagger -->|HTTP / JSON| Controller
+    Models <-->|SQL| Postgres
+    LLM -->|HTTPS / API Key| Groq
+    LLM -->|HTTPS / API Key| Gemini
+    LLM -->|HTTPS / API Key| OpenAI
+
+```
+
+---
+
+## Database
+
+### Diagram
+
+```mermaid
+erDiagram
+    chat_histories }o--|| chats: references
+    chats }o--|| media: references
+    language_learning }o--|| users: references
+    language_learning ||--o{ media: references
+    learning_progress }o--|| media: references
+    media_vocabularies }o--|| media: references
+    vocabularies ||--o{ media_vocabularies: references
+    vocabularies }o--|| language_learning: references
+    chats }o--|| users: references
+
+    users {
+        INTEGER id
+        TEXT username
+        TEXT native_language
+    }
+
+    media {
+        INTEGER id
+        TEXT title
+        TEXT content_type
+        TEXT file_path
+        TEXT extracted_content
+        INTEGER learning_id
+    }
+
+    vocabularies {
+        INTEGER id
+        INTEGER learning_id
+        TEXT word
+        TEXT translation
+        TEXT context_sentence
+        INTEGER status
+        TEXT language
+    }
+
+    chats {
+        INTEGER id
+        INTEGER media_id
+        INTEGER user_id
+    }
+
+    chat_histories {
+        INTEGER id
+        INTEGER chat_id
+        TEXT message
+        TIMESTAMP timestamp
+        TEXT role
+    }
+
+    language_learning {
+        INTEGER id
+        INTEGER user_id
+        TEXT learning_language
+        TEXT proficiency_level
+    }
+
+    learning_progress {
+        INTEGER id
+        INTEGER media_id
+        TEXT proficiency_level
+        TEXT comment
+    }
+
+    media_vocabularies {
+        INTEGER id
+        INTEGER media_id
+        INTEGER vocabulary_id
+    }
+```

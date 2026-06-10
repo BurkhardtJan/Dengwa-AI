@@ -8,8 +8,8 @@ def build_system_prompt_language_chat(chat: Chat) -> str:
 
     parts = [
         "Du bist ein Sprachlernassistent.",
-        f"Die Muttersprache des Users ist: {user.native_language}.",
-        f"Der User lernt: {learning.learning_language} auf Niveau {learning.proficiency_level}.",
+        f"Die Muttersprache des Users ist: {user.native_language} (Sprachkürzel).",
+        f"Der User lernt: {learning.learning_language} (Sprachkürzel) auf Niveau {learning.proficiency_level}.",
         "Antworte immer in der Lernsprache des Users, außer der User schreibt in der Muttersprache oder bittet dich explizit darum.",
     ]
 

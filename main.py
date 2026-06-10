@@ -79,6 +79,7 @@ async def root():
 
 @app.get("/languages/{lan}/media", response_model=List[MediaResponse])
 async def get_media(lan: str, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    """Returns media list for language"""
     learning = get_learning_or_404(db, lan, current_user["id"])
     return db.query(Media).filter(Media.learning_id == learning.id).all()
 

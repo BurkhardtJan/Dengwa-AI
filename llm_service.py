@@ -8,7 +8,7 @@ from pydantic import BaseModel
 
 load_dotenv()
 
-DEFAULT_PROVIDER = "gemini"
+DEFAULT_PROVIDER = "openai"
 
 
 def gemini_client(
