@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Form
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from typing import List
 import uvicorn
 import os
@@ -7,12 +7,13 @@ import shutil
 from media_processing import extract_content
 from llm_service import call_llm
 from prompts import build_system_prompt_language_chat
+from vocabulary import create_vocab, get_or_create_vocab, create_vocab
 
-from database import get_db
-from models import LanguageLearning, Media, Vocabulary, MediaVocabulary, Chat, ChatHistory, LearningProgress
+from database import get_db, Base, engine
+from models import LanguageLearning, Media, Vocabulary, MediaVocabulary, Chat, ChatHistory, LearningProgress, User
 from schemas import (
     MediaResponse,
-    VocabularyResponse,
+    VocabularyResponse, VocabularyCreate,
     ChatCreate, ChatResponse,
     ChatMessageRequest, ChatMessageResponse,
     ProgressResponse
@@ -76,6 +77,14 @@ async def root():
     """Health check of the Website"""
     return {"message": "Immersio AI running"}
 
+@app.post("/register")
+async def register(username: str, native_language: str = "de", db: Session = Depends(get_db)):
+    new_user = User(username=username, native_language=native_language)
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
+
 
 @app.get("/languages/{lan}/media", response_model=List[MediaResponse])
 async def get_media(lan: str, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
@@ -121,16 +130,18 @@ async def post_media(
 
 
 @app.get("/languages/{lan}/vocabularies", response_model=List[VocabularyResponse])
-async def get_vocabularies(lan: str, status: int | None = None, db: Session = Depends(get_db),
-                           current_user=Depends(get_current_user)):
+async def get_vocabularies(lan: str, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     """Get vocabulary list"""
     learning = get_learning_or_404(db, lan, current_user["id"])
 
-    query = db.query(Vocabulary).filter(Vocabulary.learning_id == learning.id)
-    if status is not None:
-        query = query.filter(Vocabulary.status == status)
+    query = db.query(Vocabulary).options(joinedload(Vocabulary.progress)).filter(Vocabulary.learning_id == learning.id)
     return query.all()
 
+@app.post("/languages/{lan}/vocabularies", response_model=VocabularyResponse)
+async def create_vocabulary_endpoint(lan: str, payload: VocabularyCreate, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    learning = get_or_create_learning(db, lan, current_user["id"])
+    vocab = get_or_create_vocab(db=db, learning_id=learning.id, word=payload.word, translation=payload.translation, context_sentence=payload.context_sentence, language=lan)
+    return vocab
 
 @app.get("/languages/{lan}/chats", response_model=List[ChatResponse])
 async def get_language_chats(lan: str, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
@@ -252,6 +263,7 @@ async def get_progress(lan: str):
 
 
 if __name__ == "__main__":
+    Base.metadata.create_all(bind=engine)
     uvicorn.run(
         app,
         host="0.0.0.0",

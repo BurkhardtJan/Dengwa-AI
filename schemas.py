@@ -42,20 +42,36 @@ class MediaResponse(BaseModel):
         from_attributes = True
 
 
-class VocabularyResponse(BaseModel):
-    id: int
-    word: str
-    translation: Optional[str] = None
-    context_sentence: Optional[str] = None
-    status: int
-    language: Optional[str] = None
+class VocabularyProgressResponse(BaseModel):
+    due: Optional[datetime] = None
+    interval_days: int = 0
+    ease_factor: float = 2.5
+    repetitions: int = 0
+    lapses: int = 0
+    llm_mastery_score: float = 0.0
 
     class Config:
         from_attributes = True
 
 
-class VocabularyUpdate(BaseModel):
-    status: int  # 0-10
+class VocabularyResponse(BaseModel):
+    id: int
+    word: str
+    translation: Optional[str] = None
+    context_sentence: Optional[str] = None
+    language: Optional[str] = None
+
+    progress: Optional[VocabularyProgressResponse] = None
+
+    class Config:
+        from_attributes = True
+
+
+class VocabularyCreate(BaseModel):
+    word: str
+    translation: Optional[str] = None
+    context_sentence: Optional[str] = None
+    language: Optional[str] = None
 
 
 class ChatCreate(BaseModel):

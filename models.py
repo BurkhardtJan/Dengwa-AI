@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, UniqueConstraint
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, UniqueConstraint, Float
 from sqlalchemy.orm import relationship
 from database import Base
 from datetime import datetime, timezone
@@ -59,11 +59,29 @@ class Vocabulary(Base):
     word = Column(String, nullable=False)
     translation = Column(String)
     context_sentence = Column(Text)
-    status = Column(Integer, default=0)  # 0-10
     language = Column(String)
+    created_at = Column(DateTime)
 
     language_learning = relationship("LanguageLearning", back_populates="vocabularies")
     media_vocabularies = relationship("MediaVocabulary", back_populates="vocabulary")
+    progress = relationship(
+        "VocabularyProgress", back_populates="vocabulary", uselist=False)
+
+
+class VocabularyProgress(Base):
+    __tablename__ = "vocabulary_progress"
+
+    id = Column(Integer, primary_key=True)
+    vocabulary_id = Column(Integer, ForeignKey("vocabularies.id"), unique=True)
+    due = Column(DateTime)
+    interval_days = Column(Integer, default=0)
+    ease_factor = Column(Float, default=2.5)
+    repetitions = Column(Integer, default=0)
+    lapses = Column(Integer, default=0)
+    llm_mastery_score = Column(Float, default=0.0)
+    last_interaction = Column(DateTime)
+    llm_context = Column(Text)
+    vocabulary = relationship("Vocabulary", back_populates="progress")
 
 
 class MediaVocabulary(Base):

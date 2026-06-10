@@ -178,6 +178,8 @@ erDiagram
         INTEGER id
         INTEGER media_id
         INTEGER user_id
+        INTEGER user_chat_id
+
     }
 
     chat_histories {
