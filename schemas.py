@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional, List
 from datetime import datetime
 
@@ -108,3 +108,18 @@ class ChatMessageResponse(BaseModel):
     class Config:
         from_attributes = True
 
+class ExtractedVocabularyItem(BaseModel):
+    word: str = Field(
+        description="Das fremdsprachige Wort in Originalschrift (z.B. Kanji/Kana bei Japanisch) und optionaler Romaji-Lautschrift in Klammern."
+    )
+    translation: str = Field(
+        description="Die präzise deutsche Übersetzung des Wortes, passend zum Kontext des Textes."
+    )
+    context_sentence: str = Field(
+        description="Der exakte Satz aus dem bereitgestellten Text, in dem das Wort vorkommt, um den Kontext zu wahren."
+    )
+
+class VocabularyExtraction(BaseModel):
+    vocabularies: List[ExtractedVocabularyItem] = Field(
+        description="Eine Liste aller aus dem Text extrahierten Schlüsselvokabeln."
+    )

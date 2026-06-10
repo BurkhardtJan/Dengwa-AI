@@ -18,7 +18,7 @@ def gemini_client(
         temperature: float = 1.0,
         max_tokens: int = 1000,
         response_schema: type[BaseModel] | None = None,
-) -> str:
+) -> str | type[BaseModel]:
     """Client for gemini API"""
     client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
     gemini_messages = []
@@ -38,6 +38,9 @@ def gemini_client(
         config.response_schema = response_schema
 
     resp = client.models.generate_content(model=model, contents=gemini_messages, config=config)
+    if response_schema:
+        return response_schema.model_validate_json(resp.text)
+
     return resp.text
 
 
@@ -48,7 +51,7 @@ def groq_client(
         temperature: float = 1.0,
         max_tokens: int = 1000,
         response_schema: type[BaseModel] | None = None,
-) -> str:
+) -> str | type[BaseModel]:
     """Client for groq API"""
     client = Groq(api_key=os.environ["GROQ_API_KEY"])
 
@@ -64,7 +67,12 @@ def groq_client(
     kwargs["messages"] = [{"role": "system", "content": system_prompt}, *messages]
 
     response = client.chat.completions.create(**kwargs)
-    return response.choices[0].message.content
+    raw_content = response.choices[0].message.content
+
+    if response_schema:
+        return response_schema.model_validate_json(raw_content)
+
+    return raw_content
 
 
 def openai_client(
@@ -72,16 +80,15 @@ def openai_client(
         system_prompt: str,
         model: str = "gpt-5-nano",
         temperature: float = 1.0,
-        max_tokens: int = 5000,
+        max_tokens: int = 50000,
         response_schema: type[BaseModel] | None = None,
-) -> str:
+) -> str | type[BaseModel]:
     """Client for openai API"""
     client = OpenAI()
 
     kwargs = {
         "model": model,
         "messages": [{"role": "system", "content": system_prompt}, *messages],
-        # "max_output_tokens": max_tokens,
     }
 
     if "gpt-5" not in model and "o1" not in model:
@@ -95,7 +102,7 @@ def openai_client(
             **kwargs,
             response_format=response_schema,
         )
-        return response.choices[0].message.parsed.model_dump_json()
+        return response.choices[0].message.parsed
     else:
         response = client.chat.completions.create(**kwargs)
         return response.choices[0].message.content
@@ -107,9 +114,9 @@ def call_llm(
         provider: str | None = None,
         model: str | None = None,
         temperature: float = 1.0,
-        max_tokens: int = 5000,
+        max_tokens: int | None = None,
         response_schema: type[BaseModel] | None = None,
-) -> str:
+) -> str | type[BaseModel]:
     """Wrapper for AI clients"""
     if not provider:
         provider = DEFAULT_PROVIDER

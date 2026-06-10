@@ -6,8 +6,8 @@ import os
 import shutil
 from media_processing import extract_content
 from llm_service import call_llm
-from prompts import build_system_prompt_language_chat
-from vocabulary import create_vocab, get_or_create_vocab, create_vocab
+from prompts import build_system_prompt_language_chat, build_vocab_extract_prompt
+from vocabulary import create_vocab, get_or_create_vocab, create_media_vocab
 
 from database import get_db, Base, engine
 from models import LanguageLearning, Media, Vocabulary, MediaVocabulary, Chat, ChatHistory, LearningProgress, User
@@ -16,7 +16,8 @@ from schemas import (
     MediaResponse,
     VocabularyResponse, VocabularyCreate, VocabularyUpdate,
     ChatCreate, ChatResponse,
-    ChatMessageRequest, ChatMessageResponse
+    ChatMessageRequest, ChatMessageResponse,
+    VocabularyExtraction
 )
 
 app = FastAPI()
@@ -99,11 +100,13 @@ async def get_languages(db: Session = Depends(get_db), current_user=Depends(get_
     ).all()
     return learning
 
+
 @app.get("/languages/{lan}", response_model=LanguageLearningResponse)
 async def get_language(lan: str, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     """Returns language info"""
     learning = get_learning_or_404(db, lan, current_user["id"])
     return learning
+
 
 @app.get("/languages/{lan}/media", response_model=List[MediaResponse])
 async def get_media(lan: str, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
@@ -140,6 +143,23 @@ async def post_media(lan: str, title: str = Form(...), file: UploadFile = File(.
     db.add(media)
     db.commit()
     db.refresh(media)
+
+    system_prompt = build_vocab_extract_prompt(media)
+    messages = []
+
+    response_structured = call_llm(
+        messages=messages,
+        system_prompt=system_prompt,
+        provider="openai",  # Oder "gemini" / "groq"
+        temperature=0.2,  # Niedrige Temp für maximale Fakten-Treue und Struktur-Stabilität
+        response_schema=VocabularyExtraction
+    )
+
+    print("Erfolgreich extrahierte Vokabeln:")
+    for item in response_structured.vocabularies:
+        print(f"Wort: {item.word} | Übersetzung: {item.translation}")
+        create_media_vocab(db, media.id, learning.id, item.word, item.translation, item.context_sentence, lan)
+
     return media
 
 

@@ -90,6 +90,7 @@ python main.py
 - [ ] Replace `get_current_user()` stub with real auth dependency
 - [ ] Docker Deployment
 - [ ] Tests (pytest)
+- [ ] Refactor Code
 
 ## Architecture
 

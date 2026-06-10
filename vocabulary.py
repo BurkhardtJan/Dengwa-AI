@@ -73,3 +73,48 @@ def get_or_create_vocab(
         language=language,
     )
 
+
+def create_media_vocab(
+        db: Session,
+        media_id: int,
+        learning_id: int,
+        word: str,
+        translation: str | None = None,
+        context_sentence: str | None = None,
+        language: str | None = None,
+) -> MediaVocabulary:
+    """
+    Creates media vocabulary and if necessary normal vocabulary.
+    """
+
+    vocab = get_or_create_vocab(
+        db=db,
+        learning_id=learning_id,
+        word=word,
+        translation=translation,
+        context_sentence=context_sentence,
+        language=language
+    )
+
+    existing_link = (
+        db.query(MediaVocabulary)
+        .filter(
+            MediaVocabulary.media_id == media_id,
+            MediaVocabulary.vocabulary_id == vocab.id
+        )
+        .first()
+    )
+
+    if existing_link:
+        return existing_link
+
+    media_vocab_link = MediaVocabulary(
+        media_id=media_id,
+        vocabulary_id=vocab.id
+    )
+
+    db.add(media_vocab_link)
+    db.commit()
+    db.refresh(media_vocab_link)
+
+    return media_vocab_link
