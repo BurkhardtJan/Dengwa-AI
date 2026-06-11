@@ -96,6 +96,104 @@ def get_vocab_or_404(db: Session, vocab_id: int, learning_id: int) -> Vocabulary
     return vocab
 
 
+def get_chat_or_404(db: Session, chat_id: int, user_id: int) -> Chat:
+    """Returns a Chat by user_chat_id scoped to a user, or raises 404."""
+    chat = db.query(Chat).filter(Chat.user_chat_id == chat_id, Chat.user_id == user_id).first()
+    if not chat:
+        raise HTTPException(status_code=404, detail="Chat not found")
+    return chat
+
+
+def save_uploaded_file(file: UploadFile, user_id: int, lan: str) -> str:
+    """
+    Saves an uploaded file to uploads/<user_id>/<lan>/<filename>.
+    Returns the file path.
+    Raises HTTPException on write error.
+    """
+    user_lan_dir = os.path.join("uploads", str(user_id), lan)
+    os.makedirs(user_lan_dir, exist_ok=True)
+    file_path = os.path.join(user_lan_dir, file.filename)
+
+    try:
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Fehler beim Speichern der Datei: {str(e)}")
+
+
+def create_media_record(db: Session, title: str, file: UploadFile, file_path: str, learning_id: int) -> Media:
+    """Creates and persists a Media DB record."""
+    media = Media(
+        title=title,
+        content_type=file.content_type,
+        file_path=file_path,
+        extracted_content=extract_content(file.content_type, file_path),
+        learning_id=learning_id
+    )
+    db.add(media)
+    db.commit()
+    db.refresh(media)
+    return media
+
+
+def extract_and_save_vocabulary(db: Session, media: Media, response_schema) -> VocabularyExtraction:
+    """
+    Calls the LLM to extract vocabulary from a media item and persists results to DB.
+    Returns the structured LLM response.
+    """
+    system_prompt = build_vocab_extract_prompt(media)
+    messages = [{"role": "user", "content": "Gib zwischen 10 Vokabeln zurück"}]
+
+    response_structured = call_llm(
+        messages=messages,
+        system_prompt=system_prompt,
+        provider="openai",
+        temperature=0.2,
+        response_schema=response_schema
+    )
+
+    for item in response_structured.vocabularies:
+        create_media_vocab(
+            db,
+            media.id,
+            media.learning_id,
+            item.word,
+            item.translation,
+            item.context_sentence,
+            media.language_learning.learning_language
+        )
+
+    return response_structured
+
+
+def get_next_user_chat_id(db: Session, user_id: int) -> int:
+    """Returns the next sequential user_chat_id for a given user."""
+    last = (
+        db.query(Chat)
+        .filter(Chat.user_id == user_id)
+        .order_by(Chat.user_chat_id.desc())
+        .first()
+    )
+    return (last.user_chat_id + 1) if last else 1
+
+
+def build_message_history(db: Session, chat_id: int, new_message: str) -> list[dict]:
+    """
+    Loads the last 20 messages for a chat and appends the new user message.
+    Returns a list of {role, content} dicts ready for the LLM.
+    """
+    history = (
+        db.query(ChatHistory)
+        .filter(ChatHistory.chat_id == chat_id)
+        .order_by(ChatHistory.timestamp.desc())
+        .limit(20)
+        .all()
+    )
+    messages = [{"role": h.role, "content": h.message} for h in reversed(history)]
+    messages.append({"role": "user", "content": new_message})
+    return messages
+
+
 #################################################
 ###############Endpoints####################
 ###########################################
@@ -141,38 +239,6 @@ async def get_media(lan: str, db: Session = Depends(get_db), current_user=Depend
     return db.query(Media).filter(Media.learning_id == learning.id).all()
 
 
-def save_uploaded_file(file: UploadFile, user_id: int, lan: str) -> str:
-    """
-    Saves an uploaded file to uploads/<user_id>/<lan>/<filename>.
-    Returns the file path.
-    Raises HTTPException on write error.
-    """
-    user_lan_dir = os.path.join("uploads", str(user_id), lan)
-    os.makedirs(user_lan_dir, exist_ok=True)
-    file_path = os.path.join(user_lan_dir, file.filename)
-
-    try:
-        with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Fehler beim Speichern der Datei: {str(e)}")
-
-
-def create_media_record(db: Session, title: str, file: UploadFile, file_path: str, learning_id: int) -> Media:
-    """Creates and persists a Media DB record."""
-    media = Media(
-        title=title,
-        content_type=file.content_type,
-        file_path=file_path,
-        extracted_content=extract_content(file.content_type, file_path),
-        learning_id=learning_id
-    )
-    db.add(media)
-    db.commit()
-    db.refresh(media)
-    return media
-
-
 @app.post("/languages/{lan}/media", response_model=MediaResponse)
 async def post_media(lan: str, title: str = Form(...), file: UploadFile = File(...), db: Session = Depends(get_db),
                      current_user=Depends(get_current_user)):
@@ -186,7 +252,6 @@ async def post_media(lan: str, title: str = Form(...), file: UploadFile = File(.
 async def get_vocabularies(lan: str, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     """Get vocabulary list"""
     learning = get_learning_or_404(db, lan, current_user["id"])
-
     query = db.query(Vocabulary).filter(Vocabulary.learning_id == learning.id)
     return query.all()
 
@@ -206,20 +271,7 @@ async def get_vocabulary(lan: str, vocab_id: int, db: Session = Depends(get_db),
                          current_user=Depends(get_current_user)):
     """Get vocabulary by ID"""
     learning = get_learning_or_404(db, lan, current_user["id"])
-
-    vocab = (
-        db.query(Vocabulary)
-        .filter(
-            Vocabulary.id == vocab_id,
-            Vocabulary.learning_id == learning.id
-        )
-        .first()
-    )
-
-    if not vocab:
-        raise HTTPException(status_code=404, detail="Vocabulary not found")
-
-    return vocab
+    return get_vocab_or_404(db, vocab_id, learning.id)
 
 
 @app.put("/languages/{lan}/vocabularies/{vocab_id}", response_model=VocabularyResponse)
@@ -227,18 +279,7 @@ async def update_vocabulary(lan: str, vocab_id: int, payload: VocabularyUpdate, 
                             current_user=Depends(get_current_user)):
     """Update Vocabulary by ID"""
     learning = get_learning_or_404(db, lan, current_user["id"])
-
-    vocab = (
-        db.query(Vocabulary)
-        .filter(
-            Vocabulary.id == vocab_id,
-            Vocabulary.learning_id == learning.id
-        )
-        .first()
-    )
-
-    if not vocab:
-        raise HTTPException(status_code=404, detail="Vocabulary not found")
+    vocab = get_vocab_or_404(db, vocab_id, learning.id)
 
     if payload.word is not None:
         vocab.word = payload.word
@@ -260,17 +301,7 @@ async def delete_vocabulary(lan: str, vocab_id: int, db: Session = Depends(get_d
                             current_user=Depends(get_current_user)):
     """Delete Vocabulary by id"""
     learning = get_learning_or_404(db, lan, current_user["id"])
-    vocab = (
-        db.query(Vocabulary)
-        .filter(
-            Vocabulary.id == vocab_id,
-            Vocabulary.learning_id == learning.id
-        )
-        .first()
-    )
-    if not vocab:
-        raise HTTPException(status_code=404, detail="Vocabulary not found")
-
+    vocab = get_vocab_or_404(db, vocab_id, learning.id)
     db.delete(vocab)
     db.commit()
 
@@ -303,9 +334,7 @@ async def get_chat_history(
         current_user=Depends(get_current_user)
 ):
     """Get chat history"""
-    chat = db.query(Chat).filter(Chat.user_chat_id == chat_id, Chat.user_id == current_user["id"]).first()
-    if not chat:
-        raise HTTPException(status_code=404, detail="Chat not found")
+    chat = get_chat_or_404(db, chat_id, current_user["id"])
 
     return db.query(ChatHistory).filter(
         ChatHistory.chat_id == chat.id
@@ -319,20 +348,12 @@ async def create_chat(
         current_user=Depends(get_current_user)
 ):
     """Create a new chat for a medium"""
-    media = db.query(Media).filter(Media.id == media_id).first()
-    if not media:
-        raise HTTPException(
-            status_code=404,
-            detail="Medium nicht gefunden oder Zugriff verweigert."
-        )
-
-    last_chat_id = db.query(Chat).filter(Chat.user_id == current_user["id"]).order_by(Chat.user_chat_id.desc()).first()
-    user_chat_id = (last_chat_id.user_chat_id + 1) if last_chat_id else 1
+    get_media_or_404(db, media_id)
 
     new_chat = Chat(
         media_id=media_id,
         user_id=current_user["id"],
-        user_chat_id=user_chat_id
+        user_chat_id=get_next_user_chat_id(db, current_user["id"])
     )
 
     db.add(new_chat)
@@ -352,26 +373,14 @@ async def post_chat_message(
         current_user=Depends(get_current_user)
 ):
     """Send a message to the AI"""
-    chat = db.query(Chat).filter(Chat.user_chat_id == chat_id, Chat.user_id == current_user["id"]).first()
-    if not chat:
-        raise HTTPException(status_code=404, detail="Chat not found")
-
-    history = (
-        db.query(ChatHistory)
-        .filter(ChatHistory.chat_id == chat.id)
-        .order_by(ChatHistory.timestamp.desc())
-        .limit(20)
-        .all()
-    )
-    messages = [{"role": h.role, "content": h.message} for h in reversed(history)]
-    messages.append({"role": "user", "content": request.message})
+    chat = get_chat_or_404(db, chat_id, current_user["id"])
+    messages = build_message_history(db, chat.id, request.message)
 
     system_prompt = build_system_prompt_language_chat(chat)
 
     user_message = ChatHistory(chat_id=chat.id, role="user", message=request.message)
     db.add(user_message)
 
-    ai_response = (f"You asked about: {request.message}")
     ai_response = call_llm(
         messages=messages,
         system_prompt=system_prompt,
@@ -392,29 +401,9 @@ async def extract_media_vocabulary(
         db: Session = Depends(get_db),
         current_user=Depends(get_current_user)
 ):
-    """Create a new chat for a medium"""
-    media = db.query(Media).filter(Media.id == media_id).first()
-    if not media:
-        raise HTTPException(
-            status_code=404,
-            detail="Medium nicht gefunden oder Zugriff verweigert."
-        )
-
-    system_prompt = build_vocab_extract_prompt(media)
-    messages = [{"role": "user", "content": "Gib zwischen 10 Vokabeln zurück"}]
-
-    response_structured = call_llm(
-        messages=messages,
-        system_prompt=system_prompt,
-        provider="openai",
-        temperature=0.2,
-        response_schema=VocabularyExtraction
-    )
-    for item in response_structured.vocabularies:
-        create_media_vocab(db, media.id, media.learning_id, item.word, item.translation, item.context_sentence,
-                           media.language_learning.learning_language)
-
-    return response_structured
+    """Extract vocabulary from a medium using LLM"""
+    media = get_media_or_404(db, media_id)
+    return extract_and_save_vocabulary(db, media, VocabularyExtraction)
 
 
 @app.get("/languages/{lan}/progress")
