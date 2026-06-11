@@ -73,6 +73,32 @@ def get_or_create_learning(db: Session, lan: str, user_id: int) -> LanguageLearn
     return learning
 
 
+def get_media_or_404(db: Session, media_id: int) -> Media:
+    """Returns a Media record or raises 404."""
+    media = db.query(Media).filter(Media.id == media_id).first()
+    if not media:
+        raise HTTPException(status_code=404, detail="Medium nicht gefunden oder Zugriff verweigert.")
+    return media
+
+
+def get_vocab_or_404(db: Session, vocab_id: int, learning_id: int) -> Vocabulary:
+    """Returns a Vocabulary record scoped to a learning entry, or raises 404."""
+    vocab = (
+        db.query(Vocabulary)
+        .filter(
+            Vocabulary.id == vocab_id,
+            Vocabulary.learning_id == learning_id
+        )
+        .first()
+    )
+    if not vocab:
+        raise HTTPException(status_code=404, detail="Vocabulary not found")
+    return vocab
+
+
+#################################################
+###############Endpoints####################
+###########################################
 @app.get("/health")
 async def root():
     """Health check of the Website"""
@@ -91,7 +117,7 @@ async def register(username: str, native_language: str = "de", db: Session = Dep
 
 @app.get("/languages", response_model=List[LanguageLearningResponse])
 async def get_languages(db: Session = Depends(get_db), current_user=Depends(get_current_user)):
-    """Returns list of language"""
+    """Returns list of languages for current user"""
     learning = (
         db.query(LanguageLearning)
         .filter(
@@ -115,14 +141,14 @@ async def get_media(lan: str, db: Session = Depends(get_db), current_user=Depend
     return db.query(Media).filter(Media.learning_id == learning.id).all()
 
 
-@app.post("/languages/{lan}/media", response_model=MediaResponse)
-async def post_media(lan: str, title: str = Form(...), file: UploadFile = File(...), db: Session = Depends(get_db),
-                     current_user=Depends(get_current_user)):
-    """Upload a Medium"""
-    learning = get_or_create_learning(db, lan, current_user["id"])
-    user_lan_dir = os.path.join("uploads", str(current_user["id"]), lan)
+def save_uploaded_file(file: UploadFile, user_id: int, lan: str) -> str:
+    """
+    Saves an uploaded file to uploads/<user_id>/<lan>/<filename>.
+    Returns the file path.
+    Raises HTTPException on write error.
+    """
+    user_lan_dir = os.path.join("uploads", str(user_id), lan)
     os.makedirs(user_lan_dir, exist_ok=True)
-
     file_path = os.path.join(user_lan_dir, file.filename)
 
     try:
@@ -130,21 +156,30 @@ async def post_media(lan: str, title: str = Form(...), file: UploadFile = File(.
             shutil.copyfileobj(file.file, buffer)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Fehler beim Speichern der Datei: {str(e)}")
-    finally:
-        await file.close()  #
 
+
+def create_media_record(db: Session, title: str, file: UploadFile, file_path: str, learning_id: int) -> Media:
+    """Creates and persists a Media DB record."""
     media = Media(
         title=title,
         content_type=file.content_type,
         file_path=file_path,
         extracted_content=extract_content(file.content_type, file_path),
-        learning_id=learning.id
+        learning_id=learning_id
     )
     db.add(media)
     db.commit()
     db.refresh(media)
-
     return media
+
+
+@app.post("/languages/{lan}/media", response_model=MediaResponse)
+async def post_media(lan: str, title: str = Form(...), file: UploadFile = File(...), db: Session = Depends(get_db),
+                     current_user=Depends(get_current_user)):
+    """Upload a Medium"""
+    learning = get_or_create_learning(db, lan, current_user["id"])
+    file_path = save_uploaded_file(file, current_user["id"], lan)
+    return create_media_record(db, title, file, file_path, learning.id)
 
 
 @app.get("/languages/{lan}/vocabularies", response_model=List[VocabularyResponse])
@@ -365,7 +400,6 @@ async def extract_media_vocabulary(
             detail="Medium nicht gefunden oder Zugriff verweigert."
         )
 
-
     system_prompt = build_vocab_extract_prompt(media)
     messages = [{"role": "user", "content": "Gib zwischen 10 Vokabeln zurück"}]
 
@@ -377,10 +411,10 @@ async def extract_media_vocabulary(
         response_schema=VocabularyExtraction
     )
     for item in response_structured.vocabularies:
-        create_media_vocab(db, media.id, media.learning_id, item.word, item.translation, item.context_sentence, media.language_learning.learning_language)
+        create_media_vocab(db, media.id, media.learning_id, item.word, item.translation, item.context_sentence,
+                           media.language_learning.learning_language)
 
     return response_structured
-
 
 
 @app.get("/languages/{lan}/progress")
