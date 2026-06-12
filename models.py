@@ -76,8 +76,6 @@ class Vocabulary(Base):
     media_vocabularies = relationship("MediaVocabulary", back_populates="vocabulary")
 
 
-
-
 class MediaVocabulary(Base):
     __tablename__ = "media_vocabularies"
 
@@ -99,7 +97,7 @@ class Chat(Base):
 
     media = relationship("Media", back_populates="chats")
     user = relationship("User", back_populates="chats")
-    chat_histories = relationship("ChatHistory", back_populates="chat")
+    chat_histories = relationship("ChatHistory", back_populates="chat", cascade="all, delete-orphan")
 
     __table_args__ = (
         UniqueConstraint(

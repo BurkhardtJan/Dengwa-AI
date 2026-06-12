@@ -74,3 +74,11 @@ async def post_chat_message(
     db.commit()
 
     return [user_message, assistant_message]
+
+
+@router.delete("/chats/{chat_id}")
+async def delete_chat(chat_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    chat = get_chat_or_404(db, chat_id, current_user["id"])
+    db.delete(chat)
+    db.commit()
+    return {"status": f"Chat {chat_id} deleted"}

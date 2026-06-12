@@ -26,6 +26,7 @@ conversation, and track your progress.
 | `GET`    | `/chats`                             | Get all chats for current user |
 | `GET`    | `/chats/{chat_id}`                   | Get chat history               |
 | `POST`   | `/chats/{chat_id}`                   | Send a message to the AI       |
+| `DELETE` | `/chats/{chat_id}`                   | Delete Chat                    |
 | `GET`    | `/languages/{lan}/progress`          | Get learning progress          |
 
 ---
