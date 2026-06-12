@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List
 from datetime import datetime
 
@@ -13,8 +13,7 @@ class UserResponse(BaseModel):
     username: str
     native_language: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class LanguageLearningCreate(BaseModel):
@@ -35,8 +34,7 @@ class LanguageLearningResponse(BaseModel):
     proficiency_level: str
     user_motivation: Optional[str] = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class MediaResponse(BaseModel):
@@ -45,8 +43,7 @@ class MediaResponse(BaseModel):
     content_type: str
     learning_id: int
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class VocabularyProgressResponse(BaseModel):
@@ -57,8 +54,7 @@ class VocabularyProgressResponse(BaseModel):
     lapses: int = 0
     llm_mastery_score: float = 0.0
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class VocabularyResponse(BaseModel):
@@ -72,8 +68,7 @@ class VocabularyResponse(BaseModel):
     comment: Optional[str] = None
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class VocabularyCreate(BaseModel):
@@ -98,8 +93,7 @@ class ChatResponse(BaseModel):
     user_id: int
     user_chat_id: int
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ChatMessageRequest(BaseModel):
@@ -112,8 +106,7 @@ class ChatMessageResponse(BaseModel):
     message: str
     timestamp: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ExtractedVocabularyItem(BaseModel):

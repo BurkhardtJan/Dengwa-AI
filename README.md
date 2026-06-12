@@ -12,7 +12,10 @@ conversation, and track your progress.
 |----------|--------------------------------------|--------------------------------|
 | `GET`    | `/health`                            | Health check                   |
 | `GET`    | `/languages`                         | List learning languages        |
+| `POST`   | `/languages`                         | Create language                |
 | `GET`    | `/languages/{lan}`                   | Get language info              |
+| `PUT`    | `/languages/{lan}`                   | Update language                |
+| `DELETE` | `/languages/{lan}`                   | Delete language                |
 | `POST`   | `/languages/{lan}/media`             | Upload a medium (SRT, TXT)     |
 | `GET`    | `/languages/{lan}/media`             | Get all media for a language   |
 | `GET`    | `/languages/{lan}/vocabularies`      | Get vocabulary list            |

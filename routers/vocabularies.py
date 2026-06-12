@@ -14,7 +14,7 @@ from schemas import (
     VocabularyExtraction
 )
 
-router = APIRouter(prefix="/languages/{lan}/vocabularies", tags=["Vocabularies"])
+router = APIRouter(prefix="/vocabularies", tags=["Vocabularies"])
 
 
 @router.get("", response_model=List[VocabularyResponse])
