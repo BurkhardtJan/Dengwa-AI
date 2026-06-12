@@ -30,6 +30,28 @@ async def get_chats(db: Session = Depends(get_db), current_user=Depends(get_curr
     return db.query(Chat).filter(Chat.user_id == current_user["id"]).all()
 
 
+@router.post("", response_model=ChatCreate)
+async def create_chat(
+        media_id: int,
+        db: Session = Depends(get_db),
+        current_user=Depends(get_current_user)
+):
+    """Create a new chat for a medium"""
+    get_media_or_404(db, media_id)
+
+    new_chat = Chat(
+        media_id=media_id,
+        user_id=current_user["id"],
+        user_chat_id=get_next_user_chat_id(db, current_user["id"])
+    )
+
+    db.add(new_chat)
+    db.commit()
+    db.refresh(new_chat)
+
+    return new_chat
+
+
 @router.get("/{chat_id}", response_model=List[ChatMessageResponse])
 async def get_chat_history(
         chat_id: int,

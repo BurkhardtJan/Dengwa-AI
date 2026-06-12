@@ -44,15 +44,9 @@ async def get_language(lan: str, db: Session = Depends(get_db), current_user=Dep
     return learning
 
 
-@router.get("/{lan}/media", response_model=List[MediaResponse])
-async def get_media(lan: str, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
-    """Returns media list for language"""
-    learning = get_learning_or_404(db, lan, current_user["id"])
-    return db.query(Media).filter(Media.learning_id == learning.id).all()
-
-
 @router.put("/{lan}", response_model=LanguageLearningResponse)
-async def update_language(lan: str, payload: LanguageLearningUpdate, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+async def update_language(lan: str, payload: LanguageLearningUpdate, db: Session = Depends(get_db),
+                          current_user=Depends(get_current_user)):
     learning = get_learning_or_404(db, lan, current_user["id"])
     if payload.proficiency_level is not None:
         learning.proficiency_level = payload.proficiency_level
@@ -69,15 +63,6 @@ async def delete_language(lan: str, db: Session = Depends(get_db), current_user=
     db.delete(learning)
     db.commit()
     return {"status": f"Language learning profile {lan} deleted"}
-
-
-@router.post("/{lan}/media", response_model=MediaResponse)
-async def post_media(lan: str, title: str = Form(...), file: UploadFile = File(...), db: Session = Depends(get_db),
-                     current_user=Depends(get_current_user)):
-    """Upload a Medium"""
-    learning = get_or_create_learning(db, lan, current_user["id"])
-    file_path = save_uploaded_file(file, current_user["id"], lan)
-    return create_media_record(db, title, file, file_path, learning.id)
 
 
 @router.get("/{lan}/chats", response_model=List[ChatResponse])

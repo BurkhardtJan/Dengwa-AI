@@ -8,31 +8,54 @@ conversation, and track your progress.
 
 ## Endpoints
 
-| Method   | Endpoint                             | Description                    |
-|----------|--------------------------------------|--------------------------------|
-| `GET`    | `/health`                            | Health check                   |
-| `GET`    | `/languages`                         | List learning languages        |
-| `POST`   | `/languages`                         | Create language                |
-| `GET`    | `/languages/{lan}`                   | Get language info              |
-| `PUT`    | `/languages/{lan}`                   | Update language                |
-| `DELETE` | `/languages/{lan}`                   | Delete language                |
-| `POST`   | `/languages/{lan}/media`             | Upload a medium (SRT, TXT)     |
-| `GET`    | `/languages/{lan}/media`             | Get all media for a language   |
-| `GET`    | `/languages/{lan}/vocabularies`      | Get vocabulary list            |
-| `POST`   | `/languages/{lan}/vocabularies`      | Post new vocabulary            |
-| `GET`    | `/languages/{lan}/vocabularies/{id}` | Get vocabulary by ID           |
-| `PUT`    | `/languages/{lan}/vocabularies/{id}` | Update vocabulary by ID        |
-| `DELETE` | `/languages/{lan}/vocabularies/{id}` | Delete vocabulary by ID        |
-| `GET`    | `/languages/{lan}/chats`             | Get all chats for a language   |
-| `POST`   | `/media/{media_id}/chats`            | Create a new chat for a medium |
-| `POST`   | `/media/{media_id}/vocabulary`       | Extract vocabulary from medium |
-| `GET`    | `/media/{media_id}`                  | Get media by ID                |
-| `DELETE` | `/media/{media_id}`                  | Delete media by ID             |
-| `GET`    | `/chats`                             | Get all chats for current user |
-| `GET`    | `/chats/{chat_id}`                   | Get chat history               |
-| `POST`   | `/chats/{chat_id}`                   | Send a message to the AI       |
-| `DELETE` | `/chats/{chat_id}`                   | Delete Chat                    |
-| `GET`    | `/languages/{lan}/progress`          | Get learning progress          |
+### System
+
+| Method     | Endpoint    | Description         |
+|------------|-------------|---------------------|
+| **`GET`**  | `/health`   | Health check        |
+| **`POST`** | `/register` | Register a new user |
+
+### Languages
+
+| Method       | Endpoint                    | Description             |
+|--------------|-----------------------------|-------------------------|
+| **`GET`**    | `/languages`                | List learning languages |
+| **`POST`**   | `/languages`                | Create language         |
+| **`GET`**    | `/languages/{lan}`          | Get language info       |
+| **`PUT`**    | `/languages/{lan}`          | Update language         |
+| **`DELETE`** | `/languages/{lan}`          | Delete language         |
+| **`GET`**    | `/languages/{lan}/progress` | Get learning progress   |
+
+### Vocabularies
+
+| Method       | Endpoint             | Description             |
+|--------------|----------------------|-------------------------|
+| **`GET`**    | `/vocabularies`      | Get vocabulary list     |
+| **`POST`**   | `/vocabularies`      | Post new vocabulary     |
+| **`GET`**    | `/vocabularies/{id}` | Get vocabulary by ID    |
+| **`PUT`**    | `/vocabularies/{id}` | Update vocabulary by ID |
+| **`DELETE`** | `/vocabularies/{id}` | Delete vocabulary by ID |
+
+### Media
+
+| Method       | Endpoint                       | Description                    |
+|--------------|--------------------------------|--------------------------------|
+| **`POST`**   | `/media`                       | Upload a medium (SRT, TXT)     |
+| **`GET`**    | `/media`                       | Get all media for a language   |
+| **`GET`**    | `/media/{media_id}`            | Get media by ID                |
+| **`DELETE`** | `/media/{media_id}`            | Delete media by ID             |
+| **`POST`**   | `/media/{media_id}/vocabulary` | Extract vocabulary from medium |
+
+### Chats
+
+| Method       | Endpoint                 | Description                    |
+|--------------|--------------------------|--------------------------------|
+| **`GET`**    | `/chats`                 | Get all chats for current user |
+| **`POST`**   | `/chats`                 | Create a new chat for a medium |
+| **`GET`**    | `/languages/{lan}/chats` | Get all chats for a language   |
+| **`GET`**    | `/chats/{chat_id}`       | Get chat history               |
+| **`POST`**   | `/chats/{chat_id}`       | Send a message to the AI       |
+| **`DELETE`** | `/chats/{chat_id}`       | Delete Chat                    |
 
 ---
 

@@ -24,26 +24,20 @@ from schemas import (
 router = APIRouter(prefix="/media", tags=["Media"])
 
 
-@router.post("/{media_id}/chats", response_model=ChatCreate)
-async def create_chat(
-        media_id: int,
-        db: Session = Depends(get_db),
-        current_user=Depends(get_current_user)
-):
-    """Create a new chat for a medium"""
-    get_media_or_404(db, media_id)
+@router.get("", response_model=List[MediaResponse])
+async def get_media(lan: str, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    """Returns media list for language"""
+    learning = get_learning_or_404(db, lan, current_user["id"])
+    return db.query(Media).filter(Media.learning_id == learning.id).all()
 
-    new_chat = Chat(
-        media_id=media_id,
-        user_id=current_user["id"],
-        user_chat_id=get_next_user_chat_id(db, current_user["id"])
-    )
 
-    db.add(new_chat)
-    db.commit()
-    db.refresh(new_chat)
-
-    return new_chat
+@router.post("", response_model=MediaResponse)
+async def post_media(lan: str, title: str = Form(...), file: UploadFile = File(...), db: Session = Depends(get_db),
+                     current_user=Depends(get_current_user)):
+    """Upload a Medium"""
+    learning = get_or_create_learning(db, lan, current_user["id"])
+    file_path = save_uploaded_file(file, current_user["id"], lan)
+    return create_media_record(db, title, file, file_path, learning.id)
 
 
 @router.post("/{media_id}/vocabulary")
