@@ -55,14 +55,23 @@ def get_or_create_learning(db: Session, lan: str, user_id: int) -> LanguageLearn
     )
 
     if not learning:
-        learning = LanguageLearning(
-            user_id=user_id,
-            learning_language=lan,
-            proficiency_level="A0"
-        )
-        db.add(learning)
-        db.commit()
-        db.refresh(learning)
+        learning = create_learning_record(db, lan, user_id)
+
+    return learning
+
+
+def create_learning_record(db: Session, lan: str, user_id: int, proficiency_level: str = "A0",
+                           user_motivation: str | None = None) -> LanguageLearning:
+    """Creates learning record in database."""
+    learning = LanguageLearning(
+        user_id=user_id,
+        learning_language=lan,
+        proficiency_level=proficiency_level,
+        user_motivation=user_motivation
+    )
+    db.add(learning)
+    db.commit()
+    db.refresh(learning)
 
     return learning
 

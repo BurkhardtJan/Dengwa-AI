@@ -86,15 +86,16 @@ python main.py
 
 ## Roadmap
 
-- [ ] Add CRUD to media, chats and languages
 - [ ] RAG — inject vocabulary context into chat prompts
 - [ ] Switch to langraph as AI wrapper
 - [ ] Progress endpoint — implement actual logic (currently stub)
 - [ ] JWT login/register endpoints
 - [ ] Replace `get_current_user()` stub with real auth dependency
+- [ ] Add default Vocab starter set (HSK, JLPT, ...)
 - [ ] Docker Deployment
 - [ ] Tests (pytest)
 - [ ] Refactor Code
+- [ ] Add Frontend
 
 ## Architecture
 

@@ -21,7 +21,8 @@ class LanguageLearning(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     learning_language = Column(String, nullable=False)
-    proficiency_level = Column(String, default="A0")  # GER
+    proficiency_level = Column(String, default="A0")
+    user_motivation = Column(String)
 
     user = relationship("User", back_populates="language_learnings")
     media = relationship("Media", back_populates="language_learning")

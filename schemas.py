@@ -20,6 +20,12 @@ class UserResponse(BaseModel):
 class LanguageLearningCreate(BaseModel):
     learning_language: str
     proficiency_level: str = "A0"
+    user_motivation: Optional[str] = None
+
+
+class LanguageLearningUpdate(BaseModel):
+    proficiency_level: Optional[str]
+    user_motivation: Optional[str]
 
 
 class LanguageLearningResponse(BaseModel):
@@ -27,6 +33,7 @@ class LanguageLearningResponse(BaseModel):
     user_id: int
     learning_language: str
     proficiency_level: str
+    user_motivation: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -108,6 +115,7 @@ class ChatMessageResponse(BaseModel):
     class Config:
         from_attributes = True
 
+
 class ExtractedVocabularyItem(BaseModel):
     word: str = Field(
         description="Das fremdsprachige Wort in Originalschrift (z.B. Kanji/Kana bei Japanisch) und optionaler Romaji-Lautschrift in Klammern."
@@ -118,6 +126,7 @@ class ExtractedVocabularyItem(BaseModel):
     context_sentence: str = Field(
         description="Der exakte Satz aus dem bereitgestellten Text, in dem das Wort vorkommt, um den Kontext zu wahren."
     )
+
 
 class VocabularyExtraction(BaseModel):
     vocabularies: List[ExtractedVocabularyItem] = Field(

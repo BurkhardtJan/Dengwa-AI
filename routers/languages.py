@@ -11,7 +11,7 @@ from schemas import (
     VocabularyResponse, VocabularyCreate, VocabularyUpdate,
     ChatCreate, ChatResponse,
     ChatMessageRequest, ChatMessageResponse,
-    VocabularyExtraction
+    VocabularyExtraction, LanguageLearningCreate, LanguageLearningUpdate
 )
 
 router = APIRouter(prefix="/languages", tags=["Languages"])
@@ -29,6 +29,14 @@ async def get_languages(db: Session = Depends(get_db), current_user=Depends(get_
     return learning
 
 
+@router.post("", response_model=LanguageLearningResponse)
+async def create_language(payload: LanguageLearningCreate, db: Session = Depends(get_db),
+                          current_user=Depends(get_current_user)):
+    learning = create_learning_record(db, payload.learning_language, current_user["id"], payload.proficiency_level,
+                                      payload.user_motivation)
+    return learning
+
+
 @router.get("/{lan}", response_model=LanguageLearningResponse)
 async def get_language(lan: str, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     """Returns language info"""
@@ -41,6 +49,26 @@ async def get_media(lan: str, db: Session = Depends(get_db), current_user=Depend
     """Returns media list for language"""
     learning = get_learning_or_404(db, lan, current_user["id"])
     return db.query(Media).filter(Media.learning_id == learning.id).all()
+
+
+@router.put("/{lan}", response_model=LanguageLearningResponse)
+async def update_language(lan: str, payload: LanguageLearningUpdate, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    learning = get_learning_or_404(db, lan, current_user["id"])
+    if payload.proficiency_level is not None:
+        learning.proficiency_level = payload.proficiency_level
+    if payload.user_motivation is not None:
+        learning.user_motivation = payload.user_motivation
+    db.commit()
+    db.refresh(learning)
+    return learning
+
+
+@router.delete("/{lan}")
+async def delete_language(lan: str, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    learning = get_learning_or_404(db, lan, current_user["id"])
+    db.delete(learning)
+    db.commit()
+    return {"status": f"Language learning profile {lan} deleted"}
 
 
 @router.post("/{lan}/media", response_model=MediaResponse)
