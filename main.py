@@ -5,13 +5,14 @@ from dependencies import *
 from database import get_db, Base, engine
 from models import User
 
-from routers import languages, media, chats
+from routers import languages, media, chats, vocabularies
 
 app = FastAPI()
 
 app.include_router(languages.router)
 app.include_router(media.router)
 app.include_router(chats.router)
+app.include_router(vocabularies.router)
 
 
 @app.get("/health")

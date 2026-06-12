@@ -23,6 +23,8 @@ conversation, and track your progress.
 | `GET`    | `/languages/{lan}/chats`             | Get all chats for a language   |
 | `POST`   | `/media/{media_id}/chats`            | Create a new chat for a medium |
 | `POST`   | `/media/{media_id}/vocabulary`       | Extract vocabulary from medium |
+| `GET`    | `/media/{media_id}`                  | Get media by ID                |
+| `DELETE` | `/media/{media_id}`                  | Delete media by ID             |
 | `GET`    | `/chats`                             | Get all chats for current user |
 | `GET`    | `/chats/{chat_id}`                   | Get chat history               |
 | `POST`   | `/chats/{chat_id}`                   | Send a message to the AI       |

@@ -46,8 +46,8 @@ class Media(Base):
     learning_id = Column(Integer, ForeignKey("language_learning.id"), nullable=False)
 
     language_learning = relationship("LanguageLearning", back_populates="media")
-    chats = relationship("Chat", back_populates="media")
-    media_vocabularies = relationship("MediaVocabulary", back_populates="media")
+    chats = relationship("Chat", back_populates="media", cascade="all, delete-orphan")
+    media_vocabularies = relationship("MediaVocabulary", back_populates="media", cascade="all, delete-orphan")
     learning_progress = relationship("LearningProgress", back_populates="media")
 
 

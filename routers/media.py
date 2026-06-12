@@ -55,3 +55,17 @@ async def extract_media_vocabulary(
     """Extract vocabulary from a medium using LLM"""
     media = get_media_or_404(db, media_id)
     return extract_and_save_vocabulary(db, media, VocabularyExtraction)
+
+
+@router.get("/{media_id}", response_model=MediaResponse)
+async def get_single_medium(media_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    media = get_media_or_404(db, media_id)
+    return media
+
+
+@router.delete("/{media_id}")
+async def delete_medium(media_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    media = get_media_or_404(db, media_id)
+    db.delete(media)
+    db.commit()
+    return {"status": "Media deleted"}
