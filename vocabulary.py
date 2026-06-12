@@ -1,7 +1,10 @@
 from datetime import datetime, timezone
 from sqlalchemy import func
 from sqlalchemy.orm import Session
-from models import Vocabulary, MediaVocabulary
+from models import Vocabulary, MediaVocabulary, Media
+from schemas import VocabularyExtraction
+from prompts import build_vocab_extract_prompt
+from llm_service import call_llm
 
 
 def create_vocab(
@@ -118,3 +121,33 @@ def create_media_vocab(
     db.refresh(media_vocab_link)
 
     return media_vocab_link
+
+
+def extract_and_save_vocabulary(db: Session, media: Media, response_schema) -> VocabularyExtraction:
+    """
+    Calls the LLM to extract vocabulary from a media item and persists results to DB.
+    Returns the structured LLM response.
+    """
+    system_prompt = build_vocab_extract_prompt(media)
+    messages = [{"role": "user", "content": "Gib zwischen 10 Vokabeln zurück"}]
+
+    response_structured = call_llm(
+        messages=messages,
+        system_prompt=system_prompt,
+        provider="openai",
+        temperature=0.2,
+        response_schema=response_schema
+    )
+
+    for item in response_structured.vocabularies:
+        create_media_vocab(
+            db,
+            media.id,
+            media.learning_id,
+            item.word,
+            item.translation,
+            item.context_sentence,
+            media.language_learning.learning_language
+        )
+
+    return response_structured
