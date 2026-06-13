@@ -1,25 +1,36 @@
 from fastapi import APIRouter, Depends
-from typing import List
+from typing import List, Optional
 from sqlalchemy.orm import Session
 from llm.prompts import build_system_prompt_language_chat
 from dependencies import get_current_user
 from database import get_db
-from models import Chat, ChatHistory
+from models import Chat, ChatHistory, Media
 from schemas import (
     ChatCreate, ChatResponse,
     ChatMessageRequest, ChatMessageResponse
 )
 from llm.client import call_llm
-from services.chat_service import get_chat_or_404, get_next_user_chat_id
+from services.chat_service import get_chat_or_404, get_next_user_chat_id, build_message_history
 from services.media_service import get_media_or_404
-from services.chat_service import build_message_history
+from services.language_service import get_learning_or_404
+
 router = APIRouter(prefix="/chats", tags=["Chats"])
 
 
 @router.get("", response_model=List[ChatResponse])
-async def get_chats(db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+async def get_chats(lan: Optional[str] = None, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     """Get all chats for current user"""
-    return db.query(Chat).filter(Chat.user_id == current_user["id"]).all()
+    if lan:
+        learning = get_learning_or_404(db, lan, current_user["id"])
+
+        return (
+            db.query(Chat)
+            .join(Media, Chat.media_id == Media.id)
+            .filter(Chat.user_id == current_user["id"], Media.learning_id == learning.id)
+            .all()
+        )
+    else:
+        return db.query(Chat).filter(Chat.user_id == current_user["id"]).all()
 
 
 @router.post("", response_model=ChatCreate)
@@ -29,7 +40,7 @@ async def create_chat(
         current_user=Depends(get_current_user)
 ):
     """Create a new chat for a medium"""
-    get_media_or_404(db, media_id)
+    get_media_or_404(db, media_id, current_user["id"])
 
     new_chat = Chat(
         media_id=media_id,

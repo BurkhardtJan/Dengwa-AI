@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends
-from typing import List
+from typing import List, Optional
 from sqlalchemy.orm import Session
 from database import get_db
 from services.vocabulary_service import get_or_create_vocab
 from dependencies import get_current_user
-from models import Vocabulary
+from models import Vocabulary, LanguageLearning
 from schemas import (
     VocabularyResponse, VocabularyCreate, VocabularyUpdate
 )
@@ -15,11 +15,17 @@ router = APIRouter(prefix="/vocabularies", tags=["Vocabularies"])
 
 
 @router.get("", response_model=List[VocabularyResponse])
-async def get_vocabularies(lan: str, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+async def get_vocabularies(lan: Optional[str] = None, db: Session = Depends(get_db),
+                           current_user=Depends(get_current_user)):
     """Get vocabulary list"""
-    learning = get_learning_or_404(db, lan, current_user["id"])
-    query = db.query(Vocabulary).filter(Vocabulary.learning_id == learning.id)
-    return query.all()
+    if lan:
+        learning = get_learning_or_404(db, lan, current_user["id"])
+        query = db.query(Vocabulary).filter(Vocabulary.learning_id == learning.id)
+        return query.all()
+    else:
+        query = db.query(Vocabulary).join(LanguageLearning, Vocabulary.learning_id == LanguageLearning.id).filter(
+            LanguageLearning.user_id == current_user["id"])
+        return query.all()
 
 
 @router.post("", response_model=VocabularyResponse)
@@ -33,19 +39,17 @@ async def create_vocabulary_endpoint(lan: str, payload: VocabularyCreate, db: Se
 
 
 @router.get("/{vocab_id}", response_model=VocabularyResponse)
-async def get_vocabulary(lan: str, vocab_id: int, db: Session = Depends(get_db),
+async def get_vocabulary(vocab_id: int, db: Session = Depends(get_db),
                          current_user=Depends(get_current_user)):
     """Get vocabulary by ID"""
-    learning = get_learning_or_404(db, lan, current_user["id"])
-    return get_vocab_or_404(db, vocab_id, learning.id)
+    return get_vocab_or_404(db, vocab_id, current_user["id"])
 
 
 @router.put("/{vocab_id}", response_model=VocabularyResponse)
-async def update_vocabulary(lan: str, vocab_id: int, payload: VocabularyUpdate, db: Session = Depends(get_db),
+async def update_vocabulary(vocab_id: int, payload: VocabularyUpdate, db: Session = Depends(get_db),
                             current_user=Depends(get_current_user)):
     """Update Vocabulary by ID"""
-    learning = get_learning_or_404(db, lan, current_user["id"])
-    vocab = get_vocab_or_404(db, vocab_id, learning.id)
+    vocab = get_vocab_or_404(db, vocab_id, current_user["id"])
 
     if payload.word is not None:
         vocab.word = payload.word
@@ -63,11 +67,10 @@ async def update_vocabulary(lan: str, vocab_id: int, payload: VocabularyUpdate, 
 
 
 @router.delete("/{vocab_id}")
-async def delete_vocabulary(lan: str, vocab_id: int, db: Session = Depends(get_db),
+async def delete_vocabulary(vocab_id: int, db: Session = Depends(get_db),
                             current_user=Depends(get_current_user)):
     """Delete Vocabulary by id"""
-    learning = get_learning_or_404(db, lan, current_user["id"])
-    vocab = get_vocab_or_404(db, vocab_id, learning.id)
+    vocab = get_vocab_or_404(db, vocab_id, current_user["id"])
     db.delete(vocab)
     db.commit()
 

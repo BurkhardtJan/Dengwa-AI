@@ -2,22 +2,13 @@ import os
 import shutil
 from fastapi import HTTPException, UploadFile
 from sqlalchemy.orm import Session
-from models import Media, MediaVocabulary
+from models import Media, MediaVocabulary, LanguageLearning
 from schemas import VocabularyExtraction
 from llm.prompts import build_vocab_extract_prompt
 from llm.client import call_llm
 from services.vocabulary_service import get_or_create_vocab
 
 OCTET_STREAM_EXTENSIONS = {".txt", ".srt", ".vtt", ".md"}
-
-"""
-TODO:
-pdf
-epub
-docx
-odt
-image
-"""
 
 
 def read_text_file(file_path: str) -> str:
@@ -46,11 +37,19 @@ def extract_content(content_type: str, file_path: str) -> str | None:
     return None
 
 
-def get_media_or_404(db: Session, media_id: int) -> Media:
+def get_media_or_404(db: Session, media_id: int, user_id: int) -> Media:
     """Returns a Media record or raises 404."""
-    media = db.query(Media).filter(Media.id == media_id).first()
+    media = (
+        db.query(Media)
+        .join(LanguageLearning, Media.learning_id == LanguageLearning.id)
+        .filter(
+            Media.id == media_id,
+            LanguageLearning.user_id == user_id,
+        )
+        .first()
+    )
     if not media:
-        raise HTTPException(status_code=404, detail="Medium nicht gefunden oder Zugriff verweigert.")
+        raise HTTPException(status_code=404, detail="Medium nicht gefunden")
     return media
 
 

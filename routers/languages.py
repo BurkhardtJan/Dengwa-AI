@@ -62,19 +62,6 @@ async def delete_language(lan: str, db: Session = Depends(get_db), current_user=
     return {"status": f"Language learning profile {lan} deleted"}
 
 
-@router.get("/{lan}/chats", response_model=List[ChatResponse])
-async def get_language_chats(lan: str, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
-    """Get all chats for a language"""
-    learning = get_learning_or_404(db, lan, current_user["id"])
-
-    return (
-        db.query(Chat)
-        .join(Media, Chat.media_id == Media.id)
-        .filter(Chat.user_id == current_user["id"], Media.learning_id == learning.id)
-        .all()
-    )
-
-
 @router.get("/{lan}/progress")
 async def get_progress(lan: str):
     """Get learning progress"""

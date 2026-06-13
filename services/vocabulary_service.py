@@ -2,19 +2,23 @@ from datetime import datetime, timezone
 from fastapi import HTTPException
 from sqlalchemy import func
 from sqlalchemy.orm import Session
-from models import Vocabulary, MediaVocabulary
+from models import Vocabulary, MediaVocabulary, LanguageLearning
 
 
-def get_vocab_or_404(db: Session, vocab_id: int, learning_id: int) -> Vocabulary:
+def get_vocab_or_404(db: Session, vocab_id: int, user_id: int, learning_id: int | None = None) -> Vocabulary:
     """Returns a Vocabulary record scoped to a learning entry, or raises 404."""
-    vocab = (
+    query = (
         db.query(Vocabulary)
+        .join(LanguageLearning, Vocabulary.learning_id == LanguageLearning.id)
         .filter(
             Vocabulary.id == vocab_id,
-            Vocabulary.learning_id == learning_id
+            LanguageLearning.user_id == user_id,
         )
-        .first()
     )
+    if learning_id:
+        query = query.filter(Vocabulary.learning_id == learning_id)
+
+    vocab = query.first()
     if not vocab:
         raise HTTPException(status_code=404, detail="Vocabulary not found")
     return vocab

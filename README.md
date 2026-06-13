@@ -112,7 +112,6 @@ python main.py
 
 ## Roadmap
 
-- [ ] Simplify Endpoint query params
 - [ ] RAG — inject vocabulary context into chat prompts
 - [ ] Switch to langraph as AI wrapper
 - [ ] Progress endpoint — implement actual logic (currently stub)
@@ -120,6 +119,7 @@ python main.py
 - [ ] Replace `get_current_user()` stub with real auth dependency
 - [ ] Add default Vocab starter set (HSK, JLPT, ...)
 - [ ] UUID instead of serial ID for endpoints
+- [ ] Other Media Parsing
 - [ ] Docker Deployment
 - [ ] Tests (pytest)
 - [ ] Refactor Code
