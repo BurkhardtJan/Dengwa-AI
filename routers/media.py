@@ -1,25 +1,15 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
-from sqlalchemy.orm import Session, joinedload
+from fastapi import APIRouter, Depends, File, Form, UploadFile
 from typing import List
-import uvicorn
-import os
-import shutil
-from media_processing import extract_content
-from llm_service import call_llm
-from prompts import build_system_prompt_language_chat, build_vocab_extract_prompt
-from vocabulary import create_vocab, get_or_create_vocab, create_media_vocab
-from dependencies import *
-
-from database import get_db, Base, engine
-from models import LanguageLearning, Media, Vocabulary, MediaVocabulary, Chat, ChatHistory, LearningProgress, User
+from sqlalchemy.orm import Session
+from dependencies import get_current_user
+from database import get_db
+from models import Media
 from schemas import (
-    LanguageLearningResponse,
     MediaResponse,
-    VocabularyResponse, VocabularyCreate, VocabularyUpdate,
-    ChatCreate, ChatResponse,
-    ChatMessageRequest, ChatMessageResponse,
     VocabularyExtraction
 )
+from services.media_service import get_media_or_404, create_media_record, save_uploaded_file, extract_and_save_vocabulary
+from services.language_service import get_learning_or_404, get_or_create_learning
 
 router = APIRouter(prefix="/media", tags=["Media"])
 

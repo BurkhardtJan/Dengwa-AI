@@ -143,7 +143,7 @@ def call_llm(
             messages=messages,
             system_prompt=system_prompt,
             model=model or "gpt-5-nano",
-            # temperature=temperature,
+            temperature=temperature,
             max_tokens=max_tokens,
             response_schema=response_schema
         )

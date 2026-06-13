@@ -1,10 +1,9 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, HTTPException
 import uvicorn
-from dependencies import *
-
+from sqlalchemy.orm import Session
+from dependencies import get_current_user
 from database import get_db, Base, engine
 from models import User
-
 from routers import languages, media, chats, vocabularies
 
 app = FastAPI()
@@ -39,8 +38,4 @@ async def register(username: str, native_language: str = "de", db: Session = Dep
 
 if __name__ == "__main__":
     Base.metadata.create_all(bind=engine)
-    uvicorn.run(
-        app,
-        host="0.0.0.0",
-        port=8000,
-    )
+    uvicorn.run(app, host="0.0.0.0", port=8000)

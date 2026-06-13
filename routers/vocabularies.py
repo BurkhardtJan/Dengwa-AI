@@ -1,18 +1,15 @@
-from fastapi import APIRouter, FastAPI, Depends, HTTPException, UploadFile, File, Form
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, Depends
 from typing import List
+from sqlalchemy.orm import Session
 from database import get_db
-from vocabulary import create_vocab, get_or_create_vocab, create_media_vocab
-from models import LanguageLearning
-from dependencies import *
+from services.vocabulary_service import get_or_create_vocab
+from dependencies import get_current_user
+from models import Vocabulary
 from schemas import (
-    LanguageLearningResponse,
-    MediaResponse,
-    VocabularyResponse, VocabularyCreate, VocabularyUpdate,
-    ChatCreate, ChatResponse,
-    ChatMessageRequest, ChatMessageResponse,
-    VocabularyExtraction
+    VocabularyResponse, VocabularyCreate, VocabularyUpdate
 )
+from services.vocabulary_service import get_vocab_or_404
+from services.language_service import get_learning_or_404, get_or_create_learning
 
 router = APIRouter(prefix="/vocabularies", tags=["Vocabularies"])
 

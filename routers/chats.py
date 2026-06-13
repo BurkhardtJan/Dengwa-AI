@@ -1,26 +1,18 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
-from sqlalchemy.orm import Session, joinedload
+from fastapi import APIRouter, Depends
 from typing import List
-import uvicorn
-import os
-import shutil
-from media_processing import extract_content
-from llm_service import call_llm
-from prompts import build_system_prompt_language_chat, build_vocab_extract_prompt
-from vocabulary import create_vocab, get_or_create_vocab, create_media_vocab
-from dependencies import *
-
-from database import get_db, Base, engine
-from models import LanguageLearning, Media, Vocabulary, MediaVocabulary, Chat, ChatHistory, LearningProgress, User
+from sqlalchemy.orm import Session
+from llm.prompts import build_system_prompt_language_chat
+from dependencies import get_current_user
+from database import get_db
+from models import Chat, ChatHistory
 from schemas import (
-    LanguageLearningResponse,
-    MediaResponse,
-    VocabularyResponse, VocabularyCreate, VocabularyUpdate,
     ChatCreate, ChatResponse,
-    ChatMessageRequest, ChatMessageResponse,
-    VocabularyExtraction
+    ChatMessageRequest, ChatMessageResponse
 )
-
+from llm.client import call_llm
+from services.chat_service import get_chat_or_404, get_next_user_chat_id
+from services.media_service import get_media_or_404
+from services.chat_service import build_message_history
 router = APIRouter(prefix="/chats", tags=["Chats"])
 
 
@@ -98,7 +90,7 @@ async def post_chat_message(
     return [user_message, assistant_message]
 
 
-@router.delete("/chats/{chat_id}")
+@router.delete("/{chat_id}")
 async def delete_chat(chat_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     chat = get_chat_or_404(db, chat_id, current_user["id"])
     db.delete(chat)
