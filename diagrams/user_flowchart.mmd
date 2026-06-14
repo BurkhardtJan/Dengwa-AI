@@ -1,0 +1,44 @@
+flowchart TD
+
+    Start([Start])
+
+    Register[Register User]
+    Login[Login]
+
+    CreateLanguage[Create Learning Language<br/>e.g. JA / EN / ...]
+
+    Dashboard[Select Language]
+
+    UploadMedia[Upload Media<br/>e.g. Subtitle / Text / Book]
+
+    GenerateVocabulary[Generate Vocabulary List]
+
+    ViewVocabulary[View Vocabulary]
+
+    CreateChat[Create Chat Session]
+
+    Chat[Chat with AI Tutor]
+
+    UpdateProgress[Update Learning Progress]
+
+    Start --> Register
+    Register --> Login
+
+    Login --> CreateLanguage
+
+    CreateLanguage --> Dashboard
+
+    Dashboard --> UploadMedia
+    UploadMedia --> GenerateVocabulary
+    GenerateVocabulary --> ViewVocabulary
+
+    Dashboard --> Chat
+    UploadMedia --> CreateChat
+
+    Dashboard <--> ViewVocabulary
+
+    CreateChat --> Chat
+    Chat -->  UpdateProgress
+
+    UpdateProgress --> Dashboard
+

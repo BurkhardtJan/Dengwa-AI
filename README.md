@@ -147,13 +147,23 @@ graph TB
             MediaRouter["media.py"]
             VocabRouter["vocabularies.py"]
             ChatRouter["chats.py"]
+            SystemRouter ~~~ LanguageRouter
+            LanguageRouter ~~~ MediaRouter
+            MediaRouter ~~~ VocabRouter
+            VocabRouter ~~~ ChatRouter
         end
 
         subgraph Services["Service layer (services/)"]
+            direction LR
+            System["system.py"]
             Language["language_service.py"]
             Media["media_service.py"]
             Vocab["vocabulary_service.py"]
             Chat["chat_service.py"]
+            System ~~~ Language
+            Language ~~~ Media
+            Media ~~~ Vocab
+            Vocab ~~~ Chat
         end
         subgraph LLMServices["LLM Service layer (llm/)"]
             LLM["llm_service.py"]

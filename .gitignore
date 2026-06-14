@@ -8,5 +8,4 @@ __pycache__
 *.db
 playground/
 uploads/
-diagrams/
 tests/
