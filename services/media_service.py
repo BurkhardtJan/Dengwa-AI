@@ -99,7 +99,7 @@ def create_media_vocab(
     return media_vocab_link
 
 
-def extract_and_save_vocabulary(db: Session, media: Media, response_schema) -> VocabularyExtraction:
+def extract_and_save_vocabulary(db: Session, media: Media, provider, model) -> VocabularyExtraction:
     """
     Calls the LLM to extract vocabulary from a media item and persists results to DB.
     Returns the structured LLM response.
@@ -110,9 +110,10 @@ def extract_and_save_vocabulary(db: Session, media: Media, response_schema) -> V
     response_structured = call_llm(
         messages=messages,
         system_prompt=system_prompt,
-        provider="openai",
+        provider=provider,
+        model=model,
         temperature=0.2,
-        response_schema=response_schema
+        response_schema=VocabularyExtraction
     )
 
     for item in response_structured.vocabularies:

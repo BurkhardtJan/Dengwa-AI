@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from typing import List
 from sqlalchemy.orm import Session
 from database import get_db
-from services.system_services import get_current_user
+from services.system_service import get_current_user
 from models import LanguageLearning
 from schemas import (
     LanguageLearningResponse,

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, File, Form, UploadFile
 from typing import List, Optional
 from sqlalchemy.orm import Session
-from services.system_services import get_current_user
+from services.system_service import get_current_user
 from database import get_db
 from models import Media, LanguageLearning
 from schemas import (
@@ -42,12 +42,14 @@ async def post_media(lan: str, title: str = Form(...), file: UploadFile = File(.
 @router.post("/{media_id}/vocabulary")
 async def extract_media_vocabulary(
         media_id: int,
+        provider: str | None = None,
+        model: str | None = None,
         db: Session = Depends(get_db),
         current_user=Depends(get_current_user)
 ):
     """Extract vocabulary from a medium using LLM"""
     media = get_media_or_404(db, media_id, current_user["id"])
-    return extract_and_save_vocabulary(db, media, VocabularyExtraction)
+    return extract_and_save_vocabulary(db, media, provider, model)
 
 
 @router.get("/{media_id}", response_model=MediaResponse)
