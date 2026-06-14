@@ -3,7 +3,7 @@ from typing import List, Optional
 from sqlalchemy.orm import Session
 from database import get_db
 from services.vocabulary_service import get_or_create_vocab
-from dependencies import get_current_user
+from services.system_services import get_current_user
 from models import Vocabulary, LanguageLearning
 from schemas import (
     VocabularyResponse, VocabularyCreate, VocabularyUpdate

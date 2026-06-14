@@ -135,25 +135,40 @@ graph TB
     end
 
     subgraph Backend["Backend layer (FastAPI)"]
-        Controller["Controller — main.py"]
-        Schemas["View / Schemas — schemas.py"]
-        Models["Model — models.py"]
+        Controller["Main — main.py"]
+        Schemas["Schemas — schemas.py"]
+        Models["Models — models.py"]
+        Database["database.py"]
 
-        subgraph Services["Service layer"]
+        subgraph Routers["Router layer (routers/)"]
+            direction LR
+            SystemRouter["system.py"]
+            LanguageRouter["languages.py"]
+            MediaRouter["media.py"]
+            VocabRouter["vocabularies.py"]
+            ChatRouter["chats.py"]
+        end
+
+        subgraph Services["Service layer (services/)"]
+            Language["language_service.py"]
+            Media["media_service.py"]
+            Vocab["vocabulary_service.py"]
+            Chat["chat_service.py"]
+        end
+        subgraph LLMServices["LLM Service layer (llm/)"]
             LLM["llm_service.py"]
-            Media["media_processing.py"]
             Prompts["prompts.py"]
         end
 
-        Controller <-->|validation| Schemas
-        Controller <-->|Data| Models
-        Controller --> LLM
-        Controller --> Media
-        Controller --> Prompts
+        Controller --> Routers
+        Routers <-->|validation| Schemas
+        Services <-->|Data| Database
+        Routers --> Services
+        Services <--> LLMServices
     end
 
     subgraph DB["Database layer"]
-        Postgres[("PostgreSQL · SQLAlchemy")]
+        Postgres[("PostgreSQL")]
     end
 
     subgraph AI["External AI APIs"]
@@ -164,10 +179,13 @@ graph TB
 
     HTTP -->|HTTP / JSON| Controller
     Swagger -->|HTTP / JSON| Controller
-    Models <-->|SQL| Postgres
     LLM -->|HTTPS / API Key| Groq
     LLM -->|HTTPS / API Key| Gemini
     LLM -->|HTTPS / API Key| OpenAI
+    Schemas <--> Models
+    Models <--> Database
+    Database <-->|SQLAlchemy| Postgres
+
 
 ```
 

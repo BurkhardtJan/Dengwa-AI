@@ -2,11 +2,10 @@ from fastapi import APIRouter, Depends
 from typing import List
 from sqlalchemy.orm import Session
 from database import get_db
-from dependencies import get_current_user
-from models import LanguageLearning, Media, Chat
+from services.system_services import get_current_user
+from models import LanguageLearning
 from schemas import (
     LanguageLearningResponse,
-    ChatResponse,
     LanguageLearningCreate, LanguageLearningUpdate
 )
 from services.language_service import get_learning_or_404, create_learning_record

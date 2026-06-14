@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from typing import List, Optional
 from sqlalchemy.orm import Session
 from llm.prompts import build_system_prompt_language_chat
-from dependencies import get_current_user
+from services.system_services import get_current_user
 from database import get_db
 from models import Chat, ChatHistory, Media
 from schemas import (

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, File, Form, UploadFile
 from typing import List, Optional
 from sqlalchemy.orm import Session
-from dependencies import get_current_user
+from services.system_services import get_current_user
 from database import get_db
 from models import Media, LanguageLearning
 from schemas import (
