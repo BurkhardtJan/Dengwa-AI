@@ -1,151 +1,114 @@
 import os
-from dotenv import load_dotenv
-from groq import Groq
-from google import genai
-from google.genai import types
-from openai import OpenAI
 from pydantic import BaseModel
+from langchain_core.messages import HumanMessage, AIMessage, SystemMessage, BaseMessage
+from langchain_openai import ChatOpenAI
+from langchain_groq import ChatGroq
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_ollama import ChatOllama
+from dotenv import load_dotenv
 
 load_dotenv()
 
-DEFAULT_PROVIDER = "openai"
+DEFAULT_PROVIDER = os.environ.get("LLM_PROVIDER", "groq")
+DEFAULT_MODELS = {
+    "openai": "gpt-5-nano",
+    "groq": "llama-3.3-70b-versatile",
+    "gemini": "gemini-2.5-flash-lite",
+    "ollama": "dolphin-llama3:latest",
+}
 
 
-def gemini_client(
-        messages: list[dict],
-        system_prompt: str,
-        model: str = "gemini-2.5-flash-lite",
+def get_model(
+        provider: str | None = None,
+        model: str | None = None,
         temperature: float = 1.0,
-        max_tokens: int = 1000,
-        response_schema: type[BaseModel] | None = None,
-) -> str | type[BaseModel]:
-    """Client for gemini API"""
-    client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
-    gemini_messages = []
-    for msg in messages:
-        role = "model" if msg["role"] == "assistant" else msg["role"]
-        gemini_messages.append(
-            types.Content(role=role, parts=[types.Part(text=msg["content"])])
-        )
-
-    config = types.GenerateContentConfig(
-        system_instruction=system_prompt,
-        temperature=temperature,
-        max_output_tokens=max_tokens,
-    )
-    if response_schema:
-        config.response_mime_type = "application/json"
-        config.response_schema = response_schema
-
-    resp = client.models.generate_content(model=model, contents=gemini_messages, config=config)
-    if response_schema:
-        return response_schema.model_validate_json(resp.text)
-
-    return resp.text
-
-
-def groq_client(
-        messages: list[dict],
-        system_prompt: str,
-        model: str = "llama-3.3-70b-versatile",
-        temperature: float = 1.0,
-        max_tokens: int = 1000,
-        response_schema: type[BaseModel] | None = None,
-) -> str | type[BaseModel]:
-    """Client for groq API"""
-    client = Groq(api_key=os.environ["GROQ_API_KEY"])
+        max_tokens: int | None = None,
+        streaming: bool = False,
+):
+    """
+    Returns LangChain Chat-Model.
+    Provider: openai | groq | gemini | ollama
+    """
+    provider = provider or DEFAULT_PROVIDER
+    model = model or DEFAULT_MODELS.get(provider)
 
     kwargs = {
         "model": model,
         "temperature": temperature,
-        "max_tokens": max_tokens,
-    }
-    if response_schema:
-        kwargs["response_format"] = {"type": "json_object"}
-        schema_str = response_schema.model_json_schema()
-        system_prompt = system_prompt + f"\nAntworte ausschließlich mit validem JSON das diesem Schema entspricht:\n{schema_str}"
-    kwargs["messages"] = [{"role": "system", "content": system_prompt}, *messages]
-
-    response = client.chat.completions.create(**kwargs)
-    raw_content = response.choices[0].message.content
-
-    if response_schema:
-        return response_schema.model_validate_json(raw_content)
-
-    return raw_content
-
-
-def openai_client(
-        messages: list[dict],
-        system_prompt: str,
-        model: str = "gpt-5-nano",
-        temperature: float = 1.0,
-        max_tokens: int = 50000,
-        response_schema: type[BaseModel] | None = None,
-) -> str | type[BaseModel]:
-    """Client for openai API"""
-    client = OpenAI()
-
-    kwargs = {
-        "model": model,
-        "messages": [{"role": "system", "content": system_prompt}, *messages],
+        "streaming": streaming,
     }
 
-    if "gpt-5" not in model and "o1" not in model:
-        kwargs["temperature"] = temperature
+    if max_tokens is not None:
         kwargs["max_tokens"] = max_tokens
-    else:
-        kwargs["max_completion_tokens"] = max_tokens
 
-    if response_schema:
-        response = client.beta.chat.completions.parse(
-            **kwargs,
-            response_format=response_schema,
+    if provider == "openai":
+        return ChatOpenAI(**kwargs)
+    elif provider == "groq":
+        return ChatGroq(**kwargs)
+    elif provider == "gemini":
+        return ChatGoogleGenerativeAI(**kwargs)
+    elif provider == "ollama":
+        return ChatOllama(
+            model=model,
+            temperature=temperature,
+            num_predict=max_tokens,
+            base_url=os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434"),
         )
-        return response.choices[0].message.parsed
     else:
-        response = client.chat.completions.create(**kwargs)
-        return response.choices[0].message.content
+        raise ValueError(f"Unknown provider '{provider}'. Available: openai, groq, gemini, ollama")
+
+
+def build_messages(
+        history: list[dict],
+        system_prompt: str | None = None,
+) -> list[BaseMessage]:
+    """
+    Converts (list of {role, content} dicts) in LangChain Message-Objekts.
+    """
+    messages: list[BaseMessage] = []
+
+    if system_prompt:
+        messages.append(SystemMessage(content=system_prompt))
+
+    for msg in history:
+        if msg["role"] == "user":
+            messages.append(HumanMessage(content=msg["content"]))
+        elif msg["role"] in ("assistant", "model"):
+            messages.append(AIMessage(content=msg["content"]))
+
+    return messages
 
 
 def call_llm(
         messages: list[dict],
-        system_prompt: str,
+        system_prompt: str = "",
         provider: str | None = None,
         model: str | None = None,
         temperature: float = 1.0,
         max_tokens: int | None = None,
         response_schema: type[BaseModel] | None = None,
-) -> str | type[BaseModel]:
-    """Wrapper for AI clients"""
-    if not provider:
-        provider = DEFAULT_PROVIDER
-    if provider == "groq":
-        return groq_client(
-            messages=messages,
-            system_prompt=system_prompt,
-            model=model or "llama-3.3-70b-versatile",
-            temperature=temperature,
-            max_tokens=max_tokens,
-            response_schema=response_schema
-        )
-    elif provider == "gemini":
-        return gemini_client(
-            messages=messages,
-            system_prompt=system_prompt,
-            model=model or "gemini-2.5-flash-lite",
-            temperature=temperature,
-            max_tokens=max_tokens,
-            response_schema=response_schema
-        )
-    elif provider == "openai":
-        return openai_client(
-            messages=messages,
-            system_prompt=system_prompt,
-            model=model or "gpt-5-nano",
-            temperature=temperature,
-            max_tokens=max_tokens,
-            response_schema=response_schema
-        )
-    else:
-        raise ValueError(f"Unknown provider '{provider}'. Available: groq, gemini, openai")
+        tools: list | None = None,
+) -> str | BaseModel:
+    """
+    Wrapper for LLM providers
+    """
+    lc_model = get_model(
+        provider=provider,
+        model=model,
+        temperature=temperature,
+        max_tokens=max_tokens,
+    )
+
+    lc_messages = build_messages(messages, system_prompt=system_prompt)
+
+    # Structured Output
+    if response_schema:
+        return lc_model.with_structured_output(response_schema).invoke(lc_messages)
+
+    # Tool-Calling
+    if tools:
+        return lc_model.bind_tools(tools).invoke(lc_messages)
+
+    # Normal Call
+    response = lc_model.invoke(lc_messages)
+    return response.content

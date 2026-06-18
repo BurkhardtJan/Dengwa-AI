@@ -113,7 +113,6 @@ python main.py
 ## Roadmap
 
 - [ ] RAG — inject vocabulary context into chat prompts
-- [ ] Switch to langraph as AI wrapper
 - [ ] Progress endpoint — implement actual logic (currently stub)
 - [ ] JWT login/register endpoints
 - [ ] Replace `get_current_user()` stub with real auth dependency
