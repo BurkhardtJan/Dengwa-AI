@@ -10,6 +10,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True)
     native_language = Column(String, default="de")
+    hashed_password = Column(String, nullable=False)
 
     language_learnings = relationship("LanguageLearning", back_populates="user")
     chats = relationship("Chat", back_populates="user")

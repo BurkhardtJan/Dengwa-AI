@@ -13,11 +13,13 @@ graph TB
         subgraph Routers["Router layer (routers/)"]
             direction LR
             SystemRouter["system.py"]
+            UserRouter["users.py"]
             LanguageRouter["languages.py"]
             MediaRouter["media.py"]
             VocabRouter["vocabularies.py"]
             ChatRouter["chats.py"]
-            SystemRouter ~~~ LanguageRouter
+            SystemRouter ~~~ UserRouter
+            UserRouter  ~~~ LanguageRouter
             LanguageRouter ~~~ MediaRouter
             MediaRouter ~~~ VocabRouter
             VocabRouter ~~~ ChatRouter
@@ -26,11 +28,13 @@ graph TB
         subgraph Services["Service layer (services/)"]
             direction LR
             System["system.py"]
+            Users["users.py"]
             Language["language_service.py"]
             Media["media_service.py"]
             Vocab["vocabulary_service.py"]
             Chat["chat_service.py"]
-            System ~~~ Language
+            System ~~~ Users
+            Users ~~~ Language
             Language ~~~ Media
             Media ~~~ Vocab
             Vocab ~~~ Chat

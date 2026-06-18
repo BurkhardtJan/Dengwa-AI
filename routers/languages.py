@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from typing import List
 from sqlalchemy.orm import Session
 from database import get_db
-from services.system_service import get_current_user
+from services.user_service import get_current_user
 from models import LanguageLearning
 from schemas import (
     LanguageLearningResponse,
@@ -19,7 +19,7 @@ async def get_languages(db: Session = Depends(get_db), current_user=Depends(get_
     learning = (
         db.query(LanguageLearning)
         .filter(
-            LanguageLearning.user_id == current_user["id"]
+            LanguageLearning.user_id == current_user.id
         )
     ).all()
     return learning
@@ -28,7 +28,7 @@ async def get_languages(db: Session = Depends(get_db), current_user=Depends(get_
 @router.post("", response_model=LanguageLearningResponse)
 async def create_language(payload: LanguageLearningCreate, db: Session = Depends(get_db),
                           current_user=Depends(get_current_user)):
-    learning = create_learning_record(db, payload.learning_language, current_user["id"], payload.proficiency_level,
+    learning = create_learning_record(db, payload.learning_language, current_user.id, payload.proficiency_level,
                                       payload.user_motivation)
     return learning
 
@@ -36,14 +36,14 @@ async def create_language(payload: LanguageLearningCreate, db: Session = Depends
 @router.get("/{lan}", response_model=LanguageLearningResponse)
 async def get_language(lan: str, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     """Returns language info"""
-    learning = get_learning_or_404(db, lan, current_user["id"])
+    learning = get_learning_or_404(db, lan, current_user.id)
     return learning
 
 
 @router.put("/{lan}", response_model=LanguageLearningResponse)
 async def update_language(lan: str, payload: LanguageLearningUpdate, db: Session = Depends(get_db),
                           current_user=Depends(get_current_user)):
-    learning = get_learning_or_404(db, lan, current_user["id"])
+    learning = get_learning_or_404(db, lan, current_user.id)
     if payload.proficiency_level is not None:
         learning.proficiency_level = payload.proficiency_level
     if payload.user_motivation is not None:
@@ -55,7 +55,7 @@ async def update_language(lan: str, payload: LanguageLearningUpdate, db: Session
 
 @router.delete("/{lan}")
 async def delete_language(lan: str, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
-    learning = get_learning_or_404(db, lan, current_user["id"])
+    learning = get_learning_or_404(db, lan, current_user.id)
     db.delete(learning)
     db.commit()
     return {"status": f"Language learning profile {lan} deleted"}

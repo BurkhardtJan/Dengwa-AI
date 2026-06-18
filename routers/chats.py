@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from typing import List, Optional
 from sqlalchemy.orm import Session
 from llm.prompts import build_system_prompt_language_chat
-from services.system_service import get_current_user
+from services.user_service import get_current_user
 from database import get_db
 from models import Chat, ChatHistory, Media
 from schemas import (
@@ -21,16 +21,16 @@ router = APIRouter(prefix="/chats", tags=["Chats"])
 async def get_chats(lan: Optional[str] = None, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     """Get all chats for current user"""
     if lan:
-        learning = get_learning_or_404(db, lan, current_user["id"])
+        learning = get_learning_or_404(db, lan, current_user.id)
 
         return (
             db.query(Chat)
             .join(Media, Chat.media_id == Media.id)
-            .filter(Chat.user_id == current_user["id"], Media.learning_id == learning.id)
+            .filter(Chat.user_id == current_user.id, Media.learning_id == learning.id)
             .all()
         )
     else:
-        return db.query(Chat).filter(Chat.user_id == current_user["id"]).all()
+        return db.query(Chat).filter(Chat.user_id == current_user.id).all()
 
 
 @router.post("", response_model=ChatCreate)
@@ -40,12 +40,12 @@ async def create_chat(
         current_user=Depends(get_current_user)
 ):
     """Create a new chat for a medium"""
-    get_media_or_404(db, media_id, current_user["id"])
+    get_media_or_404(db, media_id, current_user.id)
 
     new_chat = Chat(
         media_id=media_id,
-        user_id=current_user["id"],
-        user_chat_id=get_next_user_chat_id(db, current_user["id"])
+        user_id=current_user.id,
+        user_chat_id=get_next_user_chat_id(db, current_user.id)
     )
 
     db.add(new_chat)
@@ -62,7 +62,7 @@ async def get_chat_history(
         current_user=Depends(get_current_user)
 ):
     """Get chat history"""
-    chat = get_chat_or_404(db, chat_id, current_user["id"])
+    chat = get_chat_or_404(db, chat_id, current_user.id)
 
     return db.query(ChatHistory).filter(
         ChatHistory.chat_id == chat.id
@@ -79,7 +79,7 @@ async def post_chat_message(
         current_user=Depends(get_current_user)
 ):
     """Send a message to the AI"""
-    chat = get_chat_or_404(db, chat_id, current_user["id"])
+    chat = get_chat_or_404(db, chat_id, current_user.id)
     messages = build_message_history(db, chat.id, request.message)
 
     system_prompt = build_system_prompt_language_chat(chat)
@@ -103,7 +103,7 @@ async def post_chat_message(
 
 @router.delete("/{chat_id}")
 async def delete_chat(chat_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
-    chat = get_chat_or_404(db, chat_id, current_user["id"])
+    chat = get_chat_or_404(db, chat_id, current_user.id)
     db.delete(chat)
     db.commit()
     return {"status": f"Chat {chat_id} deleted"}

@@ -10,10 +10,16 @@ conversation, and track your progress.
 
 ### System
 
-| Method     | Endpoint    | Description         |
-|------------|-------------|---------------------|
-| **`GET`**  | `/health`   | Health check        |
-| **`POST`** | `/register` | Register a new user |
+| Method    | Endpoint  | Description  |
+|-----------|-----------|--------------|
+| **`GET`** | `/health` | Health check |
+
+### Users
+
+| Method     | Endpoint          | Description         |
+|------------|-------------------|---------------------|
+| **`POST`** | `/users/register` | Register a new user |
+| **`POST`** | `/users/login`    | Login user          |
 
 ### Languages
 
@@ -112,10 +118,8 @@ python main.py
 
 ## Roadmap
 
-- [ ] RAG — inject vocabulary context into chat prompts
+- [ ] RAG — inject vocabulary context into chat prompts (pgvector)
 - [ ] Progress endpoint — implement actual logic (currently stub)
-- [ ] JWT login/register endpoints
-- [ ] Replace `get_current_user()` stub with real auth dependency
 - [ ] Add default Vocab starter set (HSK, JLPT, ...)
 - [ ] UUID instead of serial ID for endpoints
 - [ ] Other Media Parsing
@@ -142,11 +146,13 @@ graph TB
         subgraph Routers["Router layer (routers/)"]
             direction LR
             SystemRouter["system.py"]
+            UserRouter["users.py"]
             LanguageRouter["languages.py"]
             MediaRouter["media.py"]
             VocabRouter["vocabularies.py"]
             ChatRouter["chats.py"]
-            SystemRouter ~~~ LanguageRouter
+            SystemRouter ~~~ UserRouter
+            UserRouter ~~~ LanguageRouter
             LanguageRouter ~~~ MediaRouter
             MediaRouter ~~~ VocabRouter
             VocabRouter ~~~ ChatRouter
@@ -155,11 +161,13 @@ graph TB
         subgraph Services["Service layer (services/)"]
             direction LR
             System["system.py"]
+            Users["users.py"]
             Language["language_service.py"]
             Media["media_service.py"]
             Vocab["vocabulary_service.py"]
             Chat["chat_service.py"]
-            System ~~~ Language
+            System ~~~ Users
+            Users ~~~ Language
             Language ~~~ Media
             Media ~~~ Vocab
             Vocab ~~~ Chat

@@ -1,11 +1,12 @@
 from fastapi import FastAPI
 import uvicorn
 from database import Base, engine
-from routers import system, languages, media, chats, vocabularies
+from routers import system, users, languages, media, chats, vocabularies
 
 app = FastAPI()
 
 app.include_router(system.router)
+app.include_router(users.router)
 app.include_router(languages.router)
 app.include_router(media.router)
 app.include_router(chats.router)

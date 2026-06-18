@@ -3,8 +3,9 @@ from typing import Optional, List
 from datetime import datetime
 
 
-class UserCreate(BaseModel):
+class UserRegister(BaseModel):
     username: str
+    password: str
     native_language: str = "de"
 
 
