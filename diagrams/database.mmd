@@ -12,6 +12,7 @@ erDiagram
     users {
         INTEGER id
         TEXT username
+        TEXT hashed_password
         TEXT native_language
     }
 
@@ -62,6 +63,7 @@ erDiagram
         INTEGER user_id
         TEXT learning_language
         TEXT proficiency_level
+        TEXT user_motivation
     }
 
     learning_progress {

@@ -117,7 +117,20 @@ python main.py
 ```
 
 ## Roadmap
-
+- [x] Initial project setup (DB, Backend)
+- [x] SQLAlchemy models & Pydantic schemas
+- [x] LLM integration (Groq/Gemini/OpenAI)
+- [x] POST endpoints (languages, media, chats, vocabularies)
+- [x] Media processing (SRT, TXT parsing)
+- [x] LLM integration in chat (conversation history from DB)
+- [x] Vocabulary CRUD endpoints
+- [x] Vocabulary generation from media via LLM
+- [x] Language endpoints (CRUD)
+- [x] Full CRUD for media, chats, languages
+- [x] Code refactoring (routers/, llm/, services/ structure)
+- [x] Architecture diagrams (Mermaid)
+- [x] Switch to LangGraph as AI wrapper
+- [x] JWT authentication (login/register)
 - [ ] RAG — inject vocabulary context into chat prompts (pgvector)
 - [ ] Progress endpoint — implement actual logic (currently stub)
 - [ ] Add default Vocab starter set (HSK, JLPT, ...)
@@ -227,6 +240,7 @@ erDiagram
     users {
         INTEGER id
         TEXT username
+        TEXT hashed_password
         TEXT native_language
     }
 
@@ -277,6 +291,7 @@ erDiagram
         INTEGER user_id
         TEXT learning_language
         TEXT proficiency_level
+        TEXT user_motivation
     }
 
     learning_progress {

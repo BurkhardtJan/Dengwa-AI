@@ -5,7 +5,7 @@ from passlib.context import CryptContext
 from schemas import UserRegister
 from database import get_db
 from models import User
-from services.user_service import create_access_token, verify_password, hash_password
+from services.user_service import create_access_token, verify_password, hash_password, get_current_user
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -29,9 +29,16 @@ async def register(data: UserRegister, db: Session = Depends(get_db)):
 
 @router.post("/login")
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    """Login, returns Token"""
     user = db.query(User).filter(User.username == form_data.username).first()
     if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(status_code=400, detail="Falsche Anmeldedaten")
 
     token = create_access_token(subject=str(user.id))
     return {"access_token": token, "token_type": "bearer"}
+
+
+@router.get("/me")
+def get_me(current_user: User = Depends(get_current_user)):
+    """Returns current user Info"""
+    return {"username": current_user.username, "native_language": current_user.native_language}

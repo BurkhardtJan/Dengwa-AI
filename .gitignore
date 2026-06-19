@@ -6,6 +6,6 @@ __pycache__
 *.pyo
 *.pyd
 *.db
-playground/
-uploads/
-tests/
+backend/playground/
+backend/uploads
+backend/tests/
