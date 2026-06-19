@@ -2,6 +2,7 @@ import os
 import shutil
 from fastapi import HTTPException, UploadFile
 from sqlalchemy.orm import Session
+from uuid import UUID
 from models import Media, MediaVocabulary, LanguageLearning
 from schemas import VocabularyExtraction
 from llm.prompts import build_vocab_extract_prompt
@@ -37,7 +38,7 @@ def extract_content(content_type: str, file_path: str) -> str | None:
     return None
 
 
-def get_media_or_404(db: Session, media_id: int, user_id: int) -> Media:
+def get_media_or_404(db: Session, media_id: UUID, user_id: UUID) -> Media:
     """Returns a Media record or raises 404."""
     media = (
         db.query(Media)
@@ -55,8 +56,8 @@ def get_media_or_404(db: Session, media_id: int, user_id: int) -> Media:
 
 def create_media_vocab(
         db: Session,
-        media_id: int,
-        learning_id: int,
+        media_id: UUID,
+        learning_id: UUID,
         word: str,
         translation: str | None = None,
         context_sentence: str | None = None,
@@ -130,7 +131,7 @@ def extract_and_save_vocabulary(db: Session, media: Media, provider, model) -> V
     return response_structured
 
 
-def save_uploaded_file(file: UploadFile, user_id: int, lan: str) -> str:
+def save_uploaded_file(file: UploadFile, user_id: UUID, lan: str) -> str:
     """
     Saves an uploaded file to uploads/<user_id>/<lan>/<filename>.
     Returns the file path.

@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List
 from datetime import datetime
+from uuid import UUID
 
 
 class UserRegister(BaseModel):
@@ -10,7 +11,7 @@ class UserRegister(BaseModel):
 
 
 class UserResponse(BaseModel):
-    id: int
+    id: UUID
     username: str
     native_language: str
 
@@ -29,8 +30,8 @@ class LanguageLearningUpdate(BaseModel):
 
 
 class LanguageLearningResponse(BaseModel):
-    id: int
-    user_id: int
+    id: UUID
+    user_id: UUID
     learning_language: str
     proficiency_level: str
     user_motivation: Optional[str] = None
@@ -39,10 +40,10 @@ class LanguageLearningResponse(BaseModel):
 
 
 class MediaResponse(BaseModel):
-    id: int
+    id: UUID
     title: str
     content_type: str
-    learning_id: int
+    learning_id: UUID
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -59,7 +60,7 @@ class VocabularyProgressResponse(BaseModel):
 
 
 class VocabularyResponse(BaseModel):
-    id: int
+    id: UUID
     word: str
     translation: Optional[str] = None
     context_sentence: Optional[str] = None
@@ -85,14 +86,13 @@ class VocabularyUpdate(BaseModel):
 
 
 class ChatCreate(BaseModel):
-    media_id: int
+    media_id: UUID
 
 
 class ChatResponse(BaseModel):
-    id: int
-    media_id: int
-    user_id: int
-    user_chat_id: int
+    id: UUID
+    media_id: UUID
+    user_id: UUID
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -102,7 +102,7 @@ class ChatMessageRequest(BaseModel):
 
 
 class ChatMessageResponse(BaseModel):
-    id: int
+    id: UUID
     role: str
     message: str
     timestamp: datetime

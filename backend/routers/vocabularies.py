@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 from typing import List, Optional
 from sqlalchemy.orm import Session
+from uuid import UUID
 from database import get_db
 from services.user_service import get_current_user
 from models import Vocabulary, LanguageLearning
@@ -38,14 +39,14 @@ async def create_vocabulary_endpoint(lan: str, payload: VocabularyCreate, db: Se
 
 
 @router.get("/{vocab_id}", response_model=VocabularyResponse)
-async def get_vocabulary(vocab_id: int, db: Session = Depends(get_db),
+async def get_vocabulary(vocab_id: UUID, db: Session = Depends(get_db),
                          current_user=Depends(get_current_user)):
     """Get vocabulary by ID"""
     return get_vocab_or_404(db, vocab_id, current_user.id)
 
 
 @router.put("/{vocab_id}", response_model=VocabularyResponse)
-async def update_vocabulary(vocab_id: int, payload: VocabularyUpdate, db: Session = Depends(get_db),
+async def update_vocabulary(vocab_id: UUID, payload: VocabularyUpdate, db: Session = Depends(get_db),
                             current_user=Depends(get_current_user)):
     """Update Vocabulary by ID"""
     vocab = get_vocab_or_404(db, vocab_id, current_user.id)
@@ -66,7 +67,7 @@ async def update_vocabulary(vocab_id: int, payload: VocabularyUpdate, db: Sessio
 
 
 @router.delete("/{vocab_id}")
-async def delete_vocabulary(vocab_id: int, db: Session = Depends(get_db),
+async def delete_vocabulary(vocab_id: UUID, db: Session = Depends(get_db),
                             current_user=Depends(get_current_user)):
     """Delete Vocabulary by id"""
     vocab = get_vocab_or_404(db, vocab_id, current_user.id)

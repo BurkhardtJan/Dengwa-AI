@@ -2,10 +2,11 @@ from datetime import datetime, timezone
 from fastapi import HTTPException
 from sqlalchemy import func
 from sqlalchemy.orm import Session
+from uuid import UUID
 from models import Vocabulary, MediaVocabulary, LanguageLearning
 
 
-def get_vocab_or_404(db: Session, vocab_id: int, user_id: int, learning_id: int | None = None) -> Vocabulary:
+def get_vocab_or_404(db: Session, vocab_id: UUID, user_id: UUID, learning_id: UUID | None = None) -> Vocabulary:
     """Returns a Vocabulary record scoped to a learning entry, or raises 404."""
     query = (
         db.query(Vocabulary)
@@ -26,7 +27,7 @@ def get_vocab_or_404(db: Session, vocab_id: int, user_id: int, learning_id: int 
 
 def create_vocab(
         db: Session,
-        learning_id: int,
+        learning_id: UUID,
         word: str,
         translation: str | None = None,
         context_sentence: str | None = None,
@@ -59,7 +60,7 @@ def create_vocab(
 
 def get_or_create_vocab(
         db: Session,
-        learning_id: int,
+        learning_id: UUID,
         word: str,
         translation: str | None = None,
         context_sentence: str | None = None,

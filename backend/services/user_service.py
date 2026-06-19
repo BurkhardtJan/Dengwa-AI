@@ -5,6 +5,7 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 import jwt
 import bcrypt
+from uuid import UUID
 from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 from passlib.context import CryptContext
@@ -35,7 +36,11 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         sub: str = payload.get("sub")
         if sub is None:
             raise credentials_exception
-        user = db.query(User).filter(User.id == int(sub)).first()
+        try:
+            user_uuid = UUID(sub)
+        except ValueError:
+            raise credentials_exception
+        user = db.query(User).filter(User.id == user_uuid).first()
         if user is None:
             raise credentials_exception
         return user

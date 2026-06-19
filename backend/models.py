@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, UniqueConstraint, Float
+import uuid
+from sqlalchemy import Column, String, Text, ForeignKey, DateTime, UniqueConstraint, Float, Integer, UUID
 from sqlalchemy.orm import relationship
 from database import Base
 from datetime import datetime, timezone
@@ -7,7 +8,7 @@ from datetime import datetime, timezone
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     username = Column(String, unique=True, index=True)
     native_language = Column(String, default="de")
     hashed_password = Column(String, nullable=False)
@@ -19,8 +20,8 @@ class User(Base):
 class LanguageLearning(Base):
     __tablename__ = "language_learning"
 
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     learning_language = Column(String, nullable=False)
     proficiency_level = Column(String, default="A0")
     user_motivation = Column(String)
@@ -40,12 +41,12 @@ class LanguageLearning(Base):
 class Media(Base):
     __tablename__ = "media"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     title = Column(String, nullable=False)
     content_type = Column(String, nullable=False)  # srt, txt, pdf
     file_path = Column(String)
     extracted_content = Column(Text)
-    learning_id = Column(Integer, ForeignKey("language_learning.id"), nullable=False)
+    learning_id = Column(UUID(as_uuid=True), ForeignKey("language_learning.id"), nullable=False)
 
     language_learning = relationship("LanguageLearning", back_populates="media")
     chats = relationship("Chat", back_populates="media", cascade="all, delete-orphan")
@@ -56,8 +57,8 @@ class Media(Base):
 class Vocabulary(Base):
     __tablename__ = "vocabularies"
 
-    id = Column(Integer, primary_key=True, index=True)
-    learning_id = Column(Integer, ForeignKey("language_learning.id"), nullable=False)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    learning_id = Column(UUID(as_uuid=True), ForeignKey("language_learning.id"), nullable=False)
     word = Column(String, nullable=False)
     translation = Column(String)
     context_sentence = Column(Text)
@@ -75,15 +76,15 @@ class Vocabulary(Base):
     llm_context = Column(Text)
 
     language_learning = relationship("LanguageLearning", back_populates="vocabularies")
-    media_vocabularies = relationship("MediaVocabulary", back_populates="vocabulary")
+    media_vocabularies = relationship("MediaVocabulary", back_populates="vocabulary", cascade="all, delete-orphan")
 
 
 class MediaVocabulary(Base):
     __tablename__ = "media_vocabularies"
 
-    id = Column(Integer, primary_key=True, index=True)
-    media_id = Column(Integer, ForeignKey("media.id"), nullable=False)
-    vocabulary_id = Column(Integer, ForeignKey("vocabularies.id"), nullable=False)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    media_id = Column(UUID(as_uuid=True), ForeignKey("media.id"), nullable=False)
+    vocabulary_id = Column(UUID(as_uuid=True), ForeignKey("vocabularies.id"), nullable=False)
 
     media = relationship("Media", back_populates="media_vocabularies")
     vocabulary = relationship("Vocabulary", back_populates="media_vocabularies")
@@ -92,28 +93,20 @@ class MediaVocabulary(Base):
 class Chat(Base):
     __tablename__ = "chats"
 
-    id = Column(Integer, primary_key=True, index=True)
-    media_id = Column(Integer, ForeignKey("media.id"), nullable=False)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    user_chat_id = Column(Integer, nullable=False)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    media_id = Column(UUID(as_uuid=True), ForeignKey("media.id"), nullable=False)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
 
     media = relationship("Media", back_populates="chats")
     user = relationship("User", back_populates="chats")
     chat_histories = relationship("ChatHistory", back_populates="chat", cascade="all, delete-orphan")
 
-    __table_args__ = (
-        UniqueConstraint(
-            "user_id",
-            "user_chat_id"
-        ),
-    )
-
 
 class ChatHistory(Base):
     __tablename__ = "chat_histories"
 
-    id = Column(Integer, primary_key=True, index=True)
-    chat_id = Column(Integer, ForeignKey("chats.id"), nullable=False)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    chat_id = Column(UUID(as_uuid=True), ForeignKey("chats.id"), nullable=False)
     message = Column(Text, nullable=False)
     timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     role = Column(String, nullable=False)  # "user" oder "assistant"
@@ -124,9 +117,9 @@ class ChatHistory(Base):
 class LearningProgress(Base):
     __tablename__ = "learning_progress"
 
-    id = Column(Integer, primary_key=True, index=True)
-    media_id = Column(Integer, ForeignKey("media.id"), nullable=False)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    media_id = Column(UUID(as_uuid=True), ForeignKey("media.id"), nullable=False)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     proficiency_level = Column(String)
     comment = Column(Text)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))

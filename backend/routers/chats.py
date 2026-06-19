@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 from typing import List, Optional
 from sqlalchemy.orm import Session
+from uuid import UUID
 from llm.prompts import build_system_prompt_language_chat
 from services.user_service import get_current_user
 from database import get_db
@@ -10,7 +11,7 @@ from schemas import (
     ChatMessageRequest, ChatMessageResponse
 )
 from llm.client import call_llm
-from services.chat_service import get_chat_or_404, get_next_user_chat_id, build_message_history
+from services.chat_service import get_chat_or_404, build_message_history
 from services.media_service import get_media_or_404
 from services.language_service import get_learning_or_404
 
@@ -35,7 +36,7 @@ async def get_chats(lan: Optional[str] = None, db: Session = Depends(get_db), cu
 
 @router.post("", response_model=ChatCreate)
 async def create_chat(
-        media_id: int,
+        media_id: UUID,
         db: Session = Depends(get_db),
         current_user=Depends(get_current_user)
 ):
@@ -45,7 +46,6 @@ async def create_chat(
     new_chat = Chat(
         media_id=media_id,
         user_id=current_user.id,
-        user_chat_id=get_next_user_chat_id(db, current_user.id)
     )
 
     db.add(new_chat)
@@ -57,7 +57,7 @@ async def create_chat(
 
 @router.get("/{chat_id}", response_model=List[ChatMessageResponse])
 async def get_chat_history(
-        chat_id: int,
+        chat_id: UUID,
         db: Session = Depends(get_db),
         current_user=Depends(get_current_user)
 ):
@@ -71,7 +71,7 @@ async def get_chat_history(
 
 @router.post("/{chat_id}", response_model=List[ChatMessageResponse])
 async def post_chat_message(
-        chat_id: int,
+        chat_id: UUID,
         request: ChatMessageRequest,
         provider: str | None = None,
         model: str | None = None,
@@ -102,7 +102,7 @@ async def post_chat_message(
 
 
 @router.delete("/{chat_id}")
-async def delete_chat(chat_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+async def delete_chat(chat_id: UUID, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     chat = get_chat_or_404(db, chat_id, current_user.id)
     db.delete(chat)
     db.commit()

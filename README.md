@@ -131,10 +131,10 @@ python main.py
 - [x] Architecture diagrams (Mermaid)
 - [x] Switch to LangGraph as AI wrapper
 - [x] JWT authentication (login/register)
+- [x] UUID instead of serial ID for endpoints
 - [ ] RAG — inject vocabulary context into chat prompts (pgvector)
 - [ ] Progress endpoint — implement actual logic (currently stub)
 - [ ] Add default Vocab starter set (HSK, JLPT, ...)
-- [ ] UUID instead of serial ID for endpoints
 - [ ] Other Media Parsing
 - [ ] Docker Deployment
 - [ ] Tests (pytest)

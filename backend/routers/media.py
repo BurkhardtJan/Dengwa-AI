@@ -3,6 +3,7 @@ from typing import List, Optional
 from sqlalchemy.orm import Session
 from services.user_service import get_current_user
 from database import get_db
+from uuid import UUID
 from models import Media, LanguageLearning
 from schemas import (
     MediaResponse,
@@ -41,7 +42,7 @@ async def post_media(lan: str, title: str = Form(...), file: UploadFile = File(.
 
 @router.post("/{media_id}/vocabulary")
 async def extract_media_vocabulary(
-        media_id: int,
+        media_id: UUID,
         provider: str | None = None,
         model: str | None = None,
         db: Session = Depends(get_db),
@@ -53,13 +54,13 @@ async def extract_media_vocabulary(
 
 
 @router.get("/{media_id}", response_model=MediaResponse)
-async def get_single_medium(media_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+async def get_single_medium(media_id: UUID, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     media = get_media_or_404(db, media_id, current_user.id)
     return media
 
 
 @router.delete("/{media_id}")
-async def delete_medium(media_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+async def delete_medium(media_id: UUID, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     media = get_media_or_404(db, media_id, current_user.id)
     db.delete(media)
     db.commit()
