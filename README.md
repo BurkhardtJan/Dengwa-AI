@@ -117,6 +117,7 @@ python main.py
 ```
 
 ## Roadmap
+### Done
 - [x] Initial project setup (DB, Backend)
 - [x] SQLAlchemy models & Pydantic schemas
 - [x] LLM integration (Groq/Gemini/OpenAI)
@@ -132,6 +133,7 @@ python main.py
 - [x] Switch to LangGraph as AI wrapper
 - [x] JWT authentication (login/register)
 - [x] UUID instead of serial ID for endpoints
+### Backend
 - [ ] RAG — inject vocabulary context into chat prompts (pgvector)
 - [ ] Progress endpoint — implement actual logic (currently stub)
 - [ ] Add default Vocab starter set (HSK, JLPT, ...)
@@ -139,7 +141,8 @@ python main.py
 - [ ] Docker Deployment
 - [ ] Tests (pytest)
 - [ ] Refactor Code
-- [ ] Add Frontend
+### Frontend
+- [ ] Frontend click dummy
 
 ## Architecture
 
@@ -238,14 +241,14 @@ erDiagram
     chats }o--|| users: references
 
     users {
-        INTEGER id
+        UUID id
         TEXT username
         TEXT hashed_password
         TEXT native_language
     }
 
     media {
-        INTEGER id
+        UUID id
         TEXT title
         TEXT content_type
         TEXT file_path
@@ -254,7 +257,7 @@ erDiagram
     }
 
     vocabularies {
-        INTEGER id
+        UUID id
         INTEGER learning_id
         TEXT word
         TEXT translation
@@ -272,14 +275,13 @@ erDiagram
     }
 
     chats {
-        INTEGER id
+        UUID id
         INTEGER media_id
         INTEGER user_id
-        INTEGER user_chat_id
     }
 
     chat_histories {
-        INTEGER id
+        UUID id
         INTEGER chat_id
         TEXT message
         TIMESTAMP timestamp
@@ -287,7 +289,7 @@ erDiagram
     }
 
     language_learning {
-        INTEGER id
+        UUID id
         INTEGER user_id
         TEXT learning_language
         TEXT proficiency_level
@@ -295,14 +297,14 @@ erDiagram
     }
 
     learning_progress {
-        INTEGER id
+        UUID id
         INTEGER media_id
         TEXT proficiency_level
         TEXT comment
     }
 
     media_vocabularies {
-        INTEGER id
+        UUID id
         INTEGER media_id
         INTEGER vocabulary_id
     }

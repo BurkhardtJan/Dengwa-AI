@@ -10,14 +10,14 @@ erDiagram
     chats }o--|| users: references
 
     users {
-        INTEGER id
+        UUID id
         TEXT username
         TEXT hashed_password
         TEXT native_language
     }
 
     media {
-        INTEGER id
+        UUID id
         TEXT title
         TEXT content_type
         TEXT file_path
@@ -26,7 +26,7 @@ erDiagram
     }
 
     vocabularies {
-        INTEGER id
+        UUID id
         INTEGER learning_id
         TEXT word
         TEXT translation
@@ -44,14 +44,13 @@ erDiagram
     }
 
     chats {
-        INTEGER id
+        UUID id
         INTEGER media_id
         INTEGER user_id
-        INTEGER user_chat_id
     }
 
     chat_histories {
-        INTEGER id
+        UUID id
         INTEGER chat_id
         TEXT message
         TIMESTAMP timestamp
@@ -59,7 +58,7 @@ erDiagram
     }
 
     language_learning {
-        INTEGER id
+        UUID id
         INTEGER user_id
         TEXT learning_language
         TEXT proficiency_level
@@ -67,14 +66,14 @@ erDiagram
     }
 
     learning_progress {
-        INTEGER id
+        UUID id
         INTEGER media_id
         TEXT proficiency_level
         TEXT comment
     }
 
     media_vocabularies {
-        INTEGER id
+        UUID id
         INTEGER media_id
         INTEGER vocabulary_id
     }
