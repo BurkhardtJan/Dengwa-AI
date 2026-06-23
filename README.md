@@ -16,10 +16,11 @@ conversation, and track your progress.
 
 ### Users
 
-| Method     | Endpoint          | Description         |
-|------------|-------------------|---------------------|
-| **`POST`** | `/users/register` | Register a new user |
-| **`POST`** | `/users/login`    | Login user          |
+| Method     | Endpoint          | Description             |
+|------------|-------------------|-------------------------|
+| **`POST`** | `/users/register` | Register a new user     |
+| **`POST`** | `/users/login`    | Login user              |
+| **`GET`**  | `/users/me`       | Return user information |
 
 ### Languages
 
@@ -102,7 +103,7 @@ In PostgreSQL:
 ALTER USER postgres WITH PASSWORD 'your_password';
 ```
 
-### Install requirements and start:
+### Backend:
 
 ```bash
 # Install dependencies
@@ -114,6 +115,14 @@ cp .env.example .env
 
 # Run
 python main.py
+```
+
+### Frontend:
+```bash
+cd frontend
+nvm use 22
+pnpm install
+pnpm dev
 ```
 
 ## Roadmap
@@ -133,6 +142,8 @@ python main.py
 - [x] Switch to LangGraph as AI wrapper
 - [x] JWT authentication (login/register)
 - [x] UUID instead of serial ID for endpoints
+- [x] Frontend setup (React 18 + Vite + TypeScript + Tailwind + shadcn/ui)
+
 ### Backend
 - [ ] RAG — inject vocabulary context into chat prompts (pgvector)
 - [ ] Progress endpoint — implement actual logic (currently stub)
@@ -142,10 +153,15 @@ python main.py
 - [ ] Tests (pytest)
 - [ ] Refactor Code
 ### Frontend
-- [ ] Frontend click dummy
-
+- [ ] Media upload & management
+- [ ] Chat interface
+- [ ] Language management page
+- [ ] Multiple Language UI with i18n 
+- [ ] Dashboard with real progress data
+- [ ] Comparison LLMs
 ## Architecture
 
+### Backend
 ```mermaid
 graph TB
     subgraph Client["Client layer"]

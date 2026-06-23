@@ -1,5 +1,6 @@
 import {BrowserRouter, Routes, Route, Navigate} from 'react-router-dom'
 import LoginPage from './pages/LoginPage'
+import SignInPage from './pages/SignInPage'
 import DashboardPage from './pages/DashboardPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import VocabularyPage from './pages/VocabularyPage'
@@ -10,6 +11,7 @@ function App() {
         <BrowserRouter>
             <Routes>
                 <Route path="/login" element={<LoginPage/>}/>
+                <Route path="/signin" element={<SignInPage/>}/>
                 <Route element={<ProtectedRoute><Layout/></ProtectedRoute>}>
                     <Route path="/dashboard" element={<DashboardPage/>}/>
                     <Route path="/vocabulary" element={<VocabularyPage/>}/>

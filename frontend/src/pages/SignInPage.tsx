@@ -1,34 +1,32 @@
-import {useState} from 'react'
-import {login} from '../services/auth.service'
-import {useNavigate} from 'react-router-dom'
+import { useState } from 'react'
+import { register } from '../services/auth.service'
+import { useNavigate } from 'react-router-dom'
 
-function LoginPage() {
+function SignInPage() {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
+    const [nativeLanguage, setNativeLanguage] = useState('de')
     const [error, setError] = useState('')
     const navigate = useNavigate()
 
-    async function handleSubmit(e: React.FormEvent) {
+    async function handleSignin(e: React.FormEvent) {
         e.preventDefault()
         setError('')
         try {
-            const data = await login(username, password)
-            localStorage.setItem('token', data.access_token)
-            console.log('Token:', data.access_token)
-            navigate('/dashboard')
+            await register(username, password, nativeLanguage)
+            navigate('/login')
         } catch {
-            setError('Falsche Anmeldedaten')
+            setError('Registrierung fehlgeschlagen – Username bereits vergeben?')
         }
     }
-
 
     return (
         <div className="min-h-screen flex items-center justify-center">
             <div className="w-full max-w-md p-8">
-                <h1 className="text-3xl font-bold mb-2">Willkommen</h1>
-                <p className="text-muted-foreground mb-8">Melde dich bei Immersio AI an</p>
+                <h1 className="text-3xl font-bold mb-2">Account erstellen</h1>
+                <p className="text-muted-foreground mb-8">Neu bei Immersio AI? Los geht's.</p>
 
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSignin}>
                     <div className="mb-4">
                         <label className="block text-sm font-medium mb-2">Username</label>
                         <input
@@ -37,10 +35,11 @@ function LoginPage() {
                             onChange={e => setUsername(e.target.value)}
                             className="w-full border rounded-lg px-3 py-2"
                             placeholder="Benutzername"
+                            required
                         />
                     </div>
 
-                    <div className="mb-6">
+                    <div className="mb-4">
                         <label className="block text-sm font-medium mb-2">Passwort</label>
                         <input
                             type="password"
@@ -48,23 +47,41 @@ function LoginPage() {
                             onChange={e => setPassword(e.target.value)}
                             className="w-full border rounded-lg px-3 py-2"
                             placeholder="••••••••"
+                            required
                         />
                     </div>
+
+                    <div className="mb-6">
+                        <label className="block text-sm font-medium mb-2">Muttersprache</label>
+                        <select
+                            value={nativeLanguage}
+                            onChange={e => setNativeLanguage(e.target.value)}
+                            className="w-full border rounded-lg px-3 py-2 bg-background"
+                        >
+                            <option value="de">Deutsch</option>
+                            <option value="en">Englisch</option>
+                            <option value="fr">Französisch</option>
+                            <option value="es">Spanisch</option>
+                        </select>
+                    </div>
+
                     {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+
                     <button
                         type="submit"
                         className="w-full bg-primary text-primary-foreground py-2 rounded-lg font-medium"
                     >
-                        Anmelden
+                        Account erstellen
                     </button>
                 </form>
+
                 <p className="text-center text-sm text-muted-foreground mt-6">
-                    Neu bei Immersio AI?{' '}
+                    Schon einen Account?{' '}
                     <button
-                        onClick={() => navigate('/signin')}
+                        onClick={() => navigate('/login')}
                         className="underline hover:text-foreground"
                     >
-                        Account erstellen
+                        Anmelden
                     </button>
                 </p>
             </div>
@@ -72,4 +89,4 @@ function LoginPage() {
     )
 }
 
-export default LoginPage
+export default SignInPage

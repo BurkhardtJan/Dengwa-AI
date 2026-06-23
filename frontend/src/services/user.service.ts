@@ -1,13 +1,6 @@
-import axios from 'axios'
-
-const BASE_URL = 'http://localhost:8000'
+import api from './api'
 
 export async function fetchMe() {
-  const token = localStorage.getItem('token')
-  const response = await axios.get(`${BASE_URL}/users/me`, {
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  })
+  const response = await api.get('/users/me')
   return response.data
 }

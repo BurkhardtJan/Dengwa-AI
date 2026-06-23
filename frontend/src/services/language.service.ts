@@ -1,18 +1,9 @@
-import axios from 'axios'
+import api from './api'
 import type { components } from '../types/api'
 
 type Language = components['schemas']['LanguageLearningResponse']
 
-const BASE_URL = 'http://localhost:8000'
-
-function authHeader() {
-  const token = localStorage.getItem('token')
-  return { Authorization: `Bearer ${token}` }
-}
-
 export async function fetchLanguages(): Promise<Language[]> {
-  const response = await axios.get(`${BASE_URL}/languages`, {
-    headers: authHeader()
-  })
+  const response = await api.get('/languages')
   return response.data
 }
