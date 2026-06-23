@@ -5,6 +5,7 @@ import Modal from '../components/Modal'
 import {fetchLanguages} from "../services/language.service.ts";
 import {fetchVocabularies, createVocabulary} from '../services/vocabulary.service'
 import type {components} from '../types/api'
+import {useLanguage} from "@/context/LanguageContext.tsx";
 
 type Vocabulary = components['schemas']['VocabularyResponse']
 type VocabularyCreate = components['schemas']['VocabularyCreate']
@@ -12,7 +13,7 @@ type VocabularyCreate = components['schemas']['VocabularyCreate']
 function VocabularyPage() {
     const navigate = useNavigate()
     const queryClient = useQueryClient()
-    const [selectedLan, setSelectedLan] = useState<string | null>(null)
+    const { selectedLan, setSelectedLan } = useLanguage()
     const [newWord, setNewWord] = useState('')
     const [newTranslation, setNewTranslation] = useState('')
     const [showForm, setShowForm] = useState(false)
