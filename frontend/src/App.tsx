@@ -4,6 +4,7 @@ import SignInPage from './pages/SignInPage'
 import DashboardPage from './pages/DashboardPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import VocabularyPage from './pages/VocabularyPage'
+import VocabularyDetailPage from './pages/VocabularyDetailPage'
 import Layout from './components/Layout'
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
                 <Route element={<ProtectedRoute><Layout/></ProtectedRoute>}>
                     <Route path="/dashboard" element={<DashboardPage/>}/>
                     <Route path="/vocabulary" element={<VocabularyPage/>}/>
+                    <Route path="/vocabulary/:id" element={<VocabularyDetailPage/>}/>
                 </Route>
                 <Route path="*" element={<Navigate to="/login"/>}/>
             </Routes>
