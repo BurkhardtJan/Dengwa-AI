@@ -48,7 +48,8 @@ function VocabularyPage() {
             <div className="grid gap-4">
                 {selectedLan && (
                     <div onClick={() => setShowForm(v => !v)} className="border rounded-lg p-4 cursor-pointer hover:bg-muted">
-                        Vokabel hinzufügen
+                        <p className="font-medium">{selectedLan}</p>
+                        <p className="text-muted-foreground">Vokabel hinzufügen</p>
                     </div>
                 )}
                 {showForm && (

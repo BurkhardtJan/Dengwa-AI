@@ -2,7 +2,7 @@ import {useState, useEffect} from 'react'
 import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query'
 import {useNavigate} from 'react-router-dom'
 import {fetchMe} from '../services/user.service'
-import {deleteLanguage, fetchLanguages, updateLanguage} from "@/services/language.service.ts";
+import {deleteLanguage, fetchLanguages, updateLanguage, createLanguage} from "@/services/language.service.ts"
 import {useLanguage} from '@/context/LanguageContext'
 import type {components} from '../types/api'
 import Modal from '../components/Modal'
@@ -18,6 +18,8 @@ function DashboardPage() {
     const [editing, setEditing] = useState(false)
     const [proficiencyLevel, setProficiencyLevel] = useState('')
     const [userMotivation, setUserMotivation] = useState('')
+    const [showCreate, setShowCreate] = useState(false)
+    const [newLan, setNewLan] = useState('')
 
     const {data, isLoading, isError} = useQuery({
         queryKey: ['me'],
@@ -26,6 +28,14 @@ function DashboardPage() {
     const {data: languages} = useQuery({
         queryKey: ['languages'],
         queryFn: fetchLanguages
+    })
+
+    const createMutation = useMutation({
+        mutationFn: (lan: string) => createLanguage({learning_language: lan}),
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ['languages']})
+            setShowCreate(false)
+        }
     })
 
     const updateMutation = useMutation({
@@ -70,6 +80,12 @@ function DashboardPage() {
                         <p className="font-medium">{lan.learning_language}</p>
                     </div>
                 ))}
+                <div
+                    className="border rounded-lg p-4 cursor-pointer hover:bg-muted flex items-center justify-center"
+                    onClick={() => setShowCreate(true)}
+                >
+                    <p className="text-2xl text-muted-foreground">+</p>
+                </div>
             </div>
             {selectedLan && (
                 <Modal onClose={() => {
@@ -128,6 +144,23 @@ function DashboardPage() {
                             </div>
                         </>
                     )}
+                </Modal>
+            )}
+            {showCreate && (
+                <Modal onClose={() => setShowCreate(false)}>
+                    <h2 className="text-lg font-bold mb-4">Neue Sprache</h2>
+                    <input
+                        value={newLan}
+                        onChange={e => setNewLan(e.target.value)}
+                        placeholder="z.B. English"
+                        className="border rounded-lg px-3 py-2 w-full mb-4"
+                    />
+                    <button
+                        onClick={() => createMutation.mutate(newLan)}
+                        className="bg-primary text-primary-foreground px-4 py-2 rounded-lg"
+                    >
+                        Hinzufügen
+                    </button>
                 </Modal>
             )}
         </div>
