@@ -1,9 +1,9 @@
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { fetchMe } from '../services/user.service'
-import { deleteLanguage, fetchLanguages, updateLanguage } from "@/services/language.service.ts"
-import { useLanguage } from '@/context/LanguageContext'
-import type { components } from '../types/api'
+import {useState} from 'react'
+import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query'
+import {fetchMe} from '../services/user.service'
+import {deleteLanguage, fetchLanguages, updateLanguage} from "@/services/language.service.ts"
+import {useLanguage} from '@/context/LanguageContext'
+import type {components} from '../types/api'
 import Modal from '../components/Modal'
 import CreateLanguageModal from '@/components/CreateLanguageModal'
 
@@ -11,19 +11,19 @@ type Languages = components['schemas']['LanguageLearningResponse']
 
 function DashboardPage() {
     const queryClient = useQueryClient()
-    const { selectedLan: globalLan, setSelectedLan: setGlobalLan } = useLanguage()
+    const {selectedLan: globalLan, setSelectedLan: setGlobalLan} = useLanguage()
     const [selectedLan, setSelectedLan] = useState<Languages | null>(null)
     const [editing, setEditing] = useState(false)
     const [proficiencyLevel, setProficiencyLevel] = useState('')
     const [userMotivation, setUserMotivation] = useState('')
     const [showCreate, setShowCreate] = useState(false)
 
-    const { data, isLoading, isError } = useQuery({
+    const {data, isLoading, isError} = useQuery({
         queryKey: ['me'],
         queryFn: fetchMe
     })
 
-    const { data: languages } = useQuery({
+    const {data: languages} = useQuery({
         queryKey: ['languages'],
         queryFn: fetchLanguages
     })
@@ -34,7 +34,7 @@ function DashboardPage() {
             user_motivation: userMotivation
         }),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['languages'] })
+            queryClient.invalidateQueries({queryKey: ['languages']})
             setEditing(false)
             setSelectedLan(null)
         }
@@ -43,7 +43,7 @@ function DashboardPage() {
     const deleteMutation = useMutation({
         mutationFn: (lan: string) => deleteLanguage(lan),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['languages'] })
+            queryClient.invalidateQueries({queryKey: ['languages']})
             setSelectedLan(null)
             if (globalLan === selectedLan?.learning_language) {
                 setGlobalLan(null)
@@ -98,7 +98,8 @@ function DashboardPage() {
                                 <p className="text-sm text-muted-foreground mt-0.5">Level: {lan.proficiency_level}</p>
                             </div>
                             {globalLan === lan.learning_language && (
-                                <span className="text-xs px-2.5 py-1 bg-primary text-primary-foreground rounded-full font-medium">
+                                <span
+                                    className="text-xs px-2.5 py-1 bg-primary text-primary-foreground rounded-full font-medium">
                                     Aktiv ausgewählt
                                 </span>
                             )}
@@ -115,7 +116,8 @@ function DashboardPage() {
                     <h2 className="text-lg font-bold mb-4">{selectedLan.learning_language}</h2>
                     {editing ? (
                         <div className="flex flex-col gap-3">
-                            <label className="text-xs font-medium text-muted-foreground -mb-1">Sprachniveau (z.B. A2, B1)</label>
+                            <label className="text-xs font-medium text-muted-foreground -mb-1">Sprachniveau (z.B. A2,
+                                B1)</label>
                             <input
                                 value={proficiencyLevel}
                                 onChange={e => setProficiencyLevel(e.target.value)}
@@ -161,7 +163,11 @@ function DashboardPage() {
 
                             <div className="flex gap-2 justify-end border-t pt-4">
                                 <button
-                                    onClick={() => deleteMutation.mutate(selectedLan.learning_language)}
+                                    onClick={() => {
+                                        if (confirm('Möchtest du diese Sprache wirklich unwiderruflich löschen? Alle verknüpften Medien, Chats und Vokabelzuordnungen könnten verloren gehen.')) {
+                                            deleteMutation.mutate(selectedLan.learning_language)
+                                        }
+                                    }}
                                     className="text-destructive border border-destructive/30 px-4 py-2 rounded-lg text-sm hover:bg-destructive/5 transition-colors mr-auto"
                                 >
                                     Löschen

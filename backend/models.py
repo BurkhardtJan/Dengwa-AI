@@ -27,8 +27,8 @@ class LanguageLearning(Base):
     user_motivation = Column(String)
 
     user = relationship("User", back_populates="language_learnings")
-    media = relationship("Media", back_populates="language_learning")
-    vocabularies = relationship("Vocabulary", back_populates="language_learning")
+    media = relationship("Media", back_populates="language_learning", cascade="all, delete-orphan")
+    vocabularies = relationship("Vocabulary", back_populates="language_learning", cascade="all, delete-orphan")
 
     __table_args__ = (
         UniqueConstraint(
