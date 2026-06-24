@@ -2,7 +2,6 @@ import {useState} from 'react'
 import {useNavigate} from 'react-router-dom'
 import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query'
 import Modal from '../components/Modal'
-import {fetchLanguages} from "../services/language.service.ts";
 import {fetchVocabularies, createVocabulary} from '../services/vocabulary.service'
 import type {components} from '../types/api'
 import {useLanguage} from "@/context/LanguageContext.tsx";
@@ -13,7 +12,7 @@ type VocabularyCreate = components['schemas']['VocabularyCreate']
 function VocabularyPage() {
     const navigate = useNavigate()
     const queryClient = useQueryClient()
-    const {selectedLan, setSelectedLan} = useLanguage()
+    const {selectedLan} = useLanguage()
     const [newWord, setNewWord] = useState('')
     const [newTranslation, setNewTranslation] = useState('')
     const [showForm, setShowForm] = useState(false)
@@ -21,10 +20,6 @@ function VocabularyPage() {
     const {data, isLoading, isError} = useQuery({
         queryKey: ['vocabularies', selectedLan],
         queryFn: () => fetchVocabularies(selectedLan ?? undefined)
-    })
-    const {data: languages} = useQuery({
-        queryKey: ['languages'],
-        queryFn: fetchLanguages
     })
 
 
@@ -47,7 +42,8 @@ function VocabularyPage() {
 
             <div className="grid gap-4">
                 {selectedLan && (
-                    <div onClick={() => setShowForm(v => !v)} className="border rounded-lg p-4 cursor-pointer hover:bg-muted">
+                    <div onClick={() => setShowForm(v => !v)}
+                         className="border rounded-lg p-4 cursor-pointer hover:bg-muted">
                         <p className="font-medium">{selectedLan}</p>
                         <p className="text-muted-foreground">Vokabel hinzufügen</p>
                     </div>

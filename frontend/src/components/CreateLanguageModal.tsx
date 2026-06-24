@@ -13,7 +13,7 @@ function CreateLanguageModal({onClose}: Props) {
     const [newLan, setNewLan] = useState('')
     const [lanLevel, setLanLevel] = useState('')
     const [lanMotivation, setLanMotivation] = useState('')
-    const {selectedLan, setSelectedLan} = useLanguage()
+    const {setSelectedLan} = useLanguage()
 
 
     const queryClient = useQueryClient()
@@ -21,7 +21,7 @@ function CreateLanguageModal({onClose}: Props) {
     const createMutation = useMutation({
         mutationFn: () => createLanguage({
             learning_language: newLan,
-            proficiency_level: lanLevel,
+            proficiency_level: lanLevel || 'A1',
             user_motivation: lanMotivation
         }),
         onSuccess: () => {

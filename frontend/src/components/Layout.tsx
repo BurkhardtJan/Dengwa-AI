@@ -1,7 +1,7 @@
 import {NavLink, Outlet, useNavigate} from 'react-router-dom'
 import {useState} from 'react'
-import {createLanguage, fetchLanguages} from '@/services/language.service'
-import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
+import {fetchLanguages} from '@/services/language.service'
+import {useQuery} from '@tanstack/react-query'
 import {useLanguage} from '@/context/LanguageContext'
 import CreateLanguageModal from '@/components/CreateLanguageModal'
 
@@ -9,22 +9,12 @@ function Layout() {
     const navigate = useNavigate()
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const {selectedLan, setSelectedLan} = useLanguage()
-    const [newLan, setNewLan] = useState('')
     const [showCreate, setShowCreate] = useState(false)
     const {data: languages} = useQuery({
         queryKey: ['languages'],
         queryFn: fetchLanguages
     })
-    const queryClient = useQueryClient()
 
-    const createMutation = useMutation({
-        mutationFn: (lan: string) => createLanguage({learning_language: lan}),
-        onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['languages']})
-            setNewLan('')
-            setShowCreate(false)
-        }
-    })
 
     function handleLogout() {
         localStorage.removeItem('token')

@@ -1,8 +1,7 @@
-import {useState, useEffect} from 'react'
+import {useState} from 'react'
 import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query'
-import {useNavigate} from 'react-router-dom'
 import {fetchMe} from '../services/user.service'
-import {deleteLanguage, fetchLanguages, updateLanguage, createLanguage} from "@/services/language.service.ts"
+import {deleteLanguage, fetchLanguages, updateLanguage} from "@/services/language.service.ts"
 import {useLanguage} from '@/context/LanguageContext'
 import type {components} from '../types/api'
 import Modal from '../components/Modal'
@@ -12,7 +11,6 @@ import CreateLanguageModal from '@/components/CreateLanguageModal'
 type Languages = components['schemas']['LanguageLearningResponse']
 
 function DashboardPage() {
-    const navigate = useNavigate()
     const queryClient = useQueryClient()
     const {selectedLan: globalLan, setSelectedLan: setGlobalLan} = useLanguage()
     const [selectedLan, setSelectedLan] = useState<Languages | null>(null)
@@ -30,13 +28,6 @@ function DashboardPage() {
         queryFn: fetchLanguages
     })
 
-    const createMutation = useMutation({
-        mutationFn: (lan: string) => createLanguage({learning_language: lan}),
-        onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['languages']})
-            setShowCreate(false)
-        }
-    })
 
     const updateMutation = useMutation({
         mutationFn: () => updateLanguage(selectedLan!.learning_language, {
