@@ -26,15 +26,31 @@ export default function MediaDetailPage() {
     if (isError) return <p className="p-8 text-red-500">Fehler beim Laden</p>
 
     return (
-        <div className="p-8 max-w-lg">
-            <button
-                onClick={() => navigate('/media')}
-                className="text-sm text-muted-foreground hover:underline mb-6"
-            >
-                ← Zurück
-            </button>
+        <div className="p-8 max-w-2xl mx-auto">
+            {/* Flex-Header: Navigation links, Löschen-Button oben rechts in der Ecke */}
+            <div className="flex justify-between items-start mb-6">
+                <div>
+                    <button
+                        onClick={() => navigate('/media')}
+                        className="text-sm text-muted-foreground hover:underline mb-4 block"
+                    >
+                        ← Zurück zu den Medien
+                    </button>
+                    <h1 className="text-3xl font-bold">{data?.title}</h1>
+                </div>
 
-            <h1 className="text-3xl font-bold mb-6">{data?.title}</h1>
+                <button
+                    onClick={() => {
+                        if (confirm('Möchtest du dieses Medium wirklich unwiderruflich löschen? Alle verknüpften Chats und Vokabelzuordnungen könnten verloren gehen.')) {
+                            deleteMutation.mutate()
+                        }
+                    }}
+                    disabled={deleteMutation.isPending}
+                    className="text-red-500 border border-red-500/30 px-3 py-1.5 rounded-lg hover:bg-red-50 text-sm transition-colors disabled:opacity-50"
+                >
+                    {deleteMutation.isPending ? 'Löscht...' : 'Medium Löschen'}
+                </button>
+            </div>
 
 
             <div className="mb-8">
@@ -42,12 +58,6 @@ export default function MediaDetailPage() {
                 <p className="text-muted-foreground mb-4">{data?.learning_id}</p>
             </div>
 
-            <button
-                onClick={() => deleteMutation.mutate()}
-                className="text-red-500 border border-red-500 px-4 py-2 rounded-lg hover:bg-red-50"
-            >
-                Löschen
-            </button>
         </div>
     )
 }

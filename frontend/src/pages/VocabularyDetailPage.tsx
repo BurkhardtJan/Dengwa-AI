@@ -16,6 +16,7 @@ export default function VocabularyDetailPage() {
         queryKey: ['vocabulary', id],
         queryFn: () => fetchVocabulary(id!),
     })
+
     useEffect(() => {
         if (data) {
             setWord(data.word)
@@ -27,6 +28,7 @@ export default function VocabularyDetailPage() {
         mutationFn: () => updateVocabulary(id!, {word, translation}),
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['vocabulary', id]})
+            queryClient.invalidateQueries({queryKey: ['vocabularies']}) // Auch die Liste invalidieren
             setEditing(false)
         }
     })
@@ -43,62 +45,87 @@ export default function VocabularyDetailPage() {
     if (isError) return <p className="p-8 text-red-500">Fehler beim Laden</p>
 
     return (
-        <div className="p-8 max-w-lg">
-            <button
-                onClick={() => navigate('/vocabulary')}
-                className="text-sm text-muted-foreground hover:underline mb-6"
-            >
-                ← Zurück
-            </button>
+        <div className="p-8 max-w-2xl mx-auto">
+            {/* Flex-Header: Navigation links, Löschen-Button oben rechts */}
+            <div className="flex justify-between items-start mb-6">
+                <div>
+                    <button
+                        onClick={() => navigate('/vocabulary')}
+                        className="text-sm text-muted-foreground hover:underline mb-4 block"
+                    >
+                        ← Zurück zu den Vokabeln
+                    </button>
+                    <h1 className="text-3xl font-bold">{data?.word}</h1>
+                </div>
 
-            <h1 className="text-3xl font-bold mb-6">{data?.word}</h1>
+                <button
+                    onClick={() => {
+                        if (confirm(`Möchtest du das Wort "${data?.word}" wirklich unwiderruflich aus deiner Lernkartei löschen?`)) {
+                            deleteMutation.mutate()
+                        }
+                    }}
+                    disabled={deleteMutation.isPending}
+                    className="text-red-500 border border-red-500/30 px-3 py-1.5 rounded-lg hover:bg-red-50 text-sm transition-colors disabled:opacity-50"
+                >
+                    {deleteMutation.isPending ? 'Löscht...' : 'Vokabel Löschen'}
+                </button>
+            </div>
 
+            {/* Bearbeitungs-Modus vs. Standard-Infobox */}
             {editing ? (
-                <div className="flex flex-col gap-3 mb-8">
+                <div className="flex flex-col gap-3 p-4 border rounded-lg bg-muted/10 mb-8">
+                    <label className="text-xs font-medium text-muted-foreground -mb-1">Vokabel / Fremdwort</label>
                     <input
                         value={word}
                         onChange={e => setWord(e.target.value)}
-                        className="border rounded-lg px-3 py-2"
+                        className="border rounded-lg px-3 py-2 bg-background text-sm"
                     />
+                    <label className="text-xs font-medium text-muted-foreground -mb-1">Übersetzung</label>
                     <input
                         value={translation}
                         onChange={e => setTranslation(e.target.value)}
-                        className="border rounded-lg px-3 py-2"
+                        className="border rounded-lg px-3 py-2 bg-background text-sm"
                     />
-                    <div className="flex gap-2">
-                        <button
-                            onClick={() => updateMutation.mutate()}
-                            className="bg-primary text-primary-foreground px-4 py-2 rounded-lg"
-                        >
-                            Speichern
-                        </button>
+                    <div className="flex gap-2 justify-end mt-2">
                         <button
                             onClick={() => setEditing(false)}
-                            className="border px-4 py-2 rounded-lg"
+                            className="border px-4 py-2 rounded-lg text-sm hover:bg-muted"
                         >
                             Abbrechen
+                        </button>
+                        <button
+                            onClick={() => updateMutation.mutate()}
+                            disabled={updateMutation.isPending}
+                            className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-50"
+                        >
+                            {updateMutation.isPending ? 'Speichert...' : 'Speichern'}
                         </button>
                     </div>
                 </div>
             ) : (
-                <div className="mb-8">
-                    <p className="text-muted-foreground mb-1">{data?.translation}</p>
-                    <p className="text-muted-foreground mb-4">{data?.context_sentence}</p>
+                <div className="mb-8 space-y-4">
+                    <div className="p-4 border rounded-lg bg-muted/20 space-y-3">
+                        <p className="text-sm">
+                            <span className="text-muted-foreground block text-xs">Übersetzung:</span>
+                            <span className="font-medium text-base">{data?.translation || <span
+                                className="italic text-muted-foreground">Keine Übersetzung hinterlegt</span>}</span>
+                        </p>
+                        {data?.context_sentence && (
+                            <p className="text-sm">
+                                <span className="text-muted-foreground block text-xs">Kontext / Beispielsatz:</span>
+                                <span className="italic">"{data.context_sentence}"</span>
+                            </p>
+                        )}
+                    </div>
+
                     <button
                         onClick={() => setEditing(true)}
-                        className="text-sm hover:underline"
+                        className="px-4 py-2 border rounded-lg text-sm font-medium hover:bg-muted transition-colors"
                     >
                         Bearbeiten
                     </button>
                 </div>
             )}
-
-            <button
-                onClick={() => deleteMutation.mutate()}
-                className="text-red-500 border border-red-500 px-4 py-2 rounded-lg hover:bg-red-50"
-            >
-                Löschen
-            </button>
         </div>
     )
 }

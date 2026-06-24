@@ -18,8 +18,8 @@ function ChatPage() {
     const [showForm, setShowForm] = useState(false)
     const [selectedMediaId, setSelectedMediaId] = useState('')
 
-    const {data: chats, isLoading: isChatsLoading, isError: isChatsError} = useQuery({
-        queryKey: ['chats', selectedLan],
+    const {data: chat, isLoading: isChatsLoading, isError: isChatsError} = useQuery({
+        queryKey: ['chat', selectedLan],
         queryFn: () => fetchChats(selectedLan ?? undefined)
     })
 
@@ -32,10 +32,10 @@ function ChatPage() {
     const createChatMutation = useMutation({
         mutationFn: () => createChat(selectedMediaId),
         onSuccess: (newChat) => {
-            queryClient.invalidateQueries({queryKey: ['chats']})
+            queryClient.invalidateQueries({queryKey: ['chat']})
             setSelectedMediaId('')
             setShowForm(false)
-            navigate(`/chats/${newChat.id}`)
+            navigate(`/chat/${newChat.id}`)
         }
     })
 
@@ -58,18 +58,18 @@ function ChatPage() {
             </div>
 
             <div className="grid gap-4">
-                {(chats ?? []).length === 0 ? (
+                {(chat ?? []).length === 0 ? (
                     <p className="text-muted-foreground text-sm italic">
                         {selectedLan
                             ? `Noch keine Chats für ${selectedLan} vorhanden. Klicke auf "+ Neuer Chat".`
                             : 'Bitte wähle zuerst eine Sprache in der Sidebar aus.'}
                     </p>
                 ) : (
-                    (chats ?? []).map((chat: Chat) => (
+                    (chat ?? []).map((chat: Chat) => (
                         <div
                             key={chat.id}
                             className="border rounded-lg p-4 cursor-pointer hover:bg-muted transition-colors flex justify-between items-center"
-                            onClick={() => navigate(`/chats/${chat.id}`)}
+                            onClick={() => navigate(`/chat/${chat.id}`)}
                         >
                             <div>
                                 <p className="font-medium">Konversation</p>
