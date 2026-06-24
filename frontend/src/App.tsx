@@ -5,6 +5,8 @@ import DashboardPage from './pages/DashboardPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import VocabularyPage from './pages/VocabularyPage'
 import VocabularyDetailPage from './pages/VocabularyDetailPage'
+import ChatPage from './pages/ChatPage'
+import MediaPage from './pages/MediaPage';
 import Layout from './components/Layout'
 
 function App() {
@@ -17,6 +19,9 @@ function App() {
                     <Route path="/dashboard" element={<DashboardPage/>}/>
                     <Route path="/vocabulary" element={<VocabularyPage/>}/>
                     <Route path="/vocabulary/:id" element={<VocabularyDetailPage/>}/>
+                    <Route path="/chat" element={<ChatPage/>}/>
+                    <Route path="/media" element={<MediaPage/>}/>
+
                 </Route>
                 <Route path="*" element={<Navigate to="/login"/>}/>
             </Routes>

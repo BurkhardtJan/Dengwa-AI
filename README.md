@@ -118,6 +118,7 @@ python main.py
 ```
 
 ### Frontend:
+
 ```bash
 cd frontend
 nvm use 22
@@ -126,7 +127,9 @@ pnpm dev
 ```
 
 ## Roadmap
+
 ### Done
+
 - [x] Initial project setup (DB, Backend)
 - [x] SQLAlchemy models & Pydantic schemas
 - [x] LLM integration (Groq/Gemini/OpenAI)
@@ -145,6 +148,7 @@ pnpm dev
 - [x] Frontend setup (React 18 + Vite + TypeScript + Tailwind + shadcn/ui)
 
 ### Backend
+
 - [ ] RAG — inject vocabulary context into chat prompts (pgvector)
 - [ ] Progress endpoint — implement actual logic (currently stub)
 - [ ] Add default Vocab starter set (HSK, JLPT, ...)
@@ -152,16 +156,20 @@ pnpm dev
 - [ ] Docker Deployment
 - [ ] Tests (pytest)
 - [ ] Refactor Code
+
 ### Frontend
+
 - [ ] Media upload & management
 - [ ] Chat interface
-- [ ] Language management page
-- [ ] Multiple Language UI with i18n 
+- [ ] Multiple Language UI with i18n
+- [ ] Add Flags
 - [ ] Dashboard with real progress data
 - [ ] Comparison LLMs
+
 ## Architecture
 
 ### Backend
+
 ```mermaid
 graph TB
     subgraph Client["Client layer"]
