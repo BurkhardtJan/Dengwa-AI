@@ -7,6 +7,7 @@ import VocabularyPage from './pages/VocabularyPage'
 import VocabularyDetailPage from './pages/VocabularyDetailPage'
 import ChatPage from './pages/ChatPage'
 import MediaPage from './pages/MediaPage';
+import MediaDetailPage from './pages/MediaDetailPage.tsx';
 import Layout from './components/Layout'
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
                     <Route path="/vocabulary/:id" element={<VocabularyDetailPage/>}/>
                     <Route path="/chat" element={<ChatPage/>}/>
                     <Route path="/media" element={<MediaPage/>}/>
+                    <Route path="/media/:id" element={<MediaDetailPage/>}/>
 
                 </Route>
                 <Route path="*" element={<Navigate to="/login"/>}/>
