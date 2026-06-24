@@ -83,8 +83,12 @@ function MediaPage() {
                             type="file"
                             onChange={e => setFile(e.target.files?.[0] ?? null)}
                         />
-                        <button onClick={() => createMutation.mutate()}>
-                            Speichern
+                        <button
+                            onClick={() => createMutation.mutate()}
+                            disabled={!title || !file || createMutation.isPending}
+                            className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-50"
+                        >
+                            {createMutation.isPending ? 'Lädt hoch...' : 'Speichern'}
                         </button>
                     </div>
                 </Modal>

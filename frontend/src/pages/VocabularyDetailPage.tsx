@@ -11,6 +11,8 @@ export default function VocabularyDetailPage() {
     const [editing, setEditing] = useState(false)
     const [word, setWord] = useState('')
     const [translation, setTranslation] = useState('')
+    const [contextSentence, setContextSentence] = useState('')
+    const [comment, setComment] = useState('')
 
     const {data, isLoading, isError} = useQuery({
         queryKey: ['vocabulary', id],
@@ -21,11 +23,13 @@ export default function VocabularyDetailPage() {
         if (data) {
             setWord(data.word)
             setTranslation(data.translation ?? '')
+            setContextSentence(data.context_sentence ?? '')
+            setComment(data.comment ?? '')
         }
     }, [data])
 
     const updateMutation = useMutation({
-        mutationFn: () => updateVocabulary(id!, {word, translation}),
+        mutationFn: () => updateVocabulary(id!, {word, translation, context_sentence: contextSentence}),
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['vocabulary', id]})
             queryClient.invalidateQueries({queryKey: ['vocabularies']}) // Auch die Liste invalidieren
@@ -46,7 +50,6 @@ export default function VocabularyDetailPage() {
 
     return (
         <div className="p-8 max-w-2xl mx-auto">
-            {/* Flex-Header: Navigation links, Löschen-Button oben rechts */}
             <div className="flex justify-between items-start mb-6">
                 <div>
                     <button
@@ -71,7 +74,6 @@ export default function VocabularyDetailPage() {
                 </button>
             </div>
 
-            {/* Bearbeitungs-Modus vs. Standard-Infobox */}
             {editing ? (
                 <div className="flex flex-col gap-3 p-4 border rounded-lg bg-muted/10 mb-8">
                     <label className="text-xs font-medium text-muted-foreground -mb-1">Vokabel / Fremdwort</label>
@@ -85,6 +87,13 @@ export default function VocabularyDetailPage() {
                         value={translation}
                         onChange={e => setTranslation(e.target.value)}
                         className="border rounded-lg px-3 py-2 bg-background text-sm"
+                    />
+                    <label className="text-xs font-medium text-muted-foreground -mb-1">Beispielsatz (optional)</label>
+                    <input
+                        value={contextSentence}
+                        onChange={e => setContextSentence(e.target.value)}
+                        className="border rounded-lg px-3 py-2 bg-background text-sm"
+                        placeholder="z.B. The ephemeral beauty of cherry blossoms..."
                     />
                     <div className="flex gap-2 justify-end mt-2">
                         <button
@@ -114,6 +123,12 @@ export default function VocabularyDetailPage() {
                             <p className="text-sm">
                                 <span className="text-muted-foreground block text-xs">Kontext / Beispielsatz:</span>
                                 <span className="italic">"{data.context_sentence}"</span>
+                            </p>
+                        )}
+                        {data?.comment && (
+                            <p className="text-sm">
+                                <span className="text-muted-foreground block text-xs">Kommentar:</span>
+                                <span>{data.comment}</span>
                             </p>
                         )}
                     </div>
