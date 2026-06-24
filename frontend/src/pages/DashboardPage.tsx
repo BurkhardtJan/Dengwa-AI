@@ -6,6 +6,7 @@ import {deleteLanguage, fetchLanguages, updateLanguage, createLanguage} from "@/
 import {useLanguage} from '@/context/LanguageContext'
 import type {components} from '../types/api'
 import Modal from '../components/Modal'
+import CreateLanguageModal from '@/components/CreateLanguageModal'
 
 
 type Languages = components['schemas']['LanguageLearningResponse']
@@ -19,7 +20,6 @@ function DashboardPage() {
     const [proficiencyLevel, setProficiencyLevel] = useState('')
     const [userMotivation, setUserMotivation] = useState('')
     const [showCreate, setShowCreate] = useState(false)
-    const [newLan, setNewLan] = useState('')
 
     const {data, isLoading, isError} = useQuery({
         queryKey: ['me'],
@@ -55,6 +55,9 @@ function DashboardPage() {
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['languages']})
             setSelectedLan(null)
+            if (globalLan === selectedLan?.learning_language) {
+                setGlobalLan(null)
+            }
         }
     })
 
@@ -147,21 +150,7 @@ function DashboardPage() {
                 </Modal>
             )}
             {showCreate && (
-                <Modal onClose={() => setShowCreate(false)}>
-                    <h2 className="text-lg font-bold mb-4">Neue Sprache</h2>
-                    <input
-                        value={newLan}
-                        onChange={e => setNewLan(e.target.value)}
-                        placeholder="z.B. English"
-                        className="border rounded-lg px-3 py-2 w-full mb-4"
-                    />
-                    <button
-                        onClick={() => createMutation.mutate(newLan)}
-                        className="bg-primary text-primary-foreground px-4 py-2 rounded-lg"
-                    >
-                        Hinzufügen
-                    </button>
-                </Modal>
+                <CreateLanguageModal onClose={() => setShowCreate(false)}/>
             )}
         </div>
 

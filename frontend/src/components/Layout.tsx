@@ -1,16 +1,29 @@
 import {NavLink, Outlet, useNavigate} from 'react-router-dom'
 import {useState} from 'react'
-import {useQuery} from '@tanstack/react-query'
-import {fetchLanguages} from '@/services/language.service'
+import {createLanguage, fetchLanguages} from '@/services/language.service'
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
 import {useLanguage} from '@/context/LanguageContext'
+import CreateLanguageModal from '@/components/CreateLanguageModal'
 
 function Layout() {
     const navigate = useNavigate()
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const {selectedLan, setSelectedLan} = useLanguage()
+    const [newLan, setNewLan] = useState('')
+    const [showCreate, setShowCreate] = useState(false)
     const {data: languages} = useQuery({
         queryKey: ['languages'],
         queryFn: fetchLanguages
+    })
+    const queryClient = useQueryClient()
+
+    const createMutation = useMutation({
+        mutationFn: (lan: string) => createLanguage({learning_language: lan}),
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ['languages']})
+            setNewLan('')
+            setShowCreate(false)
+        }
     })
 
     function handleLogout() {
@@ -77,7 +90,13 @@ function Layout() {
                     <p className="text-xs text-muted-foreground mb-2 px-4">Lernsprache</p>
                     <select
                         value={selectedLan ?? ''}
-                        onChange={e => setSelectedLan(e.target.value)}
+                        onChange={e => {
+                            if (e.target.value === '__add__') {
+                                setShowCreate(true)
+                            } else {
+                                setSelectedLan(e.target.value)
+                            }
+                        }}
                         className="w-full border rounded-lg px-3 py-2 text-sm bg-background"
                     >
                         <option value="" disabled>Sprache wählen...</option>
@@ -86,6 +105,9 @@ function Layout() {
                                 {lan.learning_language}
                             </option>
                         ))}
+                        <option value="__add__" className="text-primary">
+                            + Sprache hinzufügen
+                        </option>
                     </select>
                 </div>
                 <div className="mt-auto">
@@ -114,6 +136,9 @@ function Layout() {
                     <Outlet/>
                 </main>
             </div>
+            {showCreate && (
+                <CreateLanguageModal onClose={() => setShowCreate(false)}/>
+            )}
         </div>
     )
 }
