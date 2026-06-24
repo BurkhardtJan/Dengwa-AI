@@ -1,10 +1,17 @@
 import {NavLink, Outlet, useNavigate} from 'react-router-dom'
 import {useState} from 'react'
-
+import {useQuery} from '@tanstack/react-query'
+import {fetchLanguages} from '@/services/language.service'
+import {useLanguage} from '@/context/LanguageContext'
 
 function Layout() {
     const navigate = useNavigate()
     const [sidebarOpen, setSidebarOpen] = useState(false)
+    const {selectedLan, setSelectedLan} = useLanguage()
+    const {data: languages} = useQuery({
+        queryKey: ['languages'],
+        queryFn: fetchLanguages
+    })
 
     function handleLogout() {
         localStorage.removeItem('token')
@@ -66,6 +73,21 @@ function Layout() {
                 >
                     Chats
                 </NavLink>
+                <div className="mt-4">
+                    <p className="text-xs text-muted-foreground mb-2 px-4">Lernsprache</p>
+                    <select
+                        value={selectedLan ?? ''}
+                        onChange={e => setSelectedLan(e.target.value)}
+                        className="w-full border rounded-lg px-3 py-2 text-sm bg-background"
+                    >
+                        <option value="" disabled>Sprache wählen...</option>
+                        {languages?.map(lan => (
+                            <option key={lan.id} value={lan.learning_language}>
+                                {lan.learning_language}
+                            </option>
+                        ))}
+                    </select>
+                </div>
                 <div className="mt-auto">
                     <button
                         onClick={handleLogout}

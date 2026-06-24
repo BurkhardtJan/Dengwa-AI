@@ -3,6 +3,7 @@ import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query'
 import {useNavigate} from 'react-router-dom'
 import {fetchMe} from '../services/user.service'
 import {deleteLanguage, fetchLanguages, updateLanguage} from "@/services/language.service.ts";
+import {useLanguage} from '@/context/LanguageContext'
 import type {components} from '../types/api'
 import Modal from '../components/Modal'
 
@@ -12,7 +13,7 @@ type Languages = components['schemas']['LanguageLearningResponse']
 function DashboardPage() {
     const navigate = useNavigate()
     const queryClient = useQueryClient()
-
+    const {selectedLan: globalLan, setSelectedLan: setGlobalLan} = useLanguage()
     const [selectedLan, setSelectedLan] = useState<Languages | null>(null)
     const [editing, setEditing] = useState(false)
     const [proficiencyLevel, setProficiencyLevel] = useState('')
@@ -114,6 +115,15 @@ function DashboardPage() {
                                 <button onClick={() => deleteMutation.mutate(selectedLan.learning_language)}
                                         className="text-red-500 border border-red-500 px-4 py-2 rounded-lg">
                                     Löschen
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setGlobalLan(selectedLan.learning_language)
+                                        setSelectedLan(null)
+                                    }}
+                                    className="bg-primary text-primary-foreground px-4 py-2 rounded-lg"
+                                >
+                                    Auswählen
                                 </button>
                             </div>
                         </>

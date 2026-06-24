@@ -13,7 +13,7 @@ type VocabularyCreate = components['schemas']['VocabularyCreate']
 function VocabularyPage() {
     const navigate = useNavigate()
     const queryClient = useQueryClient()
-    const { selectedLan, setSelectedLan } = useLanguage()
+    const {selectedLan, setSelectedLan} = useLanguage()
     const [newWord, setNewWord] = useState('')
     const [newTranslation, setNewTranslation] = useState('')
     const [showForm, setShowForm] = useState(false)
@@ -44,46 +44,35 @@ function VocabularyPage() {
     return (
         <div className="min-h-screen p-8">
             <h1 className="text-3xl font-bold mb-8">Vokabeln</h1>
-            <select
-                value={selectedLan ?? ''}
-                onChange={e => setSelectedLan(e.target.value)}
-                className="border rounded-lg px-3 py-2"
-            >
-                <option value="" disabled>Sprache wählen...</option>
-                {languages?.map(lan => (
-                    <option key={lan.id} value={lan.learning_language}>
-                        {lan.learning_language}
-                    </option>
-                ))}
-            </select>
-            {selectedLan && (
-                <button onClick={() => setShowForm(v => !v)}>
-                    Vokabel hinzufügen
-                </button>
-            )}
-            {showForm && (
-                <Modal onClose={() => setShowForm(false)}>
-                    <h2 className="text-lg font-bold mb-4">Neue Vokabel</h2>
-                    <div className="flex flex-col gap-3">
-                        <input
-                            value={newWord}
-                            onChange={e => setNewWord(e.target.value)}
-                            placeholder="Wort"
-                            className="border rounded-lg px-3 py-2"
-                        />
-                        <input
-                            value={newTranslation}
-                            onChange={e => setNewTranslation(e.target.value)}
-                            placeholder="Übersetzung"
-                            className="border rounded-lg px-3 py-2"
-                        />
-                        <button onClick={() => createMutation.mutate({word: newWord, translation: newTranslation})}>
-                            Speichern
-                        </button>
-                    </div>
-                </Modal>
-            )}
+
             <div className="grid gap-4">
+                {selectedLan && (
+                    <div onClick={() => setShowForm(v => !v)} className="border rounded-lg p-4 cursor-pointer hover:bg-muted">
+                        Vokabel hinzufügen
+                    </div>
+                )}
+                {showForm && (
+                    <Modal onClose={() => setShowForm(false)}>
+                        <h2 className="text-lg font-bold mb-4">Neue Vokabel</h2>
+                        <div className="flex flex-col gap-3">
+                            <input
+                                value={newWord}
+                                onChange={e => setNewWord(e.target.value)}
+                                placeholder="Wort"
+                                className="border rounded-lg px-3 py-2"
+                            />
+                            <input
+                                value={newTranslation}
+                                onChange={e => setNewTranslation(e.target.value)}
+                                placeholder="Übersetzung"
+                                className="border rounded-lg px-3 py-2"
+                            />
+                            <button onClick={() => createMutation.mutate({word: newWord, translation: newTranslation})}>
+                                Speichern
+                            </button>
+                        </div>
+                    </Modal>
+                )}
                 {(data ?? []).map((vocab: Vocabulary) => (
                     <div
                         key={vocab.id}
