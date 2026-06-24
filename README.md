@@ -146,6 +146,7 @@ pnpm dev
 - [x] JWT authentication (login/register)
 - [x] UUID instead of serial ID for endpoints
 - [x] Frontend setup (React 18 + Vite + TypeScript + Tailwind + shadcn/ui)
+- [x] Media upload & management
 
 ### Backend
 
@@ -159,7 +160,6 @@ pnpm dev
 
 ### Frontend
 
-- [ ] Media upload & management
 - [ ] Chat interface
 - [ ] Multiple Language UI with i18n
 - [ ] Add Flags

@@ -37,47 +37,58 @@ function MediaPage() {
 
     return (
         <div className="min-h-screen p-8">
-            <h1 className="text-3xl font-bold mb-8">Medien</h1>
+            <div className="flex justify-between items-center mb-8">
+                <h1 className="text-3xl font-bold">Medien</h1>
+
+                {selectedLan && (
+                    <button
+                        onClick={() => setShowForm(v => !v)}
+                        className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
+                    >
+                        + Medium hinzufügen
+                    </button>
+                )}
+            </div>
 
             <div className="grid gap-4">
-                {selectedLan && (
-                    <div onClick={() => setShowForm(v => !v)}
-                         className="border rounded-lg p-4 cursor-pointer hover:bg-muted">
-                        <p className="font-medium">{selectedLan}</p>
-                        <p className="text-muted-foreground">Medium hinzufügen</p>
-                    </div>
-                )}
-                {showForm && (
-                    <Modal onClose={() => setShowForm(false)}>
-                        <h2 className="text-lg font-bold mb-4">Neue Vokabel</h2>
-                        <div className="flex flex-col gap-3">
-                            <input
-                                value={title}
-                                onChange={e => setTitle(e.target.value)}
-                                placeholder="Titel"
-                                className="border rounded-lg px-3 py-2"
-                            />
-                            <input
-                                type="file"
-                                onChange={e => setFile(e.target.files?.[0] ?? null)}
-                            />
-                            <button onClick={() => createMutation.mutate()}>
-                                Speichern
-                            </button>
+                {(data ?? []).length === 0 ? (
+                        <p className="text-muted-foreground text-sm italic">
+                            {selectedLan
+                                ? `Noch kein Medium für ${selectedLan} vorhanden. Klicke auf "+ Medium hinzufügen".`
+                                : 'Bitte wähle zuerst eine Sprache in der Sidebar aus.'}
+                        </p>
+                    ) :
+                    (data ?? []).map((media: Media) => (
+                        <div
+                            key={media.id}
+                            className="border rounded-lg p-4 cursor-pointer hover:bg-muted"
+                            onClick={() => navigate(`/media/${media.id}`)}
+                        >
+                            <p className="font-medium">{media.title}</p>
+                            <p className="text-muted-foreground">{media.learning_id}</p>
                         </div>
-                    </Modal>
-                )}
-                {(data ?? []).map((media: Media) => (
-                    <div
-                        key={media.id}
-                        className="border rounded-lg p-4 cursor-pointer hover:bg-muted"
-                        onClick={() => navigate(`/media/${media.id}`)}
-                    >
-                        <p className="font-medium">{media.title}</p>
-                        <p className="text-muted-foreground">{media.learning_id}</p>
-                    </div>
-                ))}
+                    ))}
             </div>
+            {showForm && (
+                <Modal onClose={() => setShowForm(false)}>
+                    <h2 className="text-lg font-bold mb-4">Neue Vokabel</h2>
+                    <div className="flex flex-col gap-3">
+                        <input
+                            value={title}
+                            onChange={e => setTitle(e.target.value)}
+                            placeholder="Titel"
+                            className="border rounded-lg px-3 py-2"
+                        />
+                        <input
+                            type="file"
+                            onChange={e => setFile(e.target.files?.[0] ?? null)}
+                        />
+                        <button onClick={() => createMutation.mutate()}>
+                            Speichern
+                        </button>
+                    </div>
+                </Modal>
+            )}
         </div>
     )
 }
