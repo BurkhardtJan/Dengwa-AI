@@ -26,8 +26,12 @@ function ChatPage() {
     const {data: mediaList} = useQuery({
         queryKey: ['media', selectedLan],
         queryFn: () => fetchMedia(selectedLan ?? undefined),
-        enabled: showForm // Lädt die Medien erst, wenn das Modal wirklich geöffnet wird
+        enabled: !!selectedLan
     })
+
+    const mediaMap = new Map<string, string>(
+        (mediaList ?? []).map((m: Media) => [m.id, m.title])
+    )
 
     const createChatMutation = useMutation({
         mutationFn: () => createChat(selectedMediaId),
@@ -40,7 +44,7 @@ function ChatPage() {
     })
 
     if (isChatsLoading) return <p className="p-8">Chats laden...</p>
-    if (isChatsError) return <p className="p-8 text-red-500">Fehler beim Laden der Chats</p>
+    if (isChatsError) return <p className="p-8 text-destructive">Fehler beim Laden der Chats</p>
 
     return (
         <div className="min-h-screen p-8">
@@ -72,7 +76,16 @@ function ChatPage() {
                             onClick={() => navigate(`/chat/${chat.id}`)}
                         >
                             <div>
-                                <p className="font-medium">Konversation</p>
+                                <p className="font-medium">
+                                    {mediaMap.get(chat.media_id)
+                                        ? `Chat: ${mediaMap.get(chat.media_id)}`
+                                        : 'Konversation'}
+                                </p>
+                                {mediaMap.get(chat.media_id) && (
+                                    <p className="text-xs text-muted-foreground mt-0.5">
+                                        Medium: {mediaMap.get(chat.media_id)}
+                                    </p>
+                                )}
                                 <p className="text-xs text-muted-foreground font-mono mt-1">ID: {chat.id}</p>
                             </div>
                         </div>

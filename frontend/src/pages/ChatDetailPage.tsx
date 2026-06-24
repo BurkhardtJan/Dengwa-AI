@@ -1,7 +1,8 @@
 import {useState, useRef, useEffect} from 'react'
 import {useParams, useNavigate} from 'react-router-dom'
 import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query'
-import {fetchChatHistory, sendMessage, deleteChat} from '@/services/chat.service.ts'
+import {fetchChatHistory, sendMessage, deleteChat, fetchChats} from '@/services/chat.service.ts'
+import {fetchMedium} from '@/services/media.service.ts'
 
 export default function ChatDetailPage() {
     const {id} = useParams<{ id: string }>()
@@ -14,6 +15,26 @@ export default function ChatDetailPage() {
         queryKey: ['chatHistory', id],
         queryFn: () => fetchChatHistory(id!),
         enabled: !!id
+    })
+
+    const {data: chatMeta} = useQuery({
+        queryKey: ['chatMeta', id],
+        queryFn: async () => {
+            const cached = queryClient.getQueryData<Awaited<ReturnType<typeof fetchChats>>>(['chat'])
+            if (cached) {
+                const found = cached.find(c => c.id === id)
+                if (found) return found
+            }
+            const all = await fetchChats()
+            return all.find(c => c.id === id) ?? null
+        },
+        enabled: !!id
+    })
+
+    const {data: media} = useQuery({
+        queryKey: ['media', chatMeta?.media_id],
+        queryFn: () => fetchMedium(chatMeta!.media_id),
+        enabled: !!chatMeta?.media_id
     })
 
     const sendMessageMutation = useMutation({
@@ -43,7 +64,7 @@ export default function ChatDetailPage() {
     }
 
     if (isLoading) return <p className="p-8">Lade Konversation...</p>
-    if (isError) return <p className="p-8 text-red-500">Fehler beim Laden des Chats</p>
+    if (isError) return <p className="p-8 text-destructive">Fehler beim Laden des Chats</p>
 
     return (
         <div className="p-8 max-w-2xl mx-auto flex flex-col h-[calc(100vh-2rem)]">
@@ -55,7 +76,14 @@ export default function ChatDetailPage() {
                     >
                         ← Zurück zu den Chats
                     </button>
-                    <h1 className="text-3xl font-bold">KI-Konversation</h1>
+                    <h1 className="text-3xl font-bold">
+                        {media ? `Chat: ${media.title}` : 'Konversation'}
+                    </h1>
+                    {media && (
+                        <p className="text-sm text-muted-foreground mt-1">
+                            Medium: <span className="font-medium">{media.title}</span>
+                        </p>
+                    )}
                     <p className="text-xs text-muted-foreground font-mono mt-1">ID: {id}</p>
                 </div>
 
@@ -66,7 +94,7 @@ export default function ChatDetailPage() {
                         }
                     }}
                     disabled={deleteMutation.isPending}
-                    className="text-red-500 border border-red-500/30 px-3 py-1.5 rounded-lg hover:bg-red-50 text-sm transition-colors disabled:opacity-50"
+                    className="text-destructive border border-destructive/30 px-3 py-1.5 rounded-lg hover:bg-destructive/5 text-sm transition-colors disabled:opacity-50"
                 >
                     {deleteMutation.isPending ? 'Löscht...' : 'Chat Löschen'}
                 </button>
@@ -100,6 +128,12 @@ export default function ChatDetailPage() {
                                 >
                                     <p className="whitespace-pre-wrap">{msg.message}</p>
                                 </div>
+                                <span className="text-[10px] text-muted-foreground mt-0.5 px-1">
+    {new Date(msg.timestamp).toLocaleTimeString('de-DE', {
+        hour: '2-digit',
+        minute: '2-digit'
+    })}
+</span>
                             </div>
                         )
                     })

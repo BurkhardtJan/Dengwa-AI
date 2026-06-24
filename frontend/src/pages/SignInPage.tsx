@@ -65,7 +65,7 @@ function SignInPage() {
                         </select>
                     </div>
 
-                    {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+                    {error && <p className="text-destructive text-sm mb-4">{error}</p>}
 
                     <button
                         type="submit"

@@ -42,7 +42,7 @@ export default function VocabularyDetailPage() {
     })
 
     if (isLoading) return <p className="p-8">Lädt...</p>
-    if (isError) return <p className="p-8 text-red-500">Fehler beim Laden</p>
+    if (isError) return <p className="p-8 text-destructive">Fehler beim Laden</p>
 
     return (
         <div className="p-8 max-w-2xl mx-auto">
@@ -65,7 +65,7 @@ export default function VocabularyDetailPage() {
                         }
                     }}
                     disabled={deleteMutation.isPending}
-                    className="text-red-500 border border-red-500/30 px-3 py-1.5 rounded-lg hover:bg-red-50 text-sm transition-colors disabled:opacity-50"
+                    className="text-destructive border border-destructive/30 px-3 py-1.5 rounded-lg hover:bg-destructive/5 text-sm transition-colors disabled:opacity-50"
                 >
                     {deleteMutation.isPending ? 'Löscht...' : 'Vokabel Löschen'}
                 </button>

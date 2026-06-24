@@ -16,6 +16,7 @@ function VocabularyPage() {
     const [newWord, setNewWord] = useState('')
     const [newTranslation, setNewTranslation] = useState('')
     const [showForm, setShowForm] = useState(false)
+    const [newContextSentence, setNewContextSentence] = useState('')
 
     const {data, isLoading, isError} = useQuery({
         queryKey: ['vocabularies', selectedLan],
@@ -34,7 +35,7 @@ function VocabularyPage() {
     })
 
     if (isLoading) return <p className="p-8">Lädt...</p>
-    if (isError) return <p className="p-8 text-red-500">Fehler beim Laden</p>
+    if (isError) return <p className="p-8 text-destructive">Fehler beim Laden</p>
 
     return (
         <div className="min-h-screen p-8">
@@ -75,21 +76,54 @@ function VocabularyPage() {
                 <Modal onClose={() => setShowForm(false)}>
                     <h2 className="text-lg font-bold mb-4">Neue Vokabel</h2>
                     <div className="flex flex-col gap-3">
-                        <input
-                            value={newWord}
-                            onChange={e => setNewWord(e.target.value)}
-                            placeholder="Wort"
-                            className="border rounded-lg px-3 py-2"
-                        />
-                        <input
-                            value={newTranslation}
-                            onChange={e => setNewTranslation(e.target.value)}
-                            placeholder="Übersetzung"
-                            className="border rounded-lg px-3 py-2"
-                        />
-                        <button onClick={() => createMutation.mutate({word: newWord, translation: newTranslation})}>
-                            Speichern
-                        </button>
+                        <div>
+                            <label className="text-xs font-medium text-muted-foreground block mb-1">Wort /
+                                Ausdruck</label>
+                            <input
+                                value={newWord}
+                                onChange={e => setNewWord(e.target.value)}
+                                placeholder="z.B. ephemeral"
+                                className="border rounded-lg px-3 py-2 bg-background text-sm w-full"
+                            />
+                        </div>
+                        <div>
+                            <label className="text-xs font-medium text-muted-foreground block mb-1">Übersetzung</label>
+                            <input
+                                value={newTranslation}
+                                onChange={e => setNewTranslation(e.target.value)}
+                                placeholder="z.B. vergänglich"
+                                className="border rounded-lg px-3 py-2 bg-background text-sm w-full"
+                            />
+                        </div>
+                        <div>
+                            <label className="text-xs font-medium text-muted-foreground block mb-1">Beispielsatz
+                                (optional)</label>
+                            <input
+                                value={newContextSentence}
+                                onChange={e => setNewContextSentence(e.target.value)}
+                                placeholder="z.B. The ephemeral beauty of cherry blossoms..."
+                                className="border rounded-lg px-3 py-2 bg-background text-sm w-full"
+                            />
+                        </div>
+                        <div className="flex gap-2 justify-end mt-2">
+                            <button
+                                onClick={() => setShowForm(false)}
+                                className="border px-4 py-2 rounded-lg text-sm hover:bg-muted"
+                            >
+                                Abbrechen
+                            </button>
+                            <button
+                                onClick={() => createMutation.mutate({
+                                    word: newWord,
+                                    translation: newTranslation,
+                                    context_sentence: newContextSentence || undefined
+                                })}
+                                disabled={!newWord || createMutation.isPending}
+                                className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-50"
+                            >
+                                {createMutation.isPending ? 'Speichert...' : 'Speichern'}
+                            </button>
+                        </div>
                     </div>
                 </Modal>
             )}

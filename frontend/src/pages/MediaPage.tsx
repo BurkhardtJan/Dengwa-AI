@@ -33,7 +33,7 @@ function MediaPage() {
 
 
     if (isLoading) return <p className="p-8">Lädt...</p>
-    if (isError) return <p className="p-8 text-red-500">Fehler beim Laden</p>
+    if (isError) return <p className="p-8 text-destructive">Fehler beim Laden</p>
 
     return (
         <div className="min-h-screen p-8">
@@ -71,7 +71,7 @@ function MediaPage() {
             </div>
             {showForm && (
                 <Modal onClose={() => setShowForm(false)}>
-                    <h2 className="text-lg font-bold mb-4">Neue Vokabel</h2>
+                    <h2 className="text-lg font-bold mb-4">Neues Medium</h2>
                     <div className="flex flex-col gap-3">
                         <input
                             value={title}

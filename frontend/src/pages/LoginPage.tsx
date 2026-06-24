@@ -50,7 +50,7 @@ function LoginPage() {
                             placeholder="••••••••"
                         />
                     </div>
-                    {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+                    {error && <p className="text-destructive text-sm mb-4">{error}</p>}
                     <button
                         type="submit"
                         className="w-full bg-primary text-primary-foreground py-2 rounded-lg font-medium"
