@@ -147,6 +147,7 @@ pnpm dev
 - [x] UUID instead of serial ID for endpoints
 - [x] Frontend setup (React 18 + Vite + TypeScript + Tailwind + shadcn/ui)
 - [x] Media upload & management
+- [x] Add Docker Image
 
 ### Backend
 
@@ -154,7 +155,6 @@ pnpm dev
 - [ ] Progress endpoint — implement actual logic (currently stub)
 - [ ] Add default Vocab starter set (HSK, JLPT, ...)
 - [ ] Other Media Parsing
-- [ ] Docker Deployment
 - [ ] Tests (pytest)
 - [ ] Refactor Code
 

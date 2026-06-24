@@ -73,7 +73,7 @@ function DashboardPage() {
                 <p>Muttersprache: <span className="font-medium text-foreground">{data.native_language}</span></p>
             </div>
 
-            <h2 className="text-xl font-semibold mb-4">Deine Lernsprachen</h2>
+            <h2 className="text-xl font-semibold mb-4">Deine Lernsprachen:</h2>
 
             <div className="grid gap-3">
                 {(languages ?? []).length === 0 ? (
