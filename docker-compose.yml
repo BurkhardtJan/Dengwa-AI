@@ -38,7 +38,6 @@ services:
       - "8000:8000"
     volumes:
       - ./backend/uploads:/app/uploads
-      - ./backend:/app
     networks:
       - immersio-network
 
@@ -49,11 +48,7 @@ services:
     container_name: immersio-frontend
     restart: always
     ports:
-      #- "8080:80"
-      - "5173:5173"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
+      - "8080:80"
     depends_on:
       - backend
     networks:

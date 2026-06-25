@@ -60,6 +60,8 @@ function DashboardPage() {
                 <div>
                     <h1 className="text-3xl font-bold">Dashboard</h1>
                     <p className="text-muted-foreground mt-1">Willkommen zurück, {data.username}!</p>
+                    <p>Muttersprache: <span className="font-medium text-foreground">{data.native_language}</span></p>
+
                 </div>
                 <button
                     onClick={() => setShowCreate(true)}
@@ -68,10 +70,7 @@ function DashboardPage() {
                     + Sprache hinzufügen
                 </button>
             </div>
-
-            <div className="mb-8 p-4 border rounded-lg bg-muted/40 text-sm text-muted-foreground">
-                <p>Muttersprache: <span className="font-medium text-foreground">{data.native_language}</span></p>
-            </div>
+            
 
             <h2 className="text-xl font-semibold mb-4">Deine Lernsprachen:</h2>
 

@@ -156,7 +156,6 @@ pnpm dev
 - [ ] Add default Vocab starter set (HSK, JLPT, ...)
 - [ ] Other Media Parsing
 - [ ] Tests (pytest)
-- [ ] Refactor Code
 
 ### Frontend
 
