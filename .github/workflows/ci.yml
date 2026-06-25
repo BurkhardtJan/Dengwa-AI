@@ -46,7 +46,7 @@ jobs:
           python-version: '3.12'
 
       - name: Install test dependencies
-        run: pip install pytest requests
+        run: pip install pytest requests pytest-cov
 
       - name: Run tests
         run: pytest backend/tests/test_api.py -v --cov=backend --cov-report=term-missing
