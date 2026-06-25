@@ -82,6 +82,7 @@ function MediaPage() {
                         <input
                             type="file"
                             onChange={e => setFile(e.target.files?.[0] ?? null)}
+                            className="border rounded-lg px-3 py-2"
                         />
                         <button
                             onClick={() => createMutation.mutate()}

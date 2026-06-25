@@ -148,6 +148,7 @@ pnpm dev
 - [x] Frontend setup (React 18 + Vite + TypeScript + Tailwind + shadcn/ui)
 - [x] Media upload & management
 - [x] Add Docker Image
+- [x] Added Tests (pytest)
 
 ### Backend
 
@@ -155,11 +156,9 @@ pnpm dev
 - [ ] Progress endpoint — implement actual logic (currently stub)
 - [ ] Add default Vocab starter set (HSK, JLPT, ...)
 - [ ] Other Media Parsing
-- [ ] Tests (pytest)
 
 ### Frontend
 
-- [ ] Chat interface
 - [ ] Multiple Language UI with i18n
 - [ ] Add Flags
 - [ ] Dashboard with real progress data

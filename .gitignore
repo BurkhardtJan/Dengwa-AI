@@ -7,6 +7,7 @@ __pycache__
 *.db
 backend/playground/
 backend/uploads
+backend/seed.py
 
 node_modules/
 frontend/node_modules/
