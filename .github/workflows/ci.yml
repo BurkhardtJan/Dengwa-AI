@@ -1,0 +1,60 @@
+name: CI_Immersio_AI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Create .env file
+        run: |
+          cat > backend/.env << EOF
+          SECRET_KEY=testsecretkey1234567890abcdef12
+          ALGORITHM=HS256
+          ACCESS_TOKEN_EXPIRE_MINUTES=30
+          EOF
+
+      - name: Start services
+        run: docker compose up -d --build
+
+      - name: Wait for backend to be healthy
+        run: |
+          echo "Waiting for backend..."
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:8000/health; then
+              echo "Backend is healthy"
+              break
+            fi
+            echo "Attempt $i/30 - waiting..."
+            sleep 3
+          done
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install test dependencies
+        run: pip install pytest requests
+
+      - name: Run tests
+        run: pytest backend/tests/test_api.py -v
+
+      - name: Show logs on failure
+        if: failure()
+        run: docker compose logs
+
+      - name: Cleanup
+        if: always()
+        run: docker compose down -v
