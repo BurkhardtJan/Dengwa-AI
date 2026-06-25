@@ -49,7 +49,7 @@ jobs:
         run: pip install pytest requests
 
       - name: Run tests
-        run: pytest backend/tests/test_api.py -v
+        run: pytest backend/tests/test_api.py -v --cov=backend --cov-report=term-missing
 
       - name: Show logs on failure
         if: failure()
