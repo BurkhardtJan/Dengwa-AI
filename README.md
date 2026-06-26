@@ -150,6 +150,7 @@ pnpm dev
 - [x] Add Docker Image
 - [x] Added Tests (pytest)
 - [x] Multiple Language UI with i18n
+- [x] Translate UI
 
 ### Backend
 
@@ -161,7 +162,6 @@ pnpm dev
 
 ### Frontend
 
-- [ ] Translate UI
 - [ ] Add Flags
 - [ ] Comparison of LLMs
 

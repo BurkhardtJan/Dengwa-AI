@@ -3,6 +3,7 @@ import dashboard from '../locales/en/dashboard.json';
 import vocabulary from '../locales/en/vocabulary.json';
 import media from '../locales/en/media.json';
 import chat from '../locales/en/chat.json';
+import auth from '../locales/en/auth.json';
 
 declare module 'i18next' {
     interface CustomTypeOptions {
@@ -13,6 +14,7 @@ declare module 'i18next' {
             vocabulary: typeof vocabulary;
             media: typeof media;
             chat: typeof chat;
+            auth: typeof auth;
         };
     }
 }

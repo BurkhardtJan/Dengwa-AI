@@ -7,12 +7,14 @@ import enDashboard from './locales/en/dashboard.json';
 import enVocabulary from './locales/en/vocabulary.json';
 import enMedia from './locales/en/media.json';
 import enChat from './locales/en/chat.json';
+import enAuth from './locales/en/auth.json';
 
 import deCommon from './locales/de/common.json';
 import deDashboard from './locales/de/dashboard.json';
 import deVocabulary from './locales/de/vocabulary.json';
 import deMedia from './locales/de/media.json';
 import deChat from './locales/de/chat.json';
+import deAuth from './locales/de/auth.json';
 
 i18n
     .use(LanguageDetector)
@@ -25,6 +27,7 @@ i18n
                 vocabulary: enVocabulary,
                 media: enMedia,
                 chat: enChat,
+                auth: enAuth,
             },
             de: {
                 common: deCommon,
@@ -32,6 +35,7 @@ i18n
                 vocabulary: deVocabulary,
                 media: deMedia,
                 chat: deChat,
+                auth: deAuth,
             },
         },
         defaultNS: 'common',
