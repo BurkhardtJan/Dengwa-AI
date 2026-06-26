@@ -16,3 +16,4 @@ PyJWT
 bcrypt
 passlib
 python-multipart
+alembic

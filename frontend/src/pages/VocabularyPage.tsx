@@ -4,7 +4,7 @@ import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query'
 import Modal from '../components/Modal'
 import {fetchVocabularies, createVocabulary} from '../services/vocabulary.service'
 import type {components} from '../types/api'
-import {useLanguage} from "@/context/LanguageContext.tsx";
+import {useLanguage} from "@/context/TargetLanguageContext.tsx";
 
 type Vocabulary = components['schemas']['VocabularyResponse']
 type VocabularyCreate = components['schemas']['VocabularyCreate']

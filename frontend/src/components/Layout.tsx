@@ -2,14 +2,17 @@ import {NavLink, Outlet, useNavigate} from 'react-router-dom'
 import {useState} from 'react'
 import {fetchLanguages} from '@/services/language.service'
 import {useQuery} from '@tanstack/react-query'
-import {useLanguage} from '@/context/LanguageContext'
+import {useLanguage} from '@/context/TargetLanguageContext.tsx'
 import CreateLanguageModal from '@/components/CreateLanguageModal'
+import {LanguageSwitcher} from '../components/LanguageSwitcher';
+import {useTranslation} from 'react-i18next'
 
 function Layout() {
     const navigate = useNavigate()
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const {selectedLan, setSelectedLan} = useLanguage()
     const [showCreate, setShowCreate] = useState(false)
+    const {t} = useTranslation('navigate')
     const {data: languages} = useQuery({
         queryKey: ['languages'],
         queryFn: fetchLanguages
@@ -47,7 +50,7 @@ function Layout() {
                         `px-4 py-2 rounded-lg text-sm font-medium ${isActive ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`
                     }
                 >
-                    Dashboard
+                    {t('dashboard')}
                 </NavLink>
                 <NavLink
                     to="/vocabulary"
@@ -56,7 +59,7 @@ function Layout() {
                         `px-4 py-2 rounded-lg text-sm font-medium ${isActive ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`
                     }
                 >
-                    Vokabeln
+                    {t('vocabulary')}
                 </NavLink>
                 <NavLink
                     to="/media"
@@ -65,7 +68,7 @@ function Layout() {
                         `px-4 py-2 rounded-lg text-sm font-medium ${isActive ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`
                     }
                 >
-                    Medien
+                    {t('media')}
                 </NavLink>
                 <NavLink
                     to="/chat"
@@ -74,10 +77,10 @@ function Layout() {
                         `px-4 py-2 rounded-lg text-sm font-medium ${isActive ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`
                     }
                 >
-                    Chats
+                    {t('chats')}
                 </NavLink>
                 <div className="mt-4">
-                    <p className="text-xs text-muted-foreground mb-2 px-4">Lernsprache</p>
+                    <p className="text-xs text-muted-foreground mb-2 px-4">{t('targetLanguage')}</p>
                     <select
                         value={selectedLan ?? ''}
                         onChange={e => {
@@ -89,18 +92,19 @@ function Layout() {
                         }}
                         className="w-full border rounded-lg px-3 py-2 text-sm bg-background"
                     >
-                        <option value="" disabled>Sprache wählen...</option>
+                        <option value="" disabled>{t('selectLanguage')}.</option>
                         {languages?.map(lan => (
                             <option key={lan.id} value={lan.learning_language}>
                                 {lan.learning_language}
                             </option>
                         ))}
                         <option value="__add__" className="text-primary">
-                            + Sprache hinzufügen
+                            {t('addLanguage')}
                         </option>
                     </select>
                 </div>
-                <div className="mt-auto">
+                <div className="mt-auto flex flex-col gap-2">
+                    <LanguageSwitcher/>
                     <button
                         onClick={handleLogout}
                         className="w-full px-4 py-2 rounded-lg text-sm border hover:bg-muted"

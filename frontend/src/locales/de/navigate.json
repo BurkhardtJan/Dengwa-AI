@@ -1,0 +1,10 @@
+{
+  "dashboard": "Dashboard",
+  "vocabulary": "Vokabeln",
+  "media": "Medien",
+  "chats": "Chats",
+  "targetLanguage": "Lernsprache",
+  "selectLanguage": "Sprache wählen...",
+  "addLanguage": "+ Sprache hinzufügen",
+  "logout": "Logout"
+}

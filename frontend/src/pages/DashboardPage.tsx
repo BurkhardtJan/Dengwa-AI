@@ -2,7 +2,7 @@ import {useState} from 'react'
 import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query'
 import {fetchMe} from '../services/user.service'
 import {deleteLanguage, fetchLanguages, updateLanguage} from "@/services/language.service.ts"
-import {useLanguage} from '@/context/LanguageContext'
+import {useLanguage} from '@/context/TargetLanguageContext.tsx'
 import type {components} from '../types/api'
 import Modal from '../components/Modal'
 import CreateLanguageModal from '@/components/CreateLanguageModal'

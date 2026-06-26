@@ -149,6 +149,7 @@ pnpm dev
 - [x] Media upload & management
 - [x] Add Docker Image
 - [x] Added Tests (pytest)
+- [x] Multiple Language UI with i18n
 
 ### Backend
 
@@ -156,13 +157,13 @@ pnpm dev
 - [ ] Progress endpoint — implement actual logic (currently stub)
 - [ ] Add default Vocab starter set (HSK, JLPT, ...)
 - [ ] Other Media Parsing
+- [ ] Alembic
 
 ### Frontend
 
-- [ ] Multiple Language UI with i18n
+- [ ] Translate UI
 - [ ] Add Flags
-- [ ] Dashboard with real progress data
-- [ ] Comparison LLMs
+- [ ] Comparison of LLMs
 
 ## Architecture
 

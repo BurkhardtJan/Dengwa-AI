@@ -2,7 +2,7 @@ import {useState} from 'react'
 import {createLanguage} from '@/services/language.service'
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import Modal from '../components/Modal'
-import {useLanguage} from "@/context/LanguageContext.tsx";
+import {useLanguage} from "@/context/TargetLanguageContext.tsx";
 
 
 type Props = {

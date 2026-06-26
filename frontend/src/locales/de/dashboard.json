@@ -1,0 +1,6 @@
+{
+  "title": "Übersicht",
+  "welcome": "Willkommen zurück, {{name}}!",
+  "items_count_one": "Du hast {{count}} Element",
+  "items_count_other": "Du hast {{count}} Elemente"
+}

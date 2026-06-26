@@ -4,7 +4,7 @@ import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query'
 import Modal from '../components/Modal'
 import {fetchChats, createChat} from '@/services/chat.service.ts'
 import {fetchMedia} from '@/services/media.service.ts'
-import {useLanguage} from '@/context/LanguageContext.tsx'
+import {useLanguage} from '@/context/TargetLanguageContext.tsx'
 import type {components} from '../types/api'
 
 type Chat = components['schemas']['ChatResponse']

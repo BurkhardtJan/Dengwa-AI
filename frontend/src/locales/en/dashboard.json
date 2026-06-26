@@ -1,0 +1,6 @@
+{
+  "title": "Dashboard",
+  "welcome": "Welcome back, {{name}}!",
+  "items_count_one": "You have {{count}} item",
+  "items_count_other": "You have {{count}} items"
+}

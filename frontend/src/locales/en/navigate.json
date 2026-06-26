@@ -1,0 +1,10 @@
+{
+  "dashboard": "Dashboard",
+  "vocabulary": "Vocabulary",
+  "media": "Media",
+  "chats": "Chats",
+  "targetLanguage": "Learning language",
+  "selectLanguage": "Select language...",
+  "addLanguage": "+ Add language",
+  "logout": "Logout"
+}

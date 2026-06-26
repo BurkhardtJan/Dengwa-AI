@@ -6,20 +6,20 @@ type LanguageContextType = {
     setSelectedLan: (lan: string | null) => void
 }
 
-const LanguageContext = createContext<LanguageContextType | null>(null)
+const TargetLanguageContext = createContext<LanguageContextType | null>(null)
 
-export function LanguageProvider({ children }: { children: ReactNode }) {
+export function TargetLanguageProvider({ children }: { children: ReactNode }) {
     const [selectedLan, setSelectedLan] = useState<string | null>(null)
 
     return (
-        <LanguageContext.Provider value={{ selectedLan, setSelectedLan }}>
+        <TargetLanguageContext.Provider value={{ selectedLan, setSelectedLan }}>
             {children}
-        </LanguageContext.Provider>
+        </TargetLanguageContext.Provider>
     )
 }
 
 export function useLanguage() {
-    const ctx = useContext(LanguageContext)
+    const ctx = useContext(TargetLanguageContext)
     if (!ctx) throw new Error('useLanguage must be used within LanguageProvider')
     return ctx
 }

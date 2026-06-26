@@ -4,7 +4,7 @@ import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query'
 import Modal from '../components/Modal'
 import {fetchMedia, uploadMedia} from "@/services/media.service.ts";
 import type {components} from '../types/api'
-import {useLanguage} from "@/context/LanguageContext.tsx";
+import {useLanguage} from "@/context/TargetLanguageContext.tsx";
 
 type Media = components['schemas']['MediaResponse']
 
