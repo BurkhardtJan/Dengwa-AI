@@ -1,6 +1,17 @@
 {
-  "title": "Übersicht",
   "welcome": "Willkommen zurück, {{name}}!",
-  "items_count_one": "Du hast {{count}} Element",
-  "items_count_other": "Du hast {{count}} Elemente"
+  "nativeLanguage": "Muttersprache",
+  "yourLanguages": "Deine Lernsprachen",
+  "activeLabel": "Aktiv ausgewählt",
+  "noLanguages": "Du hast noch keine Lernsprachen hinzugefügt. Klicke auf \"+ Sprache hinzufügen\".",
+  "level": "Level",
+  "currentLevel": "Aktuelles Niveau",
+  "levelPlaceholder": "Sprachniveau (z.B. A2, B1)",
+  "motivation": "Motivation",
+  "motivationLabel": "Deine Motivation",
+  "deleteConfirm": "Möchtest du diese Sprache wirklich unwiderruflich löschen? Alle verknüpften Medien, Chats und Vokabelzuordnungen könnten verloren gehen.",
+  "delete": "Löschen",
+  "edit": "Bearbeiten",
+  "activate": "Aktivieren",
+  "errorLoading": "Fehler beim Laden"
 }

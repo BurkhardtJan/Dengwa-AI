@@ -4,10 +4,8 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 
 import enCommon from './locales/en/common.json';
 import enDashboard from './locales/en/dashboard.json';
-import enNavigate from './locales/en/navigate.json'
 import deCommon from './locales/de/common.json';
 import deDashboard from './locales/de/dashboard.json';
-import deNavigate from './locales/de/navigate.json'
 
 
 i18n
@@ -18,12 +16,10 @@ i18n
             en: {
                 common: enCommon,
                 dashboard: enDashboard,
-                navigate: enNavigate,
             },
             de: {
                 common: deCommon,
                 dashboard: deDashboard,
-                navigate: deNavigate,
             },
         },
         defaultNS: 'common',

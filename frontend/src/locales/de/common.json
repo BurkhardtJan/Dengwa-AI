@@ -3,5 +3,15 @@
     "save": "Speichern",
     "cancel": "Abbrechen"
   },
-  "loading": "Wird geladen..."
+  "loading": "Wird geladen...",
+  "nav": {
+    "dashboard": "Übersicht",
+    "vocabulary": "Vokabeln",
+    "media": "Medien",
+    "chats": "Chats"
+  },
+  "targetLanguage": "Lernsprache",
+  "selectLanguage": "Sprache wählen...",
+  "addLanguage": "+ Sprache hinzufügen",
+  "logout": "Abmelden"
 }

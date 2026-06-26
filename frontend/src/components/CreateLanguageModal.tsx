@@ -3,6 +3,7 @@ import {createLanguage} from '@/services/language.service'
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import Modal from '../components/Modal'
 import {useLanguage} from "@/context/TargetLanguageContext.tsx";
+import {useTranslation} from 'react-i18next'
 
 
 type Props = {
@@ -14,6 +15,8 @@ function CreateLanguageModal({onClose}: Props) {
     const [lanLevel, setLanLevel] = useState('')
     const [lanMotivation, setLanMotivation] = useState('')
     const {setSelectedLan} = useLanguage()
+
+    const {t} = useTranslation(['common', 'dashboard'])
 
 
     const queryClient = useQueryClient()
@@ -35,23 +38,23 @@ function CreateLanguageModal({onClose}: Props) {
 
     return (
         <Modal onClose={onClose}>
-            <h2 className="text-lg font-bold mb-4">Neue Sprache</h2>
+            <h2 className="text-lg font-bold mb-4">{t('common:addLanguage')}</h2>
             <input
                 value={newLan}
                 onChange={e => setNewLan(e.target.value)}
-                placeholder="z.B. English"
+                placeholder={t('common:targetLanguage')}
                 className="border rounded-lg px-3 py-2 w-full mb-4"
             />
             <input
                 value={lanLevel}
                 onChange={e => setLanLevel(e.target.value)}
-                placeholder="z.B. A1"
+                placeholder={t('dashboard:levelPlaceholder')}
                 className="border rounded-lg px-3 py-2 w-full mb-4"
             />
             <input
                 value={lanMotivation}
                 onChange={e => setLanMotivation(e.target.value)}
-                placeholder="z.B. Just for Fun"
+                placeholder={t('dashboard:motivationLabel')}
                 className="border rounded-lg px-3 py-2 w-full mb-4"
             />
             <button

@@ -12,7 +12,7 @@ function Layout() {
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const {selectedLan, setSelectedLan} = useLanguage()
     const [showCreate, setShowCreate] = useState(false)
-    const {t} = useTranslation('navigate')
+    const {t} = useTranslation()
     const {data: languages} = useQuery({
         queryKey: ['languages'],
         queryFn: fetchLanguages
@@ -50,7 +50,7 @@ function Layout() {
                         `px-4 py-2 rounded-lg text-sm font-medium ${isActive ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`
                     }
                 >
-                    {t('dashboard')}
+                    {t('nav.dashboard')}
                 </NavLink>
                 <NavLink
                     to="/vocabulary"
@@ -59,7 +59,7 @@ function Layout() {
                         `px-4 py-2 rounded-lg text-sm font-medium ${isActive ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`
                     }
                 >
-                    {t('vocabulary')}
+                    {t('nav.vocabulary')}
                 </NavLink>
                 <NavLink
                     to="/media"
@@ -68,7 +68,7 @@ function Layout() {
                         `px-4 py-2 rounded-lg text-sm font-medium ${isActive ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`
                     }
                 >
-                    {t('media')}
+                    {t('nav.media')}
                 </NavLink>
                 <NavLink
                     to="/chat"
@@ -77,7 +77,7 @@ function Layout() {
                         `px-4 py-2 rounded-lg text-sm font-medium ${isActive ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`
                     }
                 >
-                    {t('chats')}
+                    {t('nav.chats')}
                 </NavLink>
                 <div className="mt-4">
                     <p className="text-xs text-muted-foreground mb-2 px-4">{t('targetLanguage')}</p>

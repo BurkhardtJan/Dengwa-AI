@@ -1,6 +1,17 @@
 {
-  "title": "Dashboard",
   "welcome": "Welcome back, {{name}}!",
-  "items_count_one": "You have {{count}} item",
-  "items_count_other": "You have {{count}} items"
+  "nativeLanguage": "Native language",
+  "yourLanguages": "Your learning languages",
+  "activeLabel": "Active",
+  "noLanguages": "You haven't added any learning languages yet. Click \"+ Add language\".",
+  "level": "Level",
+  "currentLevel": "Current level",
+  "levelPlaceholder": "Proficiency level (e.g. A2, B1)",
+  "motivation": "Motivation",
+  "motivationLabel": "Your motivation",
+  "deleteConfirm": "Do you really want to permanently delete this language? All linked media, chats and vocabulary assignments may be lost.",
+  "delete": "Delete",
+  "edit": "Edit",
+  "activate": "Activate",
+  "errorLoading": "Error loading data"
 }

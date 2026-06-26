@@ -6,6 +6,7 @@ import {useLanguage} from '@/context/TargetLanguageContext.tsx'
 import type {components} from '../types/api'
 import Modal from '../components/Modal'
 import CreateLanguageModal from '@/components/CreateLanguageModal'
+import {useTranslation} from 'react-i18next'
 
 type Languages = components['schemas']['LanguageLearningResponse']
 
@@ -17,6 +18,8 @@ function DashboardPage() {
     const [proficiencyLevel, setProficiencyLevel] = useState('')
     const [userMotivation, setUserMotivation] = useState('')
     const [showCreate, setShowCreate] = useState(false)
+
+    const {t} = useTranslation(['common', 'dashboard'])
 
     const {data, isLoading, isError} = useQuery({
         queryKey: ['me'],
@@ -58,26 +61,27 @@ function DashboardPage() {
         <div className="min-h-screen p-8">
             <div className="flex justify-between items-center mb-8">
                 <div>
-                    <h1 className="text-3xl font-bold">Dashboard</h1>
-                    <p className="text-muted-foreground mt-1">Willkommen zurück, {data.username}!</p>
-                    <p>Muttersprache: <span className="font-medium text-foreground">{data.native_language}</span></p>
+                    <h1 className="text-3xl font-bold">{t('common:nav.dashboard')}</h1>
+                    <p className="text-muted-foreground mt-1">{t('dashboard:welcome', {name: data.username})}</p>
+                    <p>{t('dashboard:nativeLanguage')}: <span
+                        className="font-medium text-foreground">{data.native_language}</span></p>
 
                 </div>
                 <button
                     onClick={() => setShowCreate(true)}
                     className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
                 >
-                    + Sprache hinzufügen
+                    {t('addLanguage')}
                 </button>
             </div>
-            
 
-            <h2 className="text-xl font-semibold mb-4">Deine Lernsprachen:</h2>
+
+            <h2 className="text-xl font-semibold mb-4">{t('dashboard:yourLanguages')}</h2>
 
             <div className="grid gap-3">
                 {(languages ?? []).length === 0 ? (
                     <p className="text-muted-foreground text-sm italic">
-                        Du hast noch keine Lernsprachen hinzugefügt. Klicke auf "+ Sprache hinzufügen".
+                        {t('dashboard:noLanguages')}
                     </p>
                 ) : (
                     (languages ?? []).map((lan: Languages) => (
@@ -94,12 +98,12 @@ function DashboardPage() {
                         >
                             <div>
                                 <p className="font-medium text-lg">{lan.learning_language}</p>
-                                <p className="text-sm text-muted-foreground mt-0.5">Level: {lan.proficiency_level}</p>
+                                <p className="text-sm text-muted-foreground mt-0.5">{t('dashboard:level')}: {lan.proficiency_level}</p>
                             </div>
                             {globalLan === lan.learning_language && (
                                 <span
                                     className="text-xs px-2.5 py-1 bg-primary text-primary-foreground rounded-full font-medium">
-                                    Aktiv ausgewählt
+                                    {t('dashboard:activeLabel')}
                                 </span>
                             )}
                         </div>
@@ -115,15 +119,14 @@ function DashboardPage() {
                     <h2 className="text-lg font-bold mb-4">{selectedLan.learning_language}</h2>
                     {editing ? (
                         <div className="flex flex-col gap-3">
-                            <label className="text-xs font-medium text-muted-foreground -mb-1">Sprachniveau (z.B. A2,
-                                B1)</label>
+                            <label className="text-xs font-medium text-muted-foreground -mb-1">{t('dashboard:levelPlaceholder')}</label>
                             <input
                                 value={proficiencyLevel}
                                 onChange={e => setProficiencyLevel(e.target.value)}
                                 placeholder="Level"
                                 className="border rounded-lg px-3 py-2 bg-background text-sm"
                             />
-                            <label className="text-xs font-medium text-muted-foreground -mb-1">Deine Motivation</label>
+                            <label className="text-xs font-medium text-muted-foreground -mb-1">{t('dashboard:motivationLabel')}</label>
                             <input
                                 value={userMotivation}
                                 onChange={e => setUserMotivation(e.target.value)}
@@ -135,13 +138,13 @@ function DashboardPage() {
                                     onClick={() => setEditing(false)}
                                     className="border px-4 py-2 rounded-lg text-sm hover:bg-muted"
                                 >
-                                    Abbrechen
+                                    {t('buttons.cancel')}
                                 </button>
                                 <button
                                     onClick={() => updateMutation.mutate()}
                                     className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium"
                                 >
-                                    Speichern
+                                    {t('buttons.save')}
                                 </button>
                             </div>
                         </div>
@@ -149,12 +152,14 @@ function DashboardPage() {
                         <>
                             <div className="space-y-3 mb-6">
                                 <p className="text-sm">
-                                    <span className="text-muted-foreground block text-xs">Aktuelles Niveau:</span>
+                                    <span
+                                        className="text-muted-foreground block text-xs">{t('dashboard:currentLevel')}:</span>
                                     <span className="font-medium text-base">{selectedLan.proficiency_level}</span>
                                 </p>
                                 {selectedLan.user_motivation && (
                                     <p className="text-sm">
-                                        <span className="text-muted-foreground block text-xs">Motivation:</span>
+                                        <span
+                                            className="text-muted-foreground block text-xs">{t('dashboard:motivation')}:</span>
                                         <span className="italic">"{selectedLan.user_motivation}"</span>
                                     </p>
                                 )}
@@ -163,19 +168,19 @@ function DashboardPage() {
                             <div className="flex gap-2 justify-end border-t pt-4">
                                 <button
                                     onClick={() => {
-                                        if (confirm('Möchtest du diese Sprache wirklich unwiderruflich löschen? Alle verknüpften Medien, Chats und Vokabelzuordnungen könnten verloren gehen.')) {
+                                        if (confirm(t('dashboard:deleteConfirm'))) {
                                             deleteMutation.mutate(selectedLan.learning_language)
                                         }
                                     }}
                                     className="text-destructive border border-destructive/30 px-4 py-2 rounded-lg text-sm hover:bg-destructive/5 transition-colors mr-auto"
                                 >
-                                    Löschen
+                                    {t('dashboard:delete')}
                                 </button>
                                 <button
                                     onClick={() => setEditing(true)}
                                     className="border px-4 py-2 rounded-lg text-sm hover:bg-muted"
                                 >
-                                    Bearbeiten
+                                    {t('dashboard:edit')}
                                 </button>
                                 <button
                                     onClick={() => {
@@ -184,7 +189,7 @@ function DashboardPage() {
                                     }}
                                     className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium"
                                 >
-                                    Aktivieren
+                                    {t('dashboard:activate')}
                                 </button>
                             </div>
                         </>
