@@ -1,6 +1,7 @@
 import {useState} from 'react'
 import {register} from '../services/auth.service'
 import {useNavigate} from 'react-router-dom'
+import {LanguageSwitcher} from '../components/LanguageSwitcher'
 import {useTranslation} from 'react-i18next'
 
 function SignInPage() {
@@ -24,6 +25,9 @@ function SignInPage() {
 
     return (
         <div className="min-h-screen flex items-center justify-center">
+            <div className="absolute top-4 right-4">
+                <LanguageSwitcher/>
+            </div>
             <div className="w-full max-w-md p-8">
                 <h1 className="text-3xl font-bold mb-2">{t('registerTitle')}</h1>
                 <p className="text-muted-foreground mb-8">{t('registerSubtitle')}</p>
