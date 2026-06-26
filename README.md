@@ -155,10 +155,12 @@ pnpm dev
 ### Backend
 
 - [ ] RAG — inject vocabulary context into chat prompts (pgvector)
+- [ ] Return file endpoint
 - [ ] Progress endpoint — implement actual logic (currently stub)
 - [ ] Add default Vocab starter set (HSK, JLPT, ...)
 - [ ] Other Media Parsing
 - [ ] Alembic
+- [ ] Add License
 
 ### Frontend
 
