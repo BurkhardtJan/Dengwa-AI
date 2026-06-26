@@ -1,0 +1,43 @@
+{
+  "nav": {
+    "login": "Anmelden",
+    "register": "Registrieren"
+  },
+  "hero": {
+    "title": "Sprachen lernen mit KI",
+    "subtitle": "Lade deine Medien hoch, lass die KI Vokabeln extrahieren und übe mit der KI.",
+    "cta": "Jetzt starten",
+    "login": "Anmelden"
+  },
+  "features": {
+    "title": "Was Immersio AI kann",
+    "items": [
+      {
+        "title": "Medien-Import",
+        "description": "Texte, Artikel und Dokumente in deiner Zielsprache hochladen."
+      },
+      {
+        "title": "KI-Vokabelextraktion",
+        "description": "Vokabeln werden automatisch erkannt und in deine Lernkartei eingetragen."
+      },
+      {
+        "title": "KI-Konversation",
+        "description": "Übe die Sprache im Chat mit einem KI-Assistenten, der deinen Kontext kennt."
+      }
+    ]
+  },
+  "howItWorks": {
+    "title": "So funktioniert es",
+    "steps": [
+      { "step": "Sprache wählen", "label": "Wähle deine Zielsprache aus." },
+      { "step": "Medium hochladen", "label": "Lade einen Text oder Artikel hoch." },
+      { "step": "KI extrahiert", "label": "Vokabeln werden automatisch erkannt." },
+      { "step": "Lernen", "label": "Wiederhole mit Spaced Repetition." }
+    ]
+  },
+  "cta": {
+    "title": "Bereit anzufangen?",
+    "subtitle": "Kostenlos registrieren und sofort loslegen.",
+    "button": "Jetzt registrieren"
+  }
+}

@@ -1,6 +1,7 @@
 import {BrowserRouter, Routes, Route, Navigate} from 'react-router-dom'
 import LoginPage from './pages/LoginPage'
 import SignInPage from './pages/SignInPage'
+import LandingPage from './pages/LandingPage'
 import DashboardPage from './pages/DashboardPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import VocabularyPage from './pages/VocabularyPage'
@@ -17,6 +18,7 @@ function App() {
             <Routes>
                 <Route path="/login" element={<LoginPage/>}/>
                 <Route path="/signin" element={<SignInPage/>}/>
+                <Route path="/landing" element={<LandingPage/>}/>
                 <Route element={<ProtectedRoute><Layout/></ProtectedRoute>}>
                     <Route path="/dashboard" element={<DashboardPage/>}/>
                     <Route path="/vocabulary" element={<VocabularyPage/>}/>
@@ -27,7 +29,7 @@ function App() {
                     <Route path="/media/:id" element={<MediaDetailPage/>}/>
 
                 </Route>
-                <Route path="*" element={<Navigate to="/login"/>}/>
+                <Route path="*" element={<Navigate to="/landing"/>}/>
             </Routes>
         </BrowserRouter>
     )

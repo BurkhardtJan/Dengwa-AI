@@ -1,0 +1,43 @@
+{
+  "nav": {
+    "login": "Sign in",
+    "register": "Get started"
+  },
+  "hero": {
+    "title": "Language learning with AI",
+    "subtitle": "Upload your media, let AI extract vocabulary, and practice with your AI.",
+    "cta": "Get started",
+    "login": "Sign in"
+  },
+  "features": {
+    "title": "What Immersio AI can do",
+    "items": [
+      {
+        "title": "Media import",
+        "description": "Upload texts, articles and documents in your target language."
+      },
+      {
+        "title": "AI vocabulary extraction",
+        "description": "Vocabulary is automatically detected and added to your flashcards."
+      },
+      {
+        "title": "AI conversation",
+        "description": "Practice the language in chat with an AI assistant that knows your context."
+      }
+    ]
+  },
+  "howItWorks": {
+    "title": "How it works",
+    "steps": [
+      { "step": "Choose language", "label": "Select your target language." },
+      { "step": "Upload media", "label": "Upload a text or article." },
+      { "step": "AI extracts", "label": "Vocabulary is detected automatically." },
+      { "step": "Learn", "label": "Review with spaced repetition." }
+    ]
+  },
+  "cta": {
+    "title": "Ready to start?",
+    "subtitle": "Register for free and get going immediately.",
+    "button": "Register now"
+  }
+}
