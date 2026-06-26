@@ -42,7 +42,7 @@ function Layout() {
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
         md:translate-x-0
       `}>
-                <h2 className="text-xl font-bold mb-6">Immersio AI</h2>
+                <h2 className="text-xl font-bold mb-6">Dengwa AI</h2>
                 <NavLink
                     to="/dashboard"
                     onClick={() => setSidebarOpen(false)}
@@ -124,7 +124,7 @@ function Layout() {
                     >
                         ☰
                     </button>
-                    <span className="ml-4 font-bold">Immersio AI</span>
+                    <span className="ml-4 font-bold">Dengwa AI</span>
                 </header>
                 <main className="flex-1 p-8 overflow-y-auto">
                     <Outlet/>

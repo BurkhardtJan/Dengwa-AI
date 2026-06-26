@@ -11,7 +11,7 @@ function LandingPage() {
 
             {/* Nav */}
             <header className="flex justify-between items-center px-8 py-4 border-b">
-                <span className="font-bold text-lg">Immersio AI</span>
+                <span className="font-bold text-lg">Dengwa AI</span>
                 <div className="flex items-center gap-4">
                     <LanguageSwitcher/>
                     <button
@@ -100,7 +100,7 @@ function LandingPage() {
 
             {/* Footer */}
             <footer className="px-8 py-6 border-t text-center text-xs text-muted-foreground">
-                © {new Date().getFullYear()} Immersio AI
+                © {new Date().getFullYear()} Dengwa AI
             </footer>
         </div>
     )

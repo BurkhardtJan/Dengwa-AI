@@ -1,4 +1,4 @@
-# Immersio AI
+# Dengwa AI
 
 A language learning application powered by AI.
 Upload a medium (e.g. subtitles, books, text files) and the AI will extract vocabulary, help you learn it through
@@ -93,7 +93,7 @@ sudo systemctl enable postgresql
 Create Database and start PostgreSQL:
 
 ```bash
-createdb immersio_db
+createdb dengwa_db
 psql
 ```
 

@@ -1,21 +1,21 @@
 services:
   db:
     image: postgres:15-alpine
-    container_name: immersio-db
+    container_name: dengwa-db
     restart: always
     environment:
       POSTGRES_USER: ${DB_USER:-postgres}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-geheim}
-      POSTGRES_DB: ${DB_NAME:-immersio_db}
+      POSTGRES_DB: ${DB_NAME:-dengwa_db}
       PGDATA: /var/data/pgdata
     volumes:
       - postgres_data:/var/data/pgdata
     ports:
       - "5435:5432"
     networks:
-      - immersio-network
+      - dengwa-network
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-immersio_db}" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-dengwa_db}" ]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -24,7 +24,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: immersio-backend
+    container_name: dengwa-backend
     restart: always
     depends_on:
       db:
@@ -33,13 +33,13 @@ services:
     env_file:
       - ./backend/.env
     environment:
-      - SQLALCHEMY_DATABASE_URL=postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-geheim}@db:5432/${DB_NAME:-immersio_db}
+      - SQLALCHEMY_DATABASE_URL=postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-geheim}@db:5432/${DB_NAME:-dengwa_db}
     ports:
       - "8000:8000"
     volumes:
       - ./backend/uploads:/app/uploads
     networks:
-      - immersio-network
+      - dengwa-network
     healthcheck:
       test: [ "CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health')\" || exit 1" ]
       interval: 10s
@@ -51,7 +51,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: immersio-frontend
+    container_name: dengwa-frontend
     restart: always
     ports:
       - "8080:80"
@@ -59,11 +59,11 @@ services:
       backend:
         condition: service_healthy
     networks:
-      - immersio-network
+      - dengwa-network
 
 volumes:
   postgres_data:
 
 networks:
-  immersio-network:
+  dengwa-network:
     driver: bridge
