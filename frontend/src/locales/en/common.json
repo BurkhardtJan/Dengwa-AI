@@ -1,9 +1,17 @@
 {
   "buttons": {
     "save": "Save",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "back": "← Back",
+    "saving": "Saving...",
+    "deleting": "Deleting..."
   },
   "loading": "Loading...",
+  "errorLoading": "Error loading data",
+  "noLanguageSelected": "Please select a language in the sidebar first.",
   "nav": {
     "dashboard": "Dashboard",
     "vocabulary": "Vocabulary",

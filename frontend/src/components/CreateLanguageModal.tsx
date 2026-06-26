@@ -61,7 +61,7 @@ function CreateLanguageModal({onClose}: Props) {
                 onClick={() => createMutation.mutate()}
                 className="bg-primary text-primary-foreground px-4 py-2 rounded-lg"
             >
-                Hinzufügen
+                {t('common:buttons.add')}
             </button>
         </Modal>
     )

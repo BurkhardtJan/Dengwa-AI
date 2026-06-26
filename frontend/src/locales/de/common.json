@@ -1,9 +1,17 @@
 {
   "buttons": {
     "save": "Speichern",
-    "cancel": "Abbrechen"
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "add": "Hinzufügen",
+    "back": "← Zurück",
+    "saving": "Speichert...",
+    "deleting": "Löscht..."
   },
   "loading": "Wird geladen...",
+  "errorLoading": "Fehler beim Laden",
+  "noLanguageSelected": "Bitte wähle zuerst eine Sprache in der Sidebar aus.",
   "nav": {
     "dashboard": "Übersicht",
     "vocabulary": "Vokabeln",

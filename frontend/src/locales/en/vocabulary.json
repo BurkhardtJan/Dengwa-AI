@@ -1,0 +1,21 @@
+{
+  "title": "Vocabulary",
+  "addButton": "+ Add vocabulary",
+  "noVocabulary": "No vocabulary for {{language}} yet. Click \"+ Add vocabulary\".",
+  "newVocabulary": "New vocabulary",
+  "wordLabel": "Word / Expression",
+  "wordPlaceholder": "e.g. ephemeral",
+  "translationLabel": "Translation",
+  "translationPlaceholder": "e.g. fleeting",
+  "contextLabel": "Example sentence (optional)",
+  "contextPlaceholder": "e.g. The ephemeral beauty of cherry blossoms...",
+  "backToVocabulary": "← Back to vocabulary",
+  "translationField": "Translation",
+  "noTranslation": "No translation stored",
+  "contextField": "Context / Example sentence",
+  "commentField": "Comment",
+  "foreignWord": "Vocabulary / Foreign word",
+  "deleteConfirm": "Do you really want to permanently delete \"{{word}}\" from your flashcards?",
+  "deleteButton": "Delete vocabulary",
+  "deleting": "Deleting..."
+}

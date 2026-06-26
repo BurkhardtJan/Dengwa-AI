@@ -5,6 +5,7 @@ import Modal from '../components/Modal'
 import {fetchVocabularies, createVocabulary} from '../services/vocabulary.service'
 import type {components} from '../types/api'
 import {useLanguage} from "@/context/TargetLanguageContext.tsx";
+import {useTranslation} from 'react-i18next'
 
 type Vocabulary = components['schemas']['VocabularyResponse']
 type VocabularyCreate = components['schemas']['VocabularyCreate']
@@ -17,6 +18,8 @@ function VocabularyPage() {
     const [newTranslation, setNewTranslation] = useState('')
     const [showForm, setShowForm] = useState(false)
     const [newContextSentence, setNewContextSentence] = useState('')
+
+    const {t} = useTranslation(['common', 'vocabulary'])
 
     const {data, isLoading, isError} = useQuery({
         queryKey: ['vocabularies', selectedLan],
@@ -34,20 +37,20 @@ function VocabularyPage() {
         }
     })
 
-    if (isLoading) return <p className="p-8">Lädt...</p>
-    if (isError) return <p className="p-8 text-destructive">Fehler beim Laden</p>
+    if (isLoading) return <p className="p-8">{t('common:loading')}</p>
+    if (isError) return <p className="p-8 text-destructive">{t('common:errorLoading')}</p>
 
     return (
         <div className="min-h-screen p-8">
             <div className="flex justify-between items-center mb-8">
-                <h1 className="text-3xl font-bold">Vokabeln</h1>
+                <h1 className="text-3xl font-bold">{t('common:nav.vocabulary')}</h1>
 
                 {selectedLan && (
                     <button
                         onClick={() => setShowForm(v => !v)}
                         className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
                     >
-                        + Vokabel hinzufügen
+                        {t('vocabulary:addButton')}
                     </button>
                 )}
             </div>
@@ -56,8 +59,8 @@ function VocabularyPage() {
                 {(data ?? []).length === 0 ? (
                         <p className="text-muted-foreground text-sm italic">
                             {selectedLan
-                                ? `Noch keine Vokabeln für ${selectedLan} vorhanden. Klicke auf "+ Vokabel hinzufügen".`
-                                : 'Bitte wähle zuerst eine Sprache in der Sidebar aus.'}
+                                ? t('vocabulary:noVocabulary', {language: selectedLan})
+                                : t('common:noLanguageSelected')}
                         </p>
                     ) :
                     (data ?? []).map((vocab: Vocabulary) => (
@@ -77,31 +80,29 @@ function VocabularyPage() {
                     <h2 className="text-lg font-bold mb-4">Neue Vokabel</h2>
                     <div className="flex flex-col gap-3">
                         <div>
-                            <label className="text-xs font-medium text-muted-foreground block mb-1">Wort /
-                                Ausdruck</label>
+                            <label className="text-xs font-medium text-muted-foreground block mb-1">{t('vocabulary:wordLabel')}</label>
                             <input
                                 value={newWord}
                                 onChange={e => setNewWord(e.target.value)}
-                                placeholder="z.B. ephemeral"
+                                placeholder={t('vocabulary:wordPlaceholder')}
                                 className="border rounded-lg px-3 py-2 bg-background text-sm w-full"
                             />
                         </div>
                         <div>
-                            <label className="text-xs font-medium text-muted-foreground block mb-1">Übersetzung</label>
+                            <label className="text-xs font-medium text-muted-foreground block mb-1">{t('vocabulary:translationLabel')}</label>
                             <input
                                 value={newTranslation}
                                 onChange={e => setNewTranslation(e.target.value)}
-                                placeholder="z.B. vergänglich"
+                                placeholder={t('vocabulary:translationPlaceholder')}
                                 className="border rounded-lg px-3 py-2 bg-background text-sm w-full"
                             />
                         </div>
                         <div>
-                            <label className="text-xs font-medium text-muted-foreground block mb-1">Beispielsatz
-                                (optional)</label>
+                            <label className="text-xs font-medium text-muted-foreground block mb-1">{t('vocabulary:contextLabel')}</label>
                             <input
                                 value={newContextSentence}
                                 onChange={e => setNewContextSentence(e.target.value)}
-                                placeholder="z.B. The ephemeral beauty of cherry blossoms..."
+                                placeholder={t('vocabulary:contextPlaceholder')}
                                 className="border rounded-lg px-3 py-2 bg-background text-sm w-full"
                             />
                         </div>
@@ -110,7 +111,7 @@ function VocabularyPage() {
                                 onClick={() => setShowForm(false)}
                                 className="border px-4 py-2 rounded-lg text-sm hover:bg-muted"
                             >
-                                Abbrechen
+                                {t('common:buttons.cancel')}
                             </button>
                             <button
                                 onClick={() => createMutation.mutate({
@@ -121,7 +122,7 @@ function VocabularyPage() {
                                 disabled={!newWord || createMutation.isPending}
                                 className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-50"
                             >
-                                {createMutation.isPending ? 'Speichert...' : 'Speichern'}
+                                {createMutation.isPending ? t('common:buttons.saving') : t('common:buttons.save')}
                             </button>
                         </div>
                     </div>

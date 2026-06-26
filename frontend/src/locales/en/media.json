@@ -1,0 +1,17 @@
+{
+  "title": "Media",
+  "addButton": "+ Add media",
+  "noMedia": "No media for {{language}} yet. Click \"+ Add media\".",
+  "newMedia": "New media",
+  "titlePlaceholder": "Title",
+  "uploading": "Uploading...",
+  "backToMedia": "← Back to media",
+  "deleteConfirm": "Do you really want to permanently delete this media? All linked chats and vocabulary assignments may be lost.",
+  "deleteButton": "Delete media",
+  "deleting": "Deleting...",
+  "extractTitle": "Extract vocabulary",
+  "extractDescription": "Lets the AI automatically detect vocabulary from this media and add it to your flashcards.",
+  "extractButton": "Extract vocabulary",
+  "extracting": "Extracting...",
+  "extractSuccess": "✓ Vocabulary successfully extracted."
+}

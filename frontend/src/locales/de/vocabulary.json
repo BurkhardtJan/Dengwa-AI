@@ -1,0 +1,21 @@
+{
+  "title": "Vokabeln",
+  "addButton": "+ Vokabel hinzufügen",
+  "noVocabulary": "Noch keine Vokabeln für {{language}} vorhanden. Klicke auf \"+ Vokabel hinzufügen\".",
+  "newVocabulary": "Neue Vokabel",
+  "wordLabel": "Wort / Ausdruck",
+  "wordPlaceholder": "z.B. ephemeral",
+  "translationLabel": "Übersetzung",
+  "translationPlaceholder": "z.B. vergänglich",
+  "contextLabel": "Beispielsatz (optional)",
+  "contextPlaceholder": "z.B. The ephemeral beauty of cherry blossoms...",
+  "backToVocabulary": "← Zurück zu den Vokabeln",
+  "translationField": "Übersetzung",
+  "noTranslation": "Keine Übersetzung hinterlegt",
+  "contextField": "Kontext / Beispielsatz",
+  "commentField": "Kommentar",
+  "foreignWord": "Vokabel / Fremdwort",
+  "deleteConfirm": "Möchtest du das Wort \"{{word}}\" wirklich unwiderruflich aus deiner Lernkartei löschen?",
+  "deleteButton": "Vokabel Löschen",
+  "deleting": "Löscht..."
+}

@@ -1,0 +1,17 @@
+{
+  "title": "Medien",
+  "addButton": "+ Medium hinzufügen",
+  "noMedia": "Noch kein Medium für {{language}} vorhanden. Klicke auf \"+ Medium hinzufügen\".",
+  "newMedia": "Neues Medium",
+  "titlePlaceholder": "Titel",
+  "uploading": "Lädt hoch...",
+  "backToMedia": "← Zurück zu den Medien",
+  "deleteConfirm": "Möchtest du dieses Medium wirklich unwiderruflich löschen? Alle verknüpften Chats und Vokabelzuordnungen könnten verloren gehen.",
+  "deleteButton": "Medium Löschen",
+  "deleting": "Löscht...",
+  "extractTitle": "Vokabeln extrahieren",
+  "extractDescription": "Lässt die KI automatisch Vokabeln aus diesem Medium erkennen und in deine Lernkartei eintragen.",
+  "extractButton": "Vokabeln extrahieren",
+  "extracting": "Extrahiert...",
+  "extractSuccess": "✓ Vokabeln wurden erfolgreich extrahiert."
+}

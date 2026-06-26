@@ -4,9 +4,15 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 
 import enCommon from './locales/en/common.json';
 import enDashboard from './locales/en/dashboard.json';
+import enVocabulary from './locales/en/vocabulary.json';
+import enMedia from './locales/en/media.json';
+import enChat from './locales/en/chat.json';
+
 import deCommon from './locales/de/common.json';
 import deDashboard from './locales/de/dashboard.json';
-
+import deVocabulary from './locales/de/vocabulary.json';
+import deMedia from './locales/de/media.json';
+import deChat from './locales/de/chat.json';
 
 i18n
     .use(LanguageDetector)
@@ -16,10 +22,16 @@ i18n
             en: {
                 common: enCommon,
                 dashboard: enDashboard,
+                vocabulary: enVocabulary,
+                media: enMedia,
+                chat: enChat,
             },
             de: {
                 common: deCommon,
                 dashboard: deDashboard,
+                vocabulary: deVocabulary,
+                media: deMedia,
+                chat: deChat,
             },
         },
         defaultNS: 'common',
