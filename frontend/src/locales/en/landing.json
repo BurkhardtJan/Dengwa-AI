@@ -4,40 +4,47 @@
     "register": "Get started"
   },
   "hero": {
-    "title": "Language learning with AI",
-    "subtitle": "Upload your media, let AI extract vocabulary, and practice with your AI.",
-    "cta": "Get started",
+    "eyebrow": "電話 · *dn̥ǵʰwéh₂ · language",
+    "title": "Learn languages from real content.",
+    "subtitle": "Upload texts and articles. Dengwa extracts vocabulary, explains context – and practices with you until it actually sticks.",
+    "cta": "Start for free",
     "login": "Sign in"
   },
   "features": {
-    "title": "What Dengwa AI can do",
+    "title": "Everything you need",
     "items": [
       {
-        "title": "Media import",
-        "description": "Upload texts, articles and documents in your target language."
+        "icon": "📄",
+        "title": "Your content, your language",
+        "description": "Upload texts, articles or documents in your target language. No preset curriculum, no artificial examples."
       },
       {
-        "title": "AI vocabulary extraction",
-        "description": "Vocabulary is automatically detected and added to your flashcards."
+        "icon": "🧠",
+        "title": "AI spots what matters",
+        "description": "Vocabulary is automatically extracted, explained and linked to context – straight into your personal flashcard deck."
       },
       {
-        "title": "AI conversation",
-        "description": "Practice the language in chat with an AI assistant that knows your context."
+        "icon": "💬",
+        "title": "Learn to speak by speaking",
+        "description": "Practice in chat with an AI that knows your vocabulary and progress – not a generic conversation bot."
       }
     ]
   },
   "howItWorks": {
     "title": "How it works",
     "steps": [
-      { "step": "Choose language", "label": "Select your target language." },
-      { "step": "Upload media", "label": "Upload a text or article." },
-      { "step": "AI extracts", "label": "Vocabulary is detected automatically." },
-      { "step": "Learn", "label": "Review with spaced repetition." }
+      { "step": "Pick a language", "label": "Choose what you want to learn." },
+      { "step": "Upload content", "label": "A text, article or document is all it takes." },
+      { "step": "AI takes over", "label": "Vocabulary is detected and saved automatically." },
+      { "step": "Review", "label": "Spaced repetition makes sure it sticks." }
     ]
   },
+  "etymology": {
+    "text": "Dengwa – from Proto-Indo-European *dn̥ǵʰwéh₂* (language, tongue) and Japanese 電話 (denwa) – Telephone, literally: electric language."
+  },
   "cta": {
-    "title": "Ready to start?",
-    "subtitle": "Register for free and get going immediately.",
-    "button": "Register now"
+    "title": "Ready to understand real content?",
+    "subtitle": "Register for free. No subscription, no credit card.",
+    "button": "Get started"
   }
 }

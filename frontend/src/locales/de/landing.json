@@ -1,43 +1,50 @@
 {
   "nav": {
     "login": "Anmelden",
-    "register": "Registrieren"
+    "register": "Loslegen"
   },
   "hero": {
-    "title": "Sprachen lernen mit KI",
-    "subtitle": "Lade deine Medien hoch, lass die KI Vokabeln extrahieren und übe mit der KI.",
-    "cta": "Jetzt starten",
+    "eyebrow": "電話 · *dn̥ǵʰwéh₂ · Sprache",
+    "title": "Lern Sprachen aus echten Inhalten.",
+    "subtitle": "Lade Texte und Artikel hoch. Dengwa extrahiert die Vokabeln, erklärt den Kontext – und übt mit dir, bis du es wirklich kannst.",
+    "cta": "Kostenlos starten",
     "login": "Anmelden"
   },
   "features": {
-    "title": "Was Dengwa AI kann",
+    "title": "Alles, was du brauchst",
     "items": [
       {
-        "title": "Medien-Import",
-        "description": "Texte, Artikel und Dokumente in deiner Zielsprache hochladen."
+        "icon": "📄",
+        "title": "Deine Inhalte, deine Sprache",
+        "description": "Texte, Artikel oder Dokumente hochladen – in der Sprache, die du lernst. Kein vorgefertigtes Curriculum."
       },
       {
-        "title": "KI-Vokabelextraktion",
-        "description": "Vokabeln werden automatisch erkannt und in deine Lernkartei eingetragen."
+        "icon": "🧠",
+        "title": "KI erkennt, was zählt",
+        "description": "Vokabeln werden automatisch extrahiert, erklärt und mit Kontext verknüpft – direkt in deine persönliche Lernkartei."
       },
       {
-        "title": "KI-Konversation",
-        "description": "Übe die Sprache im Chat mit einem KI-Assistenten, der deinen Kontext kennt."
+        "icon": "💬",
+        "title": "Sprechen lernen durch sprechen",
+        "description": "Übe im Chat mit einem KI-Assistenten, der deine Vokabeln und deinen Lernstand kennt – kein Smalltalk ins Leere."
       }
     ]
   },
   "howItWorks": {
-    "title": "So funktioniert es",
+    "title": "So läuft es ab",
     "steps": [
-      { "step": "Sprache wählen", "label": "Wähle deine Zielsprache aus." },
-      { "step": "Medium hochladen", "label": "Lade einen Text oder Artikel hoch." },
-      { "step": "KI extrahiert", "label": "Vokabeln werden automatisch erkannt." },
-      { "step": "Lernen", "label": "Wiederhole mit Spaced Repetition." }
+      { "step": "Sprache wählen", "label": "Leg fest, was du lernen willst." },
+      { "step": "Inhalt hochladen", "label": "Ein Text, Artikel oder Dokument reicht." },
+      { "step": "KI übernimmt", "label": "Vokabeln werden erkannt und eingetragen." },
+      { "step": "Wiederholen", "label": "Spaced Repetition sorgt dafür, dass es bleibt." }
     ]
   },
+  "etymology": {
+    "text": "Dengwa – vom proto-indogermanischen *dn̥ǵʰwéh₂* (Sprache, Zunge) und dem japanischen 電話 (denwa) – Telephon, wörtlich: elektrische Sprache."
+  },
   "cta": {
-    "title": "Bereit anzufangen?",
-    "subtitle": "Kostenlos registrieren und sofort loslegen.",
-    "button": "Jetzt registrieren"
+    "title": "Bereit, echte Inhalte zu verstehen?",
+    "subtitle": "Kostenlos registrieren. Kein Abo, keine Kreditkarte.",
+    "button": "Jetzt starten"
   }
 }

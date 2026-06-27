@@ -1,8 +1,22 @@
 # Dengwa AI
 
-A language learning application powered by AI.
-Upload a medium (e.g. subtitles, books, text files) and the AI will extract vocabulary, help you learn it through
-conversation, and track your progress.
+> *From Proto-Indo-European \*dn̥ǵʰwéh₂ (language, tongue) and Japanese 電話 denwa (telephone, literally: electric
+speech) — Dengwa AI is a language learning application that meets you where you actually are: reading real content, not
+drilling fake sentences.*
+
+Upload subtitles, books, or articles in your target language. Dengwa extracts vocabulary in context, builds your
+personal deck, and lets you practice with an AI that knows exactly what you've been reading.
+
+---
+
+## What it does
+
+|                           |                                                          |
+|---------------------------|----------------------------------------------------------|
+| **Media import**          | Upload SRT, TXT, or documents in your target language    |
+| **Vocabulary extraction** | LLM identifies and explains vocabulary in context        |
+| **Contextual chat**       | Practice with an AI that knows your vocabulary and media |
+| **Multi-LLM support**     | Groq / Gemini / OpenAI — swappable                       |
 
 ---
 
