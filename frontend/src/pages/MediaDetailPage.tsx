@@ -2,6 +2,7 @@ import {useParams, useNavigate} from 'react-router-dom'
 import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query'
 import {deleteMedia, fetchMedium, extractVocabulary} from "@/services/media.service.ts"
 import {useState} from 'react'
+import {MediaViewer} from '../components/MediaViewer'
 import {useTranslation} from 'react-i18next'
 
 export default function MediaDetailPage() {
@@ -61,8 +62,12 @@ export default function MediaDetailPage() {
             </div>
 
             <div className="mb-8">
-                <p className="text-muted-foreground mb-1">{data?.content_type}</p>
                 <p className="text-muted-foreground mb-4">{data?.learning_id}</p>
+            </div>
+
+            <div className="mb-8">
+                <p className="text-muted-foreground mb-1">{data?.content_type}</p>
+                <MediaViewer mediaId={id!} contentType={data?.content_type ?? null}/>
             </div>
 
             <div className="flex flex-col gap-3">

@@ -166,11 +166,12 @@ pnpm dev
 - [x] Added Tests (pytest)
 - [x] Multiple Language UI with i18n
 - [x] Translate UI
+- [x] Return file endpoint and show in frontend
+
 
 ### Backend
 
 - [ ] RAG — inject vocabulary context into chat prompts (pgvector)
-- [ ] Return file endpoint
 - [ ] Progress endpoint — implement actual logic (currently stub)
 - [ ] Add default Vocab starter set (HSK, JLPT, ...)
 - [ ] Other Media Parsing

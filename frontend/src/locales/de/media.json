@@ -13,5 +13,8 @@
   "extractDescription": "Lässt die KI automatisch Vokabeln aus diesem Medium erkennen und in deine Lernkartei eintragen.",
   "extractButton": "Vokabeln extrahieren",
   "extracting": "Extrahiert...",
-  "extractSuccess": "✓ Vokabeln wurden erfolgreich extrahiert."
+  "extractSuccess": "✓ Vokabeln wurden erfolgreich extrahiert.",
+  "noPreview": "Keine Vorschau verfügbar",
+  "downloadFile": "Datei herunterladen",
+  "previewError": "Vorschau konnte nicht geladen werden"
 }

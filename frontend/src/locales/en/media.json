@@ -13,5 +13,8 @@
   "extractDescription": "Lets the AI automatically detect vocabulary from this media and add it to your flashcards.",
   "extractButton": "Extract vocabulary",
   "extracting": "Extracting...",
-  "extractSuccess": "✓ Vocabulary successfully extracted."
+  "extractSuccess": "✓ Vocabulary successfully extracted.",
+  "noPreview": "No preview available",
+  "downloadFile": "Download file",
+  "previewError": "Could not load preview"
 }
