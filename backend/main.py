@@ -3,7 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from database import Base, engine
 from routers import system, users, languages, media, chats, vocabularies
+from sqlalchemy import text
 
+with engine.connect() as conn:
+    conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
+    conn.commit()
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()

@@ -12,8 +12,11 @@ langchain_openai
 langchain_groq
 langchain_google_genai
 langchain_ollama
+langchain-postgres
+langgraph
 PyJWT
 bcrypt
 passlib
 python-multipart
+pgvector
 alembic

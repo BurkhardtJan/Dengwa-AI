@@ -273,6 +273,7 @@ graph TB
 erDiagram
     chat_histories }o--|| chats: references
     chats }o--|| media: references
+    media_chunks }o--|| media: references
     language_learning }o--|| users: references
     language_learning ||--o{ media: references
     learning_progress }o--|| media: references
@@ -295,6 +296,12 @@ erDiagram
         TEXT file_path
         TEXT extracted_content
         INTEGER learning_id
+    }
+    media_chunks {
+        UUID id
+        UUID media_id
+        TEXT content
+        VECTOR embedding
     }
 
     vocabularies {
