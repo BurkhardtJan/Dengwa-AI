@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, File, Form, UploadFile
+import os
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from fastapi.responses import FileResponse
 from typing import List, Optional
 from sqlalchemy.orm import Session
 from services.user_service import get_current_user
@@ -55,12 +57,32 @@ async def extract_media_vocabulary(
 
 @router.get("/{media_id}", response_model=MediaResponse)
 async def get_single_medium(media_id: UUID, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    """Returns single medium by its UUID."""
     media = get_media_or_404(db, media_id, current_user.id)
     return media
 
 
+@router.get("/{media_id}/file")
+async def get_media_file(media_id: UUID, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    """Stream the raw file for a medium."""
+    media = get_media_or_404(db, media_id, current_user.id)
+
+    if not media.file_path or not os.path.exists(media.file_path):
+        raise HTTPException(status_code=404, detail="Datei nicht gefunden")
+
+    filename = os.path.basename(media.file_path)
+    content_type = media.content_type or "application/octet-stream"
+
+    return FileResponse(
+        path=media.file_path,
+        media_type=content_type,
+        filename=filename,
+    )
+
+
 @router.delete("/{media_id}")
 async def delete_medium(media_id: UUID, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    """Delete medium by its UUID."""
     media = get_media_or_404(db, media_id, current_user.id)
     db.delete(media)
     db.commit()

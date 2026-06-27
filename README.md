@@ -59,13 +59,14 @@ personal deck, and lets you practice with an AI that knows exactly what you've b
 
 ### Media
 
-| Method       | Endpoint                       | Description                    |
-|--------------|--------------------------------|--------------------------------|
-| **`POST`**   | `/media`                       | Upload a medium (SRT, TXT)     |
-| **`GET`**    | `/media`                       | Get all media for a language   |
-| **`GET`**    | `/media/{media_id}`            | Get media by ID                |
-| **`DELETE`** | `/media/{media_id}`            | Delete media by ID             |
-| **`POST`**   | `/media/{media_id}/vocabulary` | Extract vocabulary from medium |
+| Method       | Endpoint                       | Description                       |
+|--------------|--------------------------------|-----------------------------------|
+| **`POST`**   | `/media`                       | Upload a medium (SRT, TXT)        |
+| **`GET`**    | `/media`                       | Get all media for a language      |
+| **`GET`**    | `/media/{media_id}`            | Get media by ID                   |
+| **`GET`**    | `/media/{media_id}/file`       | Stream the raw file for a medium. |
+| **`DELETE`** | `/media/{media_id}`            | Delete media by ID                |
+| **`POST`**   | `/media/{media_id}/vocabulary` | Extract vocabulary from medium    |
 
 ### Chats
 
