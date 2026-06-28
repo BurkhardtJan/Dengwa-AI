@@ -1,61 +1,7 @@
 import os
 from pydantic import BaseModel
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage, BaseMessage
-from langchain_openai import ChatOpenAI
-from langchain_groq import ChatGroq
-from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_ollama import ChatOllama
-from dotenv import load_dotenv
-
-load_dotenv()
-
-DEFAULT_PROVIDER = os.environ.get("LLM_PROVIDER", "groq")
-DEFAULT_MODELS = {
-    "openai": "gpt-5-nano",
-    "groq": "llama-3.3-70b-versatile",
-    "gemini": "gemini-2.5-flash-lite",
-    "ollama": "dolphin-llama3:latest",
-}
-
-
-def get_model(
-        provider: str | None = None,
-        model: str | None = None,
-        temperature: float = 1.0,
-        max_tokens: int | None = None,
-        streaming: bool = False,
-):
-    """
-    Returns LangChain Chat-Model.
-    Provider: openai | groq | gemini | ollama
-    """
-    provider = provider or DEFAULT_PROVIDER
-    model = model or DEFAULT_MODELS.get(provider)
-
-    kwargs = {
-        "model": model,
-        "temperature": temperature,
-        "streaming": streaming,
-    }
-
-    if max_tokens is not None:
-        kwargs["max_tokens"] = max_tokens
-
-    if provider == "openai":
-        return ChatOpenAI(**kwargs)
-    elif provider == "groq":
-        return ChatGroq(**kwargs)
-    elif provider == "gemini":
-        return ChatGoogleGenerativeAI(**kwargs)
-    elif provider == "ollama":
-        return ChatOllama(
-            model=model,
-            temperature=temperature,
-            num_predict=max_tokens,
-            base_url=os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434"),
-        )
-    else:
-        raise ValueError(f"Unknown provider '{provider}'. Available: openai, groq, gemini, ollama")
+from llm.providers import get_chat_model as get_model
 
 
 def build_messages(

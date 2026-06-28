@@ -20,3 +20,4 @@ passlib
 python-multipart
 pgvector
 alembic
+langchain-text-splitters
