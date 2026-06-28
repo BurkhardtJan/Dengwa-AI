@@ -1,13 +1,13 @@
 import os
 from dotenv import load_dotenv
-from langchain_openai import ChatOpenAI
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_groq import ChatGroq
-from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_ollama import ChatOllama
+from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
+from langchain_ollama import ChatOllama, OllamaEmbeddings
 
 load_dotenv()
 
-DEFAULT_CHAT_PROVIDER = os.environ.get("LLM_PROVIDER", "openai")
+DEFAULT_CHAT_PROVIDER = os.environ.get("LLM_PROVIDER", "ollama")
 DEFAULT_EMBEDDING_PROVIDER = os.environ.get("EMBEDDING_PROVIDER", "openai")
 
 # ---------------------------------------------------------------------------
@@ -104,9 +104,7 @@ def get_embedding_model(provider: str | None = None):
       openai → text-embedding-3-small (1536 dim, OpenAI API)
       google → text-embedding-004     (768 dim,  Google API)
     """
-    from langchain_ollama import OllamaEmbeddings
-    from langchain_openai import OpenAIEmbeddings
-    from langchain_google_genai import GoogleGenerativeAIEmbeddings
+
 
     provider = provider or DEFAULT_EMBEDDING_PROVIDER
 
