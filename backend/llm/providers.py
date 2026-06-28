@@ -7,7 +7,7 @@ from langchain_ollama import ChatOllama, OllamaEmbeddings
 
 load_dotenv()
 
-DEFAULT_CHAT_PROVIDER = os.environ.get("LLM_PROVIDER", "ollama")
+DEFAULT_CHAT_PROVIDER = os.environ.get("LLM_PROVIDER", "openai")
 DEFAULT_EMBEDDING_PROVIDER = os.environ.get("EMBEDDING_PROVIDER", "openai")
 
 # ---------------------------------------------------------------------------

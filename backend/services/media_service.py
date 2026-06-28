@@ -7,6 +7,7 @@ from models import Media, MediaVocabulary, LanguageLearning
 from schemas import VocabularyExtraction
 from llm.prompts import build_vocab_extract_prompt
 from llm.client import call_llm
+from llm.rag_service import embed_media
 from services.vocabulary_service import get_or_create_vocab
 
 OCTET_STREAM_EXTENSIONS = {".txt", ".srt", ".vtt", ".md"}
@@ -162,4 +163,8 @@ def create_media_record(db: Session, title: str, file: UploadFile, file_path: st
     db.add(media)
     db.commit()
     db.refresh(media)
+    try:
+        embed_media(db, media)
+    except Exception:
+        pass
     return media

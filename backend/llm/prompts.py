@@ -1,7 +1,7 @@
 from models import Chat, Media
 
 
-def build_system_prompt_language_chat(chat: Chat) -> str:
+def build_system_prompt_language_chat(chat: Chat, rag_context: str | None = None) -> str:
     """Build system prompt for language chat"""
     learning = chat.media.language_learning
     user = learning.user
@@ -13,16 +13,18 @@ def build_system_prompt_language_chat(chat: Chat) -> str:
         "Antworte immer in der Lernsprache des Users, außer der User schreibt in der Muttersprache oder bittet dich explizit darum.",
     ]
 
-    if chat.media.extracted_content:
+    context = rag_context or chat.media.extracted_content
+    if context:
         parts += [
             "",
-            "Der folgende Text ist das Medium, auf das sich dieses Gespräch bezieht:",
+            "Die folgenden Textausschnitte stammen aus dem Medium, auf das sich dieses Gespräch bezieht:",
             "---",
-            chat.media.extracted_content,
+            context,
             "---",
         ]
 
     return "\n".join(parts)
+
 
 def build_vocab_extract_prompt(media: Media) -> str:
     """Build system prompt for extracting vocabulary"""

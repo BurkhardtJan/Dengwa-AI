@@ -11,6 +11,7 @@ from schemas import (
     ChatMessageRequest, ChatMessageResponse
 )
 from llm.client import call_llm
+from llm.rag_service import retrieve_context
 from services.chat_service import get_chat_or_404, build_message_history
 from services.media_service import get_media_or_404
 from services.language_service import get_learning_or_404
@@ -81,8 +82,9 @@ async def post_chat_message(
     """Send a message to the AI"""
     chat = get_chat_or_404(db, chat_id, current_user.id)
     messages = build_message_history(db, chat.id, request.message)
+    rag_context = retrieve_context(db, chat.media_id, request.message)
 
-    system_prompt = build_system_prompt_language_chat(chat)
+    system_prompt = build_system_prompt_language_chat(chat, rag_context)
 
     user_message = ChatHistory(chat_id=chat.id, role="user", message=request.message)
     db.add(user_message)
