@@ -11,11 +11,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /**
-         * Root
-         * @description Health check of the Website
-         */
-        get: operations["root_health_get"];
+        /** Health */
+        get: operations["health_health_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -198,12 +195,38 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get Single Medium */
+        /**
+         * Get Single Medium
+         * @description Returns single medium by its UUID.
+         */
         get: operations["get_single_medium_media__media_id__get"];
         put?: never;
         post?: never;
-        /** Delete Medium */
+        /**
+         * Delete Medium
+         * @description Delete medium by its UUID.
+         */
         delete: operations["delete_medium_media__media_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/media/{media_id}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Media File
+         * @description Stream the raw file for a medium.
+         */
+        get: operations["get_media_file_media__media_id__file_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -345,18 +368,12 @@ export interface components {
             /** File */
             file: string;
         };
-        /** ChatCreate */
-        ChatCreate: {
-            /**
-             * Media Id
-             * Format: uuid
-             */
-            media_id: string;
-        };
         /** ChatMessageRequest */
         ChatMessageRequest: {
             /** Message */
             message: string;
+            /** Parent Id */
+            parent_id?: string | null;
         };
         /** ChatMessageResponse */
         ChatMessageResponse: {
@@ -374,6 +391,8 @@ export interface components {
              * Format: date-time
              */
             timestamp: string;
+            /** Parent Id */
+            parent_id?: string | null;
         };
         /** ChatResponse */
         ChatResponse: {
@@ -530,7 +549,7 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    root_health_get: {
+    health_health_get: {
         parameters: {
             query?: never;
             header?: never;
@@ -979,6 +998,37 @@ export interface operations {
             };
         };
     };
+    get_media_file_media__media_id__file_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                media_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_chats_chats_get: {
         parameters: {
             query?: {
@@ -1027,7 +1077,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ChatCreate"];
+                    "application/json": components["schemas"]["ChatResponse"];
                 };
             };
             /** @description Validation Error */

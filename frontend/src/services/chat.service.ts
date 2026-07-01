@@ -19,8 +19,8 @@ export async function fetchChatHistory(chatId: string): Promise<ChatMessage[]> {
     return response.data
 }
 
-export async function sendMessage(chatId: string, message: string): Promise<ChatMessage[]> {
-    const response = await api.post(`/chats/${chatId}`, {message})
+export async function sendMessage(chatId: string, message: string, parentId?: string | null): Promise<ChatMessage[]> {
+    const response = await api.post(`/chats/${chatId}`, {message, parent_id: parentId ?? null})
     return response.data
 }
 

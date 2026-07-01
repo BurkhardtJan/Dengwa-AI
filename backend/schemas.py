@@ -107,6 +107,7 @@ class ChatMessageResponse(BaseModel):
     role: str
     message: str
     timestamp: datetime
+    parent_id: Optional[UUID] = None
 
     model_config = ConfigDict(from_attributes=True)
 

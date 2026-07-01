@@ -168,6 +168,7 @@ pnpm dev
 - [x] Translate UI
 - [x] Return file endpoint and show in frontend
 - [x] RAG — inject vocabulary context into chat prompts (pgvector)
+- [x] Add Chat branching
 
 
 ### Backend
@@ -180,7 +181,6 @@ pnpm dev
 
 ### Frontend
 
-- [ ] Add Chat branching
 - [ ] Add Flags
 - [ ] Comparison of LLMs
 
