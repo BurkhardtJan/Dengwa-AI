@@ -114,10 +114,22 @@ class ChatHistory(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     chat_id = Column(UUID(as_uuid=True), ForeignKey("chats.id"), nullable=False)
     message = Column(Text, nullable=False)
+    parent_id = Column(UUID(as_uuid=True), ForeignKey("chat_histories.id"), nullable=True)
     timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     role = Column(String, nullable=False)  # "user" oder "assistant"
 
     chat = relationship("Chat", back_populates="chat_histories")
+    parent = relationship(
+        "ChatHistory",
+        remote_side=[id],
+        back_populates="children"
+    )
+
+    children = relationship(
+        "ChatHistory",
+        back_populates="parent",
+        cascade="all, delete-orphan"
+    )
 
 
 class LearningProgress(Base):

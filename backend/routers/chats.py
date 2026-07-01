@@ -81,13 +81,14 @@ async def post_chat_message(
 ):
     """Send a message to the AI"""
     chat = get_chat_or_404(db, chat_id, current_user.id)
-    messages = build_message_history(db, chat.id, request.message)
+    messages = build_message_history(db, request.parent_id, request.message)
     rag_context = retrieve_context(db, chat.media_id, request.message)
 
     system_prompt = build_system_prompt_language_chat(chat, rag_context)
 
-    user_message = ChatHistory(chat_id=chat.id, role="user", message=request.message)
+    user_message = ChatHistory(chat_id=chat.id, role="user", message=request.message, parent_id=request.parent_id)
     db.add(user_message)
+    db.flush()
 
     ai_response = call_llm(
         messages=messages,
@@ -96,7 +97,7 @@ async def post_chat_message(
         model=model,
     )
 
-    assistant_message = ChatHistory(chat_id=chat.id, role="assistant", message=ai_response)
+    assistant_message = ChatHistory(chat_id=chat.id, role="assistant", message=ai_response, parent_id=user_message.id)
     db.add(assistant_message)
     db.commit()
 

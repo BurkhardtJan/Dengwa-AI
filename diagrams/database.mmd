@@ -23,7 +23,7 @@ erDiagram
         TEXT content_type
         TEXT file_path
         TEXT extracted_content
-        INTEGER learning_id
+        UUID learning_id
     }
     media_chunks {
         UUID id
@@ -34,7 +34,7 @@ erDiagram
 
     vocabularies {
         UUID id
-        INTEGER learning_id
+        UUID learning_id
         TEXT word
         TEXT translation
         TEXT context_sentence
@@ -52,21 +52,22 @@ erDiagram
 
     chats {
         UUID id
-        INTEGER media_id
-        INTEGER user_id
+        UUID media_id
+        UUID user_id
     }
 
     chat_histories {
         UUID id
-        INTEGER chat_id
+        UUID chat_id
+        UUID parent_id
         TEXT message
-        TIMESTAMP timestamp
         TEXT role
+        TIMESTAMP timestamp
     }
 
     language_learning {
         UUID id
-        INTEGER user_id
+        UUID user_id
         TEXT learning_language
         TEXT proficiency_level
         TEXT user_motivation
@@ -74,13 +75,13 @@ erDiagram
 
     learning_progress {
         UUID id
-        INTEGER media_id
+        UUID media_id
         TEXT proficiency_level
         TEXT comment
     }
 
     media_vocabularies {
         UUID id
-        INTEGER media_id
-        INTEGER vocabulary_id
+        UUID media_id
+        UUID vocabulary_id
     }
