@@ -64,7 +64,7 @@ function SignInPage() {
                         >
                             {Object.entries({de: 'de', en: 'en', fr: 'fr', es: 'es'}).map(([value]) => (
                                 <option key={value} value={value}>
-                                    {t(`languages.${value}`)}
+                                    {t(`languages.${value}` as any)}
                                 </option>
                             ))}
                         </select>

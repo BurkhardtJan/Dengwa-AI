@@ -20,5 +20,15 @@
   "sending": "Sending...",
   "sendButton": "Send",
   "errorLoading": "Error loading chat",
-  "loading": "Loading conversation..."
+  "loading": "Loading conversation...",
+  "settings": {
+    "title": "Model Settings",
+    "provider": "Provider",
+    "providerPlaceholder": "e.g. openai, groq, ollama",
+    "model": "Model",
+    "modelPlaceholder": "e.g. gpt-4o, llama-3.3-70b",
+    "embeddingModel": "Embedding Model",
+    "embeddingModelPlaceholder": "e.g. nomic, mxbai, openai, google",
+    "hint": "Leave empty for default"
+  }
 }

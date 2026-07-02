@@ -19,8 +19,38 @@ export async function fetchChatHistory(chatId: string): Promise<ChatMessage[]> {
     return response.data
 }
 
-export async function sendMessage(chatId: string, message: string, parentId?: string | null): Promise<ChatMessage[]> {
-    const response = await api.post(`/chats/${chatId}`, {message, parent_id: parentId ?? null})
+export async function sendMessage(
+    chatId: string,
+    message: string,
+    parentId?: string | null,
+    provider?: string | null,
+    model?: string | null,
+    embeddingModel?: string | null
+): Promise<ChatMessage[]> {
+    const response = await api.post(`/chats/${chatId}`, {message, parent_id: parentId ?? null}, {
+        params: {
+            provider: provider ?? undefined,
+            model: model ?? undefined,
+            embedding_model: embeddingModel ?? undefined
+        }
+    })
+    return response.data
+}
+
+export async function createResponse(
+    chatId: string,
+    userMessageId: string,
+    provider?: string | null,
+    model?: string | null,
+    embeddingModel?: string | null
+): Promise<ChatMessage[]> {
+    const response = await api.post(`/chats/${chatId}/messages/${userMessageId}/responses`, null, {
+        params: {
+            provider: provider ?? undefined,
+            model: model ?? undefined,
+            embedding_model: embeddingModel ?? undefined
+        }
+    })
     return response.data
 }
 

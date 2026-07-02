@@ -2,13 +2,20 @@ import {useState, useEffect, useMemo} from 'react'
 import {useMutation, useQueryClient, useQuery} from '@tanstack/react-query'
 import {fetchChatHistory, sendMessage} from '@/services/chat.service.ts'
 import {getActivePath, getSiblings, findDeepestLeaf, findGlobalLatestLeaf} from '@/utils/tree.utils'
-import type {components} from '@/types/api'
 
-type ChatMessage = components['schemas']['ChatMessageResponse']
+export interface ModelChoice {
+    provider: string | null
+    model: string | null
+    embeddingModel: string | null
+}
+
+const EMPTY_CHOICE: ModelChoice = {provider: null, model: null, embeddingModel: null}
 
 export function useChatTree(chatId: string | undefined) {
     const queryClient = useQueryClient()
     const [activeLeafId, setActiveLeafId] = useState<string | null>(null)
+
+    const [modelChoice, setModelChoice] = useState<ModelChoice>(EMPTY_CHOICE)
 
     const {data: history, isLoading, isError} = useQuery({
         queryKey: ['chatHistory', chatId],
@@ -29,8 +36,15 @@ export function useChatTree(chatId: string | undefined) {
 
     const sendMessageMutation = useMutation({
         mutationFn: ({message, parentId}: { message: string; parentId: string | null }) =>
-            sendMessage(chatId!, message, parentId),
-        onSuccess: (newMessages: ChatMessage[]) => {
+            sendMessage(
+                chatId!,
+                message,
+                parentId,
+                modelChoice.provider,
+                modelChoice.model,
+                modelChoice.embeddingModel
+            ),
+        onSuccess: (newMessages) => {
             queryClient.invalidateQueries({queryKey: ['chatHistory', chatId]})
             const newLeaf = newMessages[newMessages.length - 1]
             if (newLeaf) setActiveLeafId(newLeaf.id)
@@ -71,6 +85,8 @@ export function useChatTree(chatId: string | undefined) {
         switchSibling,
         getSiblingInfo,
         sendNew,
-        sendEdit
+        sendEdit,
+        modelChoice,
+        setModelChoice
     }
 }

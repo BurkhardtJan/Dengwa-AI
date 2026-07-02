@@ -13,7 +13,6 @@ export default function VocabularyDetailPage() {
     const [word, setWord] = useState('')
     const [translation, setTranslation] = useState('')
     const [contextSentence, setContextSentence] = useState('')
-    const [comment, setComment] = useState('')
 
     const {t} = useTranslation(['common', 'vocabulary'])
 
@@ -28,12 +27,15 @@ export default function VocabularyDetailPage() {
             setWord(data.word)
             setTranslation(data.translation ?? '')
             setContextSentence(data.context_sentence ?? '')
-            setComment(data.comment ?? '')
         }
     }, [data])
 
     const updateMutation = useMutation({
-        mutationFn: () => updateVocabulary(id!, {word, translation, context_sentence: contextSentence}),
+        mutationFn: () => updateVocabulary(id!, {
+            word,
+            translation,
+            context_sentence: contextSentence
+        }),
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['vocabulary', id]})
             queryClient.invalidateQueries({queryKey: ['vocabularies']})
@@ -80,21 +82,24 @@ export default function VocabularyDetailPage() {
 
             {editing ? (
                 <div className="flex flex-col gap-3 p-4 border rounded-lg bg-muted/10 mb-8">
-                    <label className="text-xs font-medium text-muted-foreground -mb-1">{t('vocabulary:foreignWord')}</label>
+                    <label
+                        className="text-xs font-medium text-muted-foreground -mb-1">{t('vocabulary:foreignWord')}</label>
                     <input
                         value={word}
                         onChange={e => setWord(e.target.value)}
                         className="border rounded-lg px-3 py-2 bg-background text-sm"
                         placeholder={t('vocabulary:wordPlaceholder')}
                     />
-                    <label className="text-xs font-medium text-muted-foreground -mb-1">{t('vocabulary:translationField')}</label>
+                    <label
+                        className="text-xs font-medium text-muted-foreground -mb-1">{t('vocabulary:translationField')}</label>
                     <input
                         value={translation}
                         onChange={e => setTranslation(e.target.value)}
                         className="border rounded-lg px-3 py-2 bg-background text-sm"
                         placeholder={t('vocabulary:translationPlaceholder')}
                     />
-                    <label className="text-xs font-medium text-muted-foreground -mb-1">{t('vocabulary:contextLabel')}</label>
+                    <label
+                        className="text-xs font-medium text-muted-foreground -mb-1">{t('vocabulary:contextLabel')}</label>
                     <input
                         value={contextSentence}
                         onChange={e => setContextSentence(e.target.value)}
@@ -121,19 +126,22 @@ export default function VocabularyDetailPage() {
                 <div className="mb-8 space-y-4">
                     <div className="p-4 border rounded-lg bg-muted/20 space-y-3">
                         <p className="text-sm">
-                            <span className="text-muted-foreground block text-xs">{t('vocabulary:translationLabel')}:</span>
+                            <span
+                                className="text-muted-foreground block text-xs">{t('vocabulary:translationLabel')}:</span>
                             <span className="font-medium text-base">{data?.translation || <span
                                 className="italic text-muted-foreground">{t('vocabulary:noTranslation')}</span>}</span>
                         </p>
                         {data?.context_sentence && (
                             <p className="text-sm">
-                                <span className="text-muted-foreground block text-xs">{t('vocabulary:contextField')}</span>
+                                <span
+                                    className="text-muted-foreground block text-xs">{t('vocabulary:contextField')}</span>
                                 <span className="italic">"{data.context_sentence}"</span>
                             </p>
                         )}
                         {data?.comment && (
                             <p className="text-sm">
-                                <span className="text-muted-foreground block text-xs">{t('vocabulary:commentField')}:</span>
+                                <span
+                                    className="text-muted-foreground block text-xs">{t('vocabulary:commentField')}:</span>
                                 <span>{data.comment}</span>
                             </p>
                         )}

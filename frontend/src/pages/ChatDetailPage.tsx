@@ -4,6 +4,7 @@ import {deleteChat, fetchChats} from '@/services/chat.service.ts'
 import {fetchMedium} from '@/services/media.service.ts'
 import {useChatTree} from '@/hooks/useChatTree'
 import ChatHeader from '@/components/chat/ChatHeader'
+import ChatSettings from '@/components/chat/ChatSettings'
 import ChatMessageList from '@/components/chat/ChatMessageList'
 import ChatMessageInput from '@/components/chat/ChatMessageInput'
 import {useTranslation} from 'react-i18next'
@@ -16,7 +17,8 @@ export default function ChatDetailPage() {
 
     const {
         activePath, isLoading, isError, isSending,
-        switchSibling, getSiblingInfo, sendNew, sendEdit
+        switchSibling, getSiblingInfo, sendNew, sendEdit,
+        modelChoice, setModelChoice
     } = useChatTree(id)
 
     const {data: chatMeta} = useQuery({
@@ -58,6 +60,9 @@ export default function ChatDetailPage() {
                 isDeleting={deleteMutation.isPending}
                 onDelete={() => deleteMutation.mutate()}
             />
+            <div className="mb-4">
+                <ChatSettings value={modelChoice} onChange={setModelChoice}/>
+            </div>
             <ChatMessageList
                 messages={activePath}
                 isSending={isSending}

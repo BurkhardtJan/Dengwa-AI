@@ -281,6 +281,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/chats/{chat_id}/messages/{user_message_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create Response
+         * @description Creates alternative answer to existing promt.
+         */
+        post: operations["create_response_chats__chat_id__messages__user_message_id__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/vocabularies": {
         parameters: {
             query?: never;
@@ -1133,6 +1153,7 @@ export interface operations {
             query?: {
                 provider?: string | null;
                 model?: string | null;
+                embedding_model?: string | null;
             };
             header?: never;
             path: {
@@ -1184,6 +1205,42 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_response_chats__chat_id__messages__user_message_id__post: {
+        parameters: {
+            query?: {
+                provider?: string | null;
+                model?: string | null;
+                embedding_model?: string | null;
+            };
+            header?: never;
+            path: {
+                chat_id: string;
+                user_message_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChatMessageResponse"][];
                 };
             };
             /** @description Validation Error */
