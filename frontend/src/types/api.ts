@@ -393,6 +393,12 @@ export interface components {
             timestamp: string;
             /** Parent Id */
             parent_id?: string | null;
+            /** Provider */
+            provider?: string | null;
+            /** Model */
+            model?: string | null;
+            /** Embedding Model */
+            embedding_model?: string | null;
         };
         /** ChatResponse */
         ChatResponse: {

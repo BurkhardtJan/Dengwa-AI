@@ -105,7 +105,6 @@ def get_embedding_model(provider: str | None = None):
       google → text-embedding-004     (768 dim,  Google API)
     """
 
-
     provider = provider or DEFAULT_EMBEDDING_PROVIDER
 
     if provider in ("nomic", "mxbai"):
@@ -132,3 +131,17 @@ def get_embedding_dim(provider: str | None = None) -> int:
 def get_embedding_table(provider: str | None = None) -> str:
     provider = provider or DEFAULT_EMBEDDING_PROVIDER
     return EMBEDDING_TABLES[provider]
+
+
+def resolve_chat_config(provider: str | None = None, model: str | None = None) -> tuple[str, str]:
+    """
+    Resolves chat config or uses default
+    """
+    resolved_provider = provider or DEFAULT_CHAT_PROVIDER
+    resolved_model = model or CHAT_MODELS.get(resolved_provider)
+    return resolved_provider, resolved_model
+
+
+def resolve_embedding_provider(embedding_model: str | None = None) -> str:
+    """Resolves embedding provider or uses default"""
+    return embedding_model or DEFAULT_EMBEDDING_PROVIDER

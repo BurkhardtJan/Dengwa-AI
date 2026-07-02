@@ -117,6 +117,9 @@ class ChatHistory(Base):
     parent_id = Column(UUID(as_uuid=True), ForeignKey("chat_histories.id"), nullable=True)
     timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     role = Column(String, nullable=False)  # "user" oder "assistant"
+    provider = Column(Text, nullable=True)
+    model = Column(Text, nullable=True)
+    embedding_model = Column(Text, nullable=True)
 
     chat = relationship("Chat", back_populates="chat_histories")
     parent = relationship(

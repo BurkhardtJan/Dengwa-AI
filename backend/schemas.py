@@ -108,6 +108,9 @@ class ChatMessageResponse(BaseModel):
     message: str
     timestamp: datetime
     parent_id: Optional[UUID] = None
+    provider: Optional[str] = None
+    model: Optional[str] = None
+    embedding_model: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
 

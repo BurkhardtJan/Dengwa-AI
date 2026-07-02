@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from typing import List, Optional
 from sqlalchemy.orm import Session
 from uuid import UUID
 from llm.prompts import build_system_prompt_language_chat
+from llm.providers import DEFAULT_CHAT_PROVIDER, DEFAULT_EMBEDDING_PROVIDER
 from services.user_service import get_current_user
 from database import get_db
 from models import Chat, ChatHistory, Media
@@ -11,8 +12,9 @@ from schemas import (
     ChatMessageRequest, ChatMessageResponse
 )
 from llm.client import call_llm
+from llm.providers import resolve_embedding_provider
 from llm.rag_service import retrieve_context
-from services.chat_service import get_chat_or_404, build_message_history
+from services.chat_service import get_chat_or_404, build_message_history, generate_assistant_reply
 from services.media_service import get_media_or_404
 from services.language_service import get_learning_or_404
 
@@ -76,32 +78,62 @@ async def post_chat_message(
         request: ChatMessageRequest,
         provider: str | None = None,
         model: str | None = None,
+        embedding_model: str | None = None,
         db: Session = Depends(get_db),
         current_user=Depends(get_current_user)
 ):
     """Send a message to the AI"""
     chat = get_chat_or_404(db, chat_id, current_user.id)
-    messages = build_message_history(db, request.parent_id, request.message)
-    rag_context = retrieve_context(db, chat.media_id, request.message)
 
-    system_prompt = build_system_prompt_language_chat(chat, rag_context)
+    resolved_embedding = resolve_embedding_provider(embedding_model)
 
-    user_message = ChatHistory(chat_id=chat.id, role="user", message=request.message, parent_id=request.parent_id)
+    user_message = ChatHistory(
+        chat_id=chat.id,
+        role="user",
+        message=request.message,
+        parent_id=request.parent_id,
+    )
     db.add(user_message)
     db.flush()
 
-    ai_response = call_llm(
-        messages=messages,
-        system_prompt=system_prompt,
-        provider=provider,
-        model=model,
+    assistant_message = generate_assistant_reply(
+        db, chat, user_message, provider, model, embedding_model
     )
-
-    assistant_message = ChatHistory(chat_id=chat.id, role="assistant", message=ai_response, parent_id=user_message.id)
     db.add(assistant_message)
     db.commit()
+    db.refresh(user_message)
+    db.refresh(assistant_message)
 
     return [user_message, assistant_message]
+
+
+@router.post("/{chat_id}/messages/{user_message_id}", response_model=List[ChatMessageResponse])
+async def create_response(
+        chat_id: UUID,
+        user_message_id: UUID,
+        provider: str | None = None,
+        model: str | None = None,
+        embedding_model: str | None = None,
+        db: Session = Depends(get_db),
+        current_user=Depends(get_current_user)
+):
+    """
+    Creates alternative answer to existing promt.
+    """
+    chat = get_chat_or_404(db, chat_id, current_user.id)
+
+    user_message = db.get(ChatHistory, user_message_id)
+    if not user_message or user_message.chat_id != chat.id or user_message.role != "user":
+        raise HTTPException(status_code=404, detail="User message not found")
+
+    assistant_message = generate_assistant_reply(
+        db, chat, user_message, provider, model, embedding_model
+    )
+    db.add(assistant_message)
+    db.commit()
+    db.refresh(assistant_message)
+
+    return [assistant_message]
 
 
 @router.delete("/{chat_id}")
