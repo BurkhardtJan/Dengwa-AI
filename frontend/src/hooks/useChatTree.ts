@@ -9,12 +9,25 @@ export interface ModelChoice {
     embeddingModel: string | null
 }
 
+export type ViewMode = 'switch' | 'sbs'
+
 const EMPTY_CHOICE: ModelChoice = {provider: null, model: null, embeddingModel: null}
+const VIEW_MODE_KEY = 'dengwa-chat-view-mode'
 
 export function useChatTree(chatId: string | undefined) {
     const queryClient = useQueryClient()
     const [activeLeafId, setActiveLeafId] = useState<string | null>(null)
     const [modelChoice, setModelChoice] = useState<ModelChoice>(EMPTY_CHOICE)
+
+    const [viewMode, setViewModeState] = useState<ViewMode>(() => {
+        const stored = localStorage.getItem(VIEW_MODE_KEY)
+        return stored === 'sbs' ? 'sbs' : 'switch'
+    })
+
+    const setViewMode = (mode: ViewMode) => {
+        setViewModeState(mode)
+        localStorage.setItem(VIEW_MODE_KEY, mode)
+    }
 
     const {data: history, isLoading, isError} = useQuery({
         queryKey: ['chatHistory', chatId],
@@ -79,6 +92,11 @@ export function useChatTree(chatId: string | undefined) {
         return {index: siblings.findIndex(s => s.id === messageId), count: siblings.length}
     }
 
+    const getSiblingMessages = (messageId: string) => {
+        if (!history) return []
+        return getSiblings(history, messageId)
+    }
+
     const sendNew = (message: string) => {
         const parentId = activePath.length > 0 ? activePath[activePath.length - 1].id : null
         sendMessageMutation.mutate({message, parentId})
@@ -101,10 +119,13 @@ export function useChatTree(chatId: string | undefined) {
         isRegenerating: regenerateMutation.isPending,
         switchSibling,
         getSiblingInfo,
+        getSiblingMessages,
         sendNew,
         sendEdit,
         regenerate,
         modelChoice,
-        setModelChoice
+        setModelChoice,
+        viewMode,
+        setViewMode
     }
 }

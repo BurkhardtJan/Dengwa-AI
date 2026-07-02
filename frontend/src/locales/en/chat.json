@@ -22,6 +22,7 @@
   "errorLoading": "Error loading chat",
   "loading": "Loading conversation...",
   "regenerate": "Regenerate response",
+  "defaultModel": "Default",
   "settings": {
     "title": "Model Settings",
     "provider": "Provider",
@@ -30,6 +31,9 @@
     "modelPlaceholder": "e.g. gpt-4o, llama-3.3-70b",
     "embeddingModel": "Embedding Model",
     "embeddingModelPlaceholder": "e.g. nomic, mxbai, openai, google",
-    "hint": "Leave empty for default"
+    "hint": "Leave empty for default",
+    "viewMode": "View",
+    "viewModeSwitch": "Switch",
+    "viewModeSbs": "Side by side"
   }
 }

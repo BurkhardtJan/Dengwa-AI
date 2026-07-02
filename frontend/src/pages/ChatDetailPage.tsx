@@ -17,8 +17,8 @@ export default function ChatDetailPage() {
 
     const {
         activePath, isLoading, isError, isSending, isRegenerating,
-        switchSibling, getSiblingInfo, sendNew, sendEdit, regenerate,
-        modelChoice, setModelChoice
+        switchSibling, getSiblingInfo, getSiblingMessages, sendNew, sendEdit, regenerate,
+        modelChoice, setModelChoice, viewMode, setViewMode
     } = useChatTree(id)
 
     const {data: chatMeta} = useQuery({
@@ -61,13 +61,20 @@ export default function ChatDetailPage() {
                 onDelete={() => deleteMutation.mutate()}
             />
             <div className="mb-4">
-                <ChatSettings value={modelChoice} onChange={setModelChoice}/>
+                <ChatSettings
+                    value={modelChoice}
+                    onChange={setModelChoice}
+                    viewMode={viewMode}
+                    onViewModeChange={setViewMode}
+                />
             </div>
             <ChatMessageList
                 messages={activePath}
                 isSending={isSending}
                 isRegenerating={isRegenerating}
+                viewMode={viewMode}
                 getSiblingInfo={getSiblingInfo}
+                getSiblingMessages={getSiblingMessages}
                 onSwitchSibling={switchSibling}
                 onEditSubmit={(_id, newText, originalParentId) => sendEdit(newText, originalParentId)}
                 onRegenerate={regenerate}

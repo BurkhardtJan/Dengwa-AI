@@ -1,7 +1,9 @@
 import {useEffect, useRef} from 'react'
 import {useTranslation} from 'react-i18next'
 import ChatMessageBubble from './ChatMessageBubble'
+import CompareView from './CompareView'
 import type {components} from '@/types/api'
+import type {ViewMode} from '@/hooks/useChatTree'
 
 type ChatMessage = components['schemas']['ChatMessageResponse']
 
@@ -9,15 +11,24 @@ interface Props {
     messages: ChatMessage[]
     isSending: boolean
     isRegenerating: boolean
+    viewMode: ViewMode
     getSiblingInfo: (messageId: string) => { index: number; count: number }
+    getSiblingMessages: (messageId: string) => ChatMessage[]
     onSwitchSibling: (messageId: string, direction: 'prev' | 'next') => void
     onEditSubmit: (messageId: string, newText: string, originalParentId: string | null | undefined) => void
     onRegenerate: (userMessageId: string) => void
 }
 
 export default function ChatMessageList({
-                                            messages, isSending, isRegenerating, getSiblingInfo,
-                                            onSwitchSibling, onEditSubmit, onRegenerate
+                                            messages,
+                                            isSending,
+                                            isRegenerating,
+                                            viewMode,
+                                            getSiblingInfo,
+                                            getSiblingMessages,
+                                            onSwitchSibling,
+                                            onEditSubmit,
+                                            onRegenerate
                                         }: Props) {
     const {t} = useTranslation('chat')
     const endRef = useRef<HTMLDivElement>(null)
@@ -36,6 +47,11 @@ export default function ChatMessageList({
                 messages.map((msg) => {
                     const {index, count} = getSiblingInfo(msg.id)
                     const isAi = msg.role === 'assistant' || msg.role === 'ai'
+                    if (isAi && count > 1 && viewMode === 'sbs') {
+                        const siblings = getSiblingMessages(msg.id)
+                        return <CompareView key={msg.parent_id ?? msg.id} siblings={siblings}/>
+                    }
+
                     return (
                         <ChatMessageBubble
                             key={msg.id}

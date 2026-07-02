@@ -22,6 +22,7 @@
   "errorLoading": "Fehler beim Laden des Chats",
   "loading": "Lade Konversation...",
   "regenerate": "Antwort neu generieren",
+  "defaultModel": "Standard",
   "settings": {
     "title": "Modell-Einstellungen",
     "provider": "Anbieter",
@@ -30,6 +31,9 @@
     "modelPlaceholder": "z.B. gpt-4o, llama-3.3-70b",
     "embeddingModel": "Embedding-Modell",
     "embeddingModelPlaceholder": "z.B. nomic, mxbai, openai, google",
-    "hint": "Leer lassen für Standardeinstellung"
+    "hint": "Leer lassen für Standardeinstellung",
+    "viewMode": "Ansicht",
+    "viewModeSwitch": "Pfeil",
+    "viewModeSbs": "Nebeneinander"
   }
 }
