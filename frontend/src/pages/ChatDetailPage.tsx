@@ -16,8 +16,8 @@ export default function ChatDetailPage() {
     const {t} = useTranslation('chat')
 
     const {
-        activePath, isLoading, isError, isSending,
-        switchSibling, getSiblingInfo, sendNew, sendEdit,
+        activePath, isLoading, isError, isSending, isRegenerating,
+        switchSibling, getSiblingInfo, sendNew, sendEdit, regenerate,
         modelChoice, setModelChoice
     } = useChatTree(id)
 
@@ -66,9 +66,11 @@ export default function ChatDetailPage() {
             <ChatMessageList
                 messages={activePath}
                 isSending={isSending}
+                isRegenerating={isRegenerating}
                 getSiblingInfo={getSiblingInfo}
                 onSwitchSibling={switchSibling}
                 onEditSubmit={(_id, newText, originalParentId) => sendEdit(newText, originalParentId)}
+                onRegenerate={regenerate}
             />
             <ChatMessageInput isSending={isSending} onSend={sendNew}/>
         </div>

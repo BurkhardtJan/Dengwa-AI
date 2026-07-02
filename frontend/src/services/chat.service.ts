@@ -44,7 +44,7 @@ export async function createResponse(
     model?: string | null,
     embeddingModel?: string | null
 ): Promise<ChatMessage[]> {
-    const response = await api.post(`/chats/${chatId}/messages/${userMessageId}/responses`, null, {
+    const response = await api.post(`/chats/${chatId}/messages/${userMessageId}`, null, {
         params: {
             provider: provider ?? undefined,
             model: model ?? undefined,

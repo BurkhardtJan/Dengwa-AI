@@ -21,6 +21,7 @@
   "sendButton": "Senden",
   "errorLoading": "Fehler beim Laden des Chats",
   "loading": "Lade Konversation...",
+  "regenerate": "Antwort neu generieren",
   "settings": {
     "title": "Modell-Einstellungen",
     "provider": "Anbieter",

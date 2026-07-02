@@ -21,6 +21,7 @@
   "sendButton": "Send",
   "errorLoading": "Error loading chat",
   "loading": "Loading conversation...",
+  "regenerate": "Regenerate response",
   "settings": {
     "title": "Model Settings",
     "provider": "Provider",

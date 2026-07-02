@@ -8,12 +8,17 @@ type ChatMessage = components['schemas']['ChatMessageResponse']
 interface Props {
     messages: ChatMessage[]
     isSending: boolean
+    isRegenerating: boolean
     getSiblingInfo: (messageId: string) => { index: number; count: number }
     onSwitchSibling: (messageId: string, direction: 'prev' | 'next') => void
     onEditSubmit: (messageId: string, newText: string, originalParentId: string | null | undefined) => void
+    onRegenerate: (userMessageId: string) => void
 }
 
-export default function ChatMessageList({messages, isSending, getSiblingInfo, onSwitchSibling, onEditSubmit}: Props) {
+export default function ChatMessageList({
+                                            messages, isSending, isRegenerating, getSiblingInfo,
+                                            onSwitchSibling, onEditSubmit, onRegenerate
+                                        }: Props) {
     const {t} = useTranslation('chat')
     const endRef = useRef<HTMLDivElement>(null)
 
@@ -30,6 +35,7 @@ export default function ChatMessageList({messages, isSending, getSiblingInfo, on
             ) : (
                 messages.map((msg) => {
                     const {index, count} = getSiblingInfo(msg.id)
+                    const isAi = msg.role === 'assistant' || msg.role === 'ai'
                     return (
                         <ChatMessageBubble
                             key={msg.id}
@@ -37,8 +43,10 @@ export default function ChatMessageList({messages, isSending, getSiblingInfo, on
                             siblingIndex={index}
                             siblingCount={count}
                             isSending={isSending}
+                            isRegenerating={isRegenerating}
                             onSwitchSibling={(direction) => onSwitchSibling(msg.id, direction)}
                             onEditSubmit={(newText) => onEditSubmit(msg.id, newText, msg.parent_id)}
+                            onRegenerate={() => isAi && msg.parent_id && onRegenerate(msg.parent_id)}
                         />
                     )
                 })

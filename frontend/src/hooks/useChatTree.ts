@@ -1,6 +1,6 @@
 import {useState, useEffect, useMemo} from 'react'
 import {useMutation, useQueryClient, useQuery} from '@tanstack/react-query'
-import {fetchChatHistory, sendMessage} from '@/services/chat.service.ts'
+import {fetchChatHistory, sendMessage, createResponse} from '@/services/chat.service.ts'
 import {getActivePath, getSiblings, findDeepestLeaf, findGlobalLatestLeaf} from '@/utils/tree.utils'
 
 export interface ModelChoice {
@@ -14,7 +14,6 @@ const EMPTY_CHOICE: ModelChoice = {provider: null, model: null, embeddingModel: 
 export function useChatTree(chatId: string | undefined) {
     const queryClient = useQueryClient()
     const [activeLeafId, setActiveLeafId] = useState<string | null>(null)
-
     const [modelChoice, setModelChoice] = useState<ModelChoice>(EMPTY_CHOICE)
 
     const {data: history, isLoading, isError} = useQuery({
@@ -51,6 +50,19 @@ export function useChatTree(chatId: string | undefined) {
         }
     })
 
+    const regenerateMutation = useMutation({
+        mutationFn: (userMessageId: string) =>
+            createResponse(
+                chatId!, userMessageId,
+                modelChoice.provider, modelChoice.model, modelChoice.embeddingModel
+            ),
+        onSuccess: (newMessages) => {
+            queryClient.invalidateQueries({queryKey: ['chatHistory', chatId]})
+            const newLeaf = newMessages[newMessages.length - 1]
+            if (newLeaf) setActiveLeafId(newLeaf.id)
+        }
+    })
+
     const switchSibling = (messageId: string, direction: 'prev' | 'next') => {
         if (!history) return
         const siblings = getSiblings(history, messageId)
@@ -76,16 +88,22 @@ export function useChatTree(chatId: string | undefined) {
         sendMessageMutation.mutate({message, parentId: originalParentId ?? null})
     }
 
+    const regenerate = (userMessageId: string) => {
+        regenerateMutation.mutate(userMessageId)
+    }
+
     return {
         history,
         activePath,
         isLoading,
         isError,
         isSending: sendMessageMutation.isPending,
+        isRegenerating: regenerateMutation.isPending,
         switchSibling,
         getSiblingInfo,
         sendNew,
         sendEdit,
+        regenerate,
         modelChoice,
         setModelChoice
     }

@@ -1,6 +1,6 @@
 import {useState} from 'react'
 import {useTranslation} from 'react-i18next'
-import {ChevronLeft, ChevronRight, Pencil} from 'lucide-react'
+import {ChevronLeft, ChevronRight, Pencil, RotateCw} from 'lucide-react'
 import type {components} from '@/types/api'
 
 type ChatMessage = components['schemas']['ChatMessageResponse']
@@ -10,13 +10,16 @@ interface Props {
     siblingIndex: number
     siblingCount: number
     isSending: boolean
+    isRegenerating: boolean
     onSwitchSibling: (direction: 'prev' | 'next') => void
     onEditSubmit: (newText: string) => void
+    onRegenerate: () => void
 }
 
 export default function ChatMessageBubble({
-    message, siblingIndex, siblingCount, isSending, onSwitchSibling, onEditSubmit
-}: Props) {
+                                              message, siblingIndex, siblingCount, isSending, isRegenerating,
+                                              onSwitchSibling, onEditSubmit, onRegenerate
+                                          }: Props) {
     const {t, i18n} = useTranslation(['chat', 'common'])
     const [isEditing, setIsEditing] = useState(false)
     const [editText, setEditText] = useState(message.message)
@@ -35,6 +38,11 @@ export default function ChatMessageBubble({
         <div className={`group flex flex-col max-w-[80%] ${isAi ? 'mr-auto items-start' : 'ml-auto items-end'}`}>
             <span className="text-[10px] text-muted-foreground mb-0.5 px-1 uppercase tracking-wider">
                 {isAi ? t('aiLabel') : t('userLabel')}
+                {isAi && (message.model || message.provider) && (
+                    <span className="ml-1.5 normal-case tracking-normal opacity-70">
+                        · {message.model ?? message.provider}
+                    </span>
+                )}
             </span>
 
             {isEditing ? (
@@ -84,6 +92,16 @@ export default function ChatMessageBubble({
                     }`}>
                         <p className="whitespace-pre-wrap">{message.message}</p>
                     </div>
+                    {isAi && (
+                        <button
+                            onClick={onRegenerate}
+                            disabled={isRegenerating}
+                            className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground p-1 disabled:opacity-50"
+                            title={t('regenerate')}
+                        >
+                            <RotateCw size={13} className={isRegenerating ? 'animate-spin' : ''}/>
+                        </button>
+                    )}
                 </div>
             )}
 
