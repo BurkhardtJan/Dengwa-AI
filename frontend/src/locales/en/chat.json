@@ -34,6 +34,10 @@
     "hint": "Leave empty for default",
     "viewMode": "View",
     "viewModeSwitch": "Switch",
-    "viewModeSbs": "Side by side"
+    "viewModeSbs": "Side by side",
+    "primary": "Primary",
+    "compareLabel": "Compare",
+    "addConfig": "Add configuration",
+    "multiHint": "All configurations will be sent simultaneously."
   }
 }

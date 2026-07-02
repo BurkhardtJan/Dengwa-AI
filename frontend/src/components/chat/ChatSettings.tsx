@@ -1,22 +1,23 @@
 import {useState} from 'react'
 import {useTranslation} from 'react-i18next'
-import {Settings, ChevronDown, ChevronUp} from 'lucide-react'
+import {Settings, ChevronDown, ChevronUp, Plus} from 'lucide-react'
+import ModelConfigFields from './ModelConfigFields'
 import type {ModelChoice, ViewMode} from '@/hooks/useChatTree'
 
 interface Props {
-    value: ModelChoice
-    onChange: (choice: ModelChoice) => void
+    configs: ModelChoice[]
+    onAddConfig: () => void
+    onRemoveConfig: (index: number) => void
+    onUpdateConfig: (index: number, choice: ModelChoice) => void
     viewMode: ViewMode
     onViewModeChange: (mode: ViewMode) => void
 }
 
-export default function ChatSettings({value, onChange, viewMode, onViewModeChange}: Props) {
+export default function ChatSettings({
+    configs, onAddConfig, onRemoveConfig, onUpdateConfig, viewMode, onViewModeChange
+}: Props) {
     const {t} = useTranslation('chat')
     const [isOpen, setIsOpen] = useState(false)
-
-    const updateField = (field: keyof ModelChoice, raw: string) => {
-        onChange({...value, [field]: raw.trim() === '' ? null : raw.trim()})
-    }
 
     return (
         <div className="border rounded-lg bg-muted/10">
@@ -27,55 +28,40 @@ export default function ChatSettings({value, onChange, viewMode, onViewModeChang
                 <span className="flex items-center gap-1.5">
                     <Settings size={14}/>
                     {t('settings.title')}
+                    {configs.length > 1 && (
+                        <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">
+                            {configs.length}×
+                        </span>
+                    )}
                 </span>
                 {isOpen ? <ChevronUp size={14}/> : <ChevronDown size={14}/>}
             </button>
 
             {isOpen && (
                 <div className="px-3 pb-3 flex flex-col gap-3">
-                    <div className="flex flex-col gap-2">
-                        <label className="flex flex-col gap-1">
-                            <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
-                                {t('settings.provider')}
-                            </span>
-                            <input
-                                type="text"
-                                value={value.provider ?? ''}
-                                onChange={(e) => updateField('provider', e.target.value)}
-                                placeholder={t('settings.providerPlaceholder')}
-                                className="border rounded-md px-2 py-1 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-primary"
+                    <div className="grid gap-2" style={{gridTemplateColumns: `repeat(${Math.min(configs.length, 3)}, 1fr)`}}>
+                        {configs.map((cfg, i) => (
+                            <ModelConfigFields
+                                key={i}
+                                value={cfg}
+                                onChange={(choice) => onUpdateConfig(i, choice)}
+                                onRemove={configs.length > 1 ? () => onRemoveConfig(i) : undefined}
+                                label={i === 0 ? t('settings.primary') : `${t('settings.compareLabel')} ${i}`}
                             />
-                        </label>
-
-                        <label className="flex flex-col gap-1">
-                            <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
-                                {t('settings.model')}
-                            </span>
-                            <input
-                                type="text"
-                                value={value.model ?? ''}
-                                onChange={(e) => updateField('model', e.target.value)}
-                                placeholder={t('settings.modelPlaceholder')}
-                                className="border rounded-md px-2 py-1 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-primary"
-                            />
-                        </label>
-
-                        <label className="flex flex-col gap-1">
-                            <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
-                                {t('settings.embeddingModel')}
-                            </span>
-                            <input
-                                type="text"
-                                value={value.embeddingModel ?? ''}
-                                onChange={(e) => updateField('embeddingModel', e.target.value)}
-                                placeholder={t('settings.embeddingModelPlaceholder')}
-                                className="border rounded-md px-2 py-1 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-primary"
-                            />
-                        </label>
+                        ))}
                     </div>
+
+                    <button
+                        onClick={onAddConfig}
+                        className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground self-start"
+                    >
+                        <Plus size={13}/>
+                        {t('settings.addConfig')}
+                    </button>
 
                     <p className="text-[10px] text-muted-foreground italic">
                         {t('settings.hint')}
+                        {configs.length > 1 && ` ${t('settings.multiHint')}`}
                     </p>
 
                     <div className="flex flex-col gap-1 pt-2 border-t">

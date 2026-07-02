@@ -18,7 +18,7 @@ export default function ChatDetailPage() {
     const {
         activePath, isLoading, isError, isSending, isRegenerating,
         switchSibling, getSiblingInfo, getSiblingMessages, sendNew, sendEdit, regenerate,
-        modelChoice, setModelChoice, viewMode, setViewMode
+        configs, addConfig, removeConfig, updateConfig, viewMode, setViewMode
     } = useChatTree(id)
 
     const {data: chatMeta} = useQuery({
@@ -62,8 +62,10 @@ export default function ChatDetailPage() {
             />
             <div className="mb-4">
                 <ChatSettings
-                    value={modelChoice}
-                    onChange={setModelChoice}
+                    configs={configs}
+                    onAddConfig={addConfig}
+                    onRemoveConfig={removeConfig}
+                    onUpdateConfig={updateConfig}
                     viewMode={viewMode}
                     onViewModeChange={setViewMode}
                 />

@@ -17,7 +17,8 @@ const VIEW_MODE_KEY = 'dengwa-chat-view-mode'
 export function useChatTree(chatId: string | undefined) {
     const queryClient = useQueryClient()
     const [activeLeafId, setActiveLeafId] = useState<string | null>(null)
-    const [modelChoice, setModelChoice] = useState<ModelChoice>(EMPTY_CHOICE)
+
+    const [configs, setConfigs] = useState<ModelChoice[]>([EMPTY_CHOICE])
 
     const [viewMode, setViewModeState] = useState<ViewMode>(() => {
         const stored = localStorage.getItem(VIEW_MODE_KEY)
@@ -47,28 +48,40 @@ export function useChatTree(chatId: string | undefined) {
     )
 
     const sendMessageMutation = useMutation({
-        mutationFn: ({message, parentId}: { message: string; parentId: string | null }) =>
-            sendMessage(
-                chatId!,
-                message,
-                parentId,
-                modelChoice.provider,
-                modelChoice.model,
-                modelChoice.embeddingModel
-            ),
-        onSuccess: (newMessages) => {
+        mutationFn: async ({message, parentId}: { message: string; parentId: string | null }) => {
+            const [primary, ...extra] = configs.length > 0 ? configs : [EMPTY_CHOICE]
+
+            const primaryResult = await sendMessage(
+                chatId!, message, parentId,
+                primary.provider, primary.model, primary.embeddingModel
+            )
+            const userMessage = primaryResult[0]
+
+            const extraResults = extra.length > 0
+                ? await Promise.all(
+                    extra.map(cfg =>
+                        createResponse(chatId!, userMessage.id, cfg.provider, cfg.model, cfg.embeddingModel)
+                    )
+                )
+                : []
+
+            return {primaryResult, extraResults: extraResults.flat()}
+        },
+        onSuccess: ({primaryResult}) => {
             queryClient.invalidateQueries({queryKey: ['chatHistory', chatId]})
-            const newLeaf = newMessages[newMessages.length - 1]
-            if (newLeaf) setActiveLeafId(newLeaf.id)
+            const primaryLeaf = primaryResult[primaryResult.length - 1]
+            if (primaryLeaf) setActiveLeafId(primaryLeaf.id)
         }
     })
 
     const regenerateMutation = useMutation({
-        mutationFn: (userMessageId: string) =>
-            createResponse(
+        mutationFn: (userMessageId: string) => {
+            const primary = configs[0] ?? EMPTY_CHOICE
+            return createResponse(
                 chatId!, userMessageId,
-                modelChoice.provider, modelChoice.model, modelChoice.embeddingModel
-            ),
+                primary.provider, primary.model, primary.embeddingModel
+            )
+        },
         onSuccess: (newMessages) => {
             queryClient.invalidateQueries({queryKey: ['chatHistory', chatId]})
             const newLeaf = newMessages[newMessages.length - 1]
@@ -110,6 +123,11 @@ export function useChatTree(chatId: string | undefined) {
         regenerateMutation.mutate(userMessageId)
     }
 
+    const addConfig = () => setConfigs(prev => [...prev, EMPTY_CHOICE])
+    const removeConfig = (index: number) => setConfigs(prev => prev.filter((_, i) => i !== index))
+    const updateConfig = (index: number, choice: ModelChoice) =>
+        setConfigs(prev => prev.map((c, i) => i === index ? choice : c))
+
     return {
         history,
         activePath,
@@ -123,8 +141,10 @@ export function useChatTree(chatId: string | undefined) {
         sendNew,
         sendEdit,
         regenerate,
-        modelChoice,
-        setModelChoice,
+        configs,
+        addConfig,
+        removeConfig,
+        updateConfig,
         viewMode,
         setViewMode
     }

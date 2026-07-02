@@ -34,6 +34,10 @@
     "hint": "Leer lassen für Standardeinstellung",
     "viewMode": "Ansicht",
     "viewModeSwitch": "Pfeil",
-    "viewModeSbs": "Nebeneinander"
+    "viewModeSbs": "Nebeneinander",
+    "primary": "Primär",
+    "compareLabel": "Vergleich",
+    "addConfig": "Konfiguration hinzufügen",
+    "multiHint": "Alle Konfigurationen werden gleichzeitig gesendet."
   }
 }
