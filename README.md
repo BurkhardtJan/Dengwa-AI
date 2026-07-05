@@ -70,14 +70,15 @@ personal deck, and lets you practice with an AI that knows exactly what you've b
 
 ### Chats
 
-| Method       | Endpoint                 | Description                    |
-|--------------|--------------------------|--------------------------------|
-| **`GET`**    | `/chats`                 | Get all chats for current user |
-| **`POST`**   | `/chats`                 | Create a new chat for a medium |
-| **`GET`**    | `/languages/{lan}/chats` | Get all chats for a language   |
-| **`GET`**    | `/chats/{chat_id}`       | Get chat history               |
-| **`POST`**   | `/chats/{chat_id}`       | Send a message to the AI       |
-| **`DELETE`** | `/chats/{chat_id}`       | Delete Chat                    |
+| Method       | Endpoint                                 | Description                     |
+|--------------|------------------------------------------|---------------------------------|
+| **`GET`**    | `/chats`                                 | Get all chats for current user  |
+| **`POST`**   | `/chats`                                 | Create a new chat for a medium  |
+| **`GET`**    | `/languages/{lan}/chats`                 | Get all chats for a language    |
+| **`GET`**    | `/chats/{chat_id}`                       | Get chat history                |
+| **`POST`**   | `/chats/{chat_id}`                       | Send a message to the AI        |
+| **`DELETE`** | `/chats/{chat_id}`                       | Delete Chat                     |
+| **`POST`**   | `/chats/{chat_id}/messages/{message_id}` | Create a response for a message |
 
 ---
 
@@ -171,7 +172,6 @@ pnpm dev
 - [x] Add Chat branching
 - [x] Comparison of LLMs
 
-
 ### Backend
 
 - [ ] Progress endpoint — implement actual logic (currently stub)
@@ -179,10 +179,12 @@ pnpm dev
 - [ ] Other Media Parsing
 - [ ] Alembic
 - [ ] Add License
+- [ ] PWA
 
 ### Frontend
 
 - [ ] Add Flags
+- [ ] Error handling
 
 ## Architecture
 
@@ -296,7 +298,7 @@ erDiagram
         TEXT content_type
         TEXT file_path
         TEXT extracted_content
-        INTEGER learning_id
+        UUID learning_id
     }
     media_chunks {
         UUID id
@@ -307,7 +309,7 @@ erDiagram
 
     vocabularies {
         UUID id
-        INTEGER learning_id
+        UUID learning_id
         TEXT word
         TEXT translation
         TEXT context_sentence
@@ -325,21 +327,25 @@ erDiagram
 
     chats {
         UUID id
-        INTEGER media_id
-        INTEGER user_id
+        UUID media_id
+        UUID user_id
     }
 
     chat_histories {
         UUID id
-        INTEGER chat_id
+        UUID chat_id
+        UUID parent_id
         TEXT message
-        TIMESTAMP timestamp
         TEXT role
+        TEXT provider
+        TEXT model
+        TEXT embedding_model
+        TIMESTAMP timestamp
     }
 
     language_learning {
         UUID id
-        INTEGER user_id
+        UUID user_id
         TEXT learning_language
         TEXT proficiency_level
         TEXT user_motivation
@@ -347,14 +353,14 @@ erDiagram
 
     learning_progress {
         UUID id
-        INTEGER media_id
+        UUID media_id
         TEXT proficiency_level
         TEXT comment
     }
 
     media_vocabularies {
         UUID id
-        INTEGER media_id
-        INTEGER vocabulary_id
+        UUID media_id
+        UUID vocabulary_id
     }
 ```
