@@ -1,7 +1,16 @@
 import {useState, useEffect, useMemo} from 'react'
 import {useMutation, useQueryClient, useQuery} from '@tanstack/react-query'
 import {fetchChatHistory, sendMessage, createResponse} from '@/services/chat.service.ts'
-import {getActivePath, getSiblings, findDeepestLeaf, findGlobalLatestLeaf} from '@/utils/tree.utils'
+import {
+    getActivePath,
+    getSiblings,
+    findDeepestLeaf,
+    findGlobalLatestLeaf,
+    PENDING_USER_MESSAGE_ID
+} from '@/utils/tree.utils'
+import type {components} from '@/types/api'
+
+type ChatMessage = components['schemas']['ChatMessageResponse']
 
 export interface ModelChoice {
     provider: string | null
@@ -17,8 +26,9 @@ const VIEW_MODE_KEY = 'dengwa-chat-view-mode'
 export function useChatTree(chatId: string | undefined) {
     const queryClient = useQueryClient()
     const [activeLeafId, setActiveLeafId] = useState<string | null>(null)
-
     const [configs, setConfigs] = useState<ModelChoice[]>([EMPTY_CHOICE])
+    const [pendingUserText, setPendingUserText] = useState<string | null>(null)
+    const [pendingReplyForId, setPendingReplyForId] = useState<string | null>(null)
 
     const [viewMode, setViewModeState] = useState<ViewMode>(() => {
         const stored = localStorage.getItem(VIEW_MODE_KEY)
@@ -47,6 +57,21 @@ export function useChatTree(chatId: string | undefined) {
         [history, activeLeafId]
     )
 
+    const displayPath = useMemo<ChatMessage[]>(() => {
+        if (!pendingUserText) return activePath
+        const tempMessage: ChatMessage = {
+            id: PENDING_USER_MESSAGE_ID,
+            role: 'user',
+            message: pendingUserText,
+            timestamp: new Date().toISOString(),
+            parent_id: activePath.length > 0 ? activePath[activePath.length - 1].id : null,
+            provider: null,
+            model: null,
+            embedding_model: null,
+        }
+        return [...activePath, tempMessage]
+    }, [activePath, pendingUserText])
+
     const sendMessageMutation = useMutation({
         mutationFn: async ({message, parentId}: { message: string; parentId: string | null }) => {
             const [primary, ...extra] = configs.length > 0 ? configs : [EMPTY_CHOICE]
@@ -67,10 +92,16 @@ export function useChatTree(chatId: string | undefined) {
 
             return {primaryResult, extraResults: extraResults.flat()}
         },
+        onMutate: ({message}) => {
+            setPendingUserText(message)
+        },
         onSuccess: ({primaryResult}) => {
             queryClient.invalidateQueries({queryKey: ['chatHistory', chatId]})
             const primaryLeaf = primaryResult[primaryResult.length - 1]
             if (primaryLeaf) setActiveLeafId(primaryLeaf.id)
+        },
+        onSettled: () => {
+            setPendingUserText(null)
         }
     })
 
@@ -82,10 +113,16 @@ export function useChatTree(chatId: string | undefined) {
                 primary.provider, primary.model, primary.embeddingModel
             )
         },
+        onMutate: (userMessageId) => {
+            setPendingReplyForId(userMessageId)
+        },
         onSuccess: (newMessages) => {
             queryClient.invalidateQueries({queryKey: ['chatHistory', chatId]})
             const newLeaf = newMessages[newMessages.length - 1]
             if (newLeaf) setActiveLeafId(newLeaf.id)
+        },
+        onSettled: () => {
+            setPendingReplyForId(null)
         }
     })
 
@@ -131,10 +168,12 @@ export function useChatTree(chatId: string | undefined) {
     return {
         history,
         activePath,
+        displayPath,
         isLoading,
         isError,
         isSending: sendMessageMutation.isPending,
         isRegenerating: regenerateMutation.isPending,
+        pendingReplyForId,
         switchSibling,
         getSiblingInfo,
         getSiblingMessages,

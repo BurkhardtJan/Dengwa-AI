@@ -2,6 +2,7 @@ import type {components} from '../types/api'
 
 type ChatMessage = components['schemas']['ChatMessageResponse']
 
+export const PENDING_USER_MESSAGE_ID = '__pending_user__'
 
 export function getActivePath(history: ChatMessage[], activeId: string | null | undefined): ChatMessage[] {
     if (!activeId) return []

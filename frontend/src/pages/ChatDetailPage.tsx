@@ -16,8 +16,9 @@ export default function ChatDetailPage() {
     const {t} = useTranslation('chat')
 
     const {
-        activePath, isLoading, isError, isSending, isRegenerating,
-        switchSibling, getSiblingInfo, getSiblingMessages, sendNew, sendEdit, regenerate,
+        displayPath, isLoading, isError, isSending, isRegenerating, pendingReplyForId,
+        switchSibling, getSiblingInfo, getSiblingMessages, selectBranch,
+        sendNew, sendEdit, regenerate,
         configs, addConfig, removeConfig, updateConfig, viewMode, setViewMode
     } = useChatTree(id)
 
@@ -71,13 +72,15 @@ export default function ChatDetailPage() {
                 />
             </div>
             <ChatMessageList
-                messages={activePath}
+                messages={displayPath}
                 isSending={isSending}
                 isRegenerating={isRegenerating}
+                pendingReplyForId={pendingReplyForId}
                 viewMode={viewMode}
                 getSiblingInfo={getSiblingInfo}
                 getSiblingMessages={getSiblingMessages}
                 onSwitchSibling={switchSibling}
+                onSelectBranch={selectBranch}
                 onEditSubmit={(_id, newText, originalParentId) => sendEdit(newText, originalParentId)}
                 onRegenerate={regenerate}
             />
