@@ -23,6 +23,7 @@
   "loading": "Lade Konversation...",
   "regenerate": "Antwort neu generieren",
   "defaultModel": "Standard",
+  "thinking": "Denkt nach…",
   "settings": {
     "title": "Modell-Einstellungen",
     "provider": "Anbieter",
@@ -38,6 +39,7 @@
     "primary": "Primär",
     "compareLabel": "Vergleich",
     "addConfig": "Konfiguration hinzufügen",
-    "multiHint": "Alle Konfigurationen werden gleichzeitig gesendet."
+    "multiHint": "Alle Konfigurationen werden gleichzeitig gesendet.",
+    "continueFrom": "wird fortgesetzt"
   }
 }

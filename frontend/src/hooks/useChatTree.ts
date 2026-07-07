@@ -164,6 +164,10 @@ export function useChatTree(chatId: string | undefined) {
     const removeConfig = (index: number) => setConfigs(prev => prev.filter((_, i) => i !== index))
     const updateConfig = (index: number, choice: ModelChoice) =>
         setConfigs(prev => prev.map((c, i) => i === index ? choice : c))
+    const selectBranch = (messageId: string) => {
+        if (!history) return
+        setActiveLeafId(findDeepestLeaf(history, messageId))
+    }
 
     return {
         history,
@@ -177,6 +181,7 @@ export function useChatTree(chatId: string | undefined) {
         switchSibling,
         getSiblingInfo,
         getSiblingMessages,
+        selectBranch,
         sendNew,
         sendEdit,
         regenerate,

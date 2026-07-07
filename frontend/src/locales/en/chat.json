@@ -23,6 +23,7 @@
   "loading": "Loading conversation...",
   "regenerate": "Regenerate response",
   "defaultModel": "Default",
+  "thinking": "Thinking…",
   "settings": {
     "title": "Model Settings",
     "provider": "Provider",
@@ -38,6 +39,7 @@
     "primary": "Primary",
     "compareLabel": "Compare",
     "addConfig": "Add configuration",
-    "multiHint": "All configurations will be sent simultaneously."
+    "multiHint": "All configurations will be sent simultaneously.",
+    "continueFrom": "will continue"
   }
 }
