@@ -136,3 +136,7 @@ class VocabularyExtraction(BaseModel):
 class ProviderModelsResponse(BaseModel):
     """Provider -> Liste of available models."""
     providers: dict[str, list[str]]
+
+class EmbeddingModelsResponse(BaseModel):
+    """List of curated Embedding-Provider-Keys."""
+    models: list[str]

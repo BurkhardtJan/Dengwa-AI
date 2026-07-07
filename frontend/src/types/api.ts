@@ -353,6 +353,43 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/llm_models/chat": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Chat Providers
+         * @description Get all chat providers and models.
+         */
+        get: operations["get_chat_providers_llm_models_chat_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/llm_models/embedding": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Embedding Providers */
+        get: operations["get_embedding_providers_llm_models_embedding_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -438,6 +475,14 @@ export interface components {
              */
             user_id: string;
         };
+        /**
+         * EmbeddingModelsResponse
+         * @description List of curated Embedding-Provider-Keys.
+         */
+        EmbeddingModelsResponse: {
+            /** Models */
+            models: string[];
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -497,6 +542,16 @@ export interface components {
              * Format: uuid
              */
             learning_id: string;
+        };
+        /**
+         * ProviderModelsResponse
+         * @description Provider -> Liste of available models.
+         */
+        ProviderModelsResponse: {
+            /** Providers */
+            providers: {
+                [key: string]: string[];
+            };
         };
         /** UserRegister */
         UserRegister: {
@@ -1413,6 +1468,46 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_chat_providers_llm_models_chat_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProviderModelsResponse"];
+                };
+            };
+        };
+    };
+    get_embedding_providers_llm_models_embedding_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmbeddingModelsResponse"];
                 };
             };
         };

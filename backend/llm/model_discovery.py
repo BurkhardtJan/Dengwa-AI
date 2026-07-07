@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from google import genai
 from groq import Groq
 from openai import OpenAI
+from llm.providers import EMBEDDING_MODELS
 
 load_dotenv()
 
@@ -84,7 +85,7 @@ def list_available_chat_models() -> dict[str, list[str]]:
     return result
 
 
-def list_available_embedding_models() -> dict[str, list[str]]:
+def list_all_available_embedding_models() -> dict[str, list[str]]:
     """
     Queries all configured embedding providers for their available models.
     """
@@ -111,6 +112,13 @@ def list_available_embedding_models() -> dict[str, list[str]]:
             result[name] = []
 
     return result
+
+
+def list_available_embedding_models() -> list[str]:
+    """
+    Queries curated embedding models
+    """
+    return sorted(EMBEDDING_MODELS.keys())
 
 
 if __name__ == "__main__":

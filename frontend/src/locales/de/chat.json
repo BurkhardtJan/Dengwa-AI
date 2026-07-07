@@ -40,6 +40,8 @@
     "compareLabel": "Vergleich",
     "addConfig": "Konfiguration hinzufügen",
     "multiHint": "Alle Konfigurationen werden gleichzeitig gesendet.",
-    "continueFrom": "wird fortgesetzt"
+    "continueFrom": "wird fortgesetzt",
+    "default": "Standard",
+    "chatModel": "Chat-Modell"
   }
 }

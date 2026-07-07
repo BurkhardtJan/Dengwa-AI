@@ -1,5 +1,8 @@
 import {useTranslation} from 'react-i18next'
 import {X} from 'lucide-react'
+import {useChatProviders, useEmbeddingProviders} from '@/hooks/useModelOptions'
+import ProviderModelSelect from './ProviderModelSelect'
+import EmbeddingSelect from './EmbeddingSelect'
 import type {ModelChoice} from '@/hooks/useChatTree'
 
 interface Props {
@@ -11,10 +14,8 @@ interface Props {
 
 export default function ModelConfigFields({value, onChange, onRemove, label}: Props) {
     const {t} = useTranslation('chat')
-
-    const updateField = (field: keyof ModelChoice, raw: string) => {
-        onChange({...value, [field]: raw.trim() === '' ? null : raw.trim()})
-    }
+    const {data: chatProviders, isLoading: isChatLoading} = useChatProviders()
+    const {data: embeddingProviders, isLoading: isEmbeddingLoading} = useEmbeddingProviders()
 
     return (
         <div className="border rounded-md p-2 flex flex-col gap-2 bg-background/50">
@@ -29,27 +30,25 @@ export default function ModelConfigFields({value, onChange, onRemove, label}: Pr
                 )}
             </div>
 
-            <input
-                type="text"
-                value={value.provider ?? ''}
-                onChange={(e) => updateField('provider', e.target.value)}
-                placeholder={t('settings.providerPlaceholder')}
-                className="border rounded-md px-2 py-1 text-xs bg-background focus:outline-none focus:ring-1 focus:ring-primary"
-            />
-            <input
-                type="text"
-                value={value.model ?? ''}
-                onChange={(e) => updateField('model', e.target.value)}
-                placeholder={t('settings.modelPlaceholder')}
-                className="border rounded-md px-2 py-1 text-xs bg-background focus:outline-none focus:ring-1 focus:ring-primary"
-            />
-            <input
-                type="text"
-                value={value.embeddingModel ?? ''}
-                onChange={(e) => updateField('embeddingModel', e.target.value)}
-                placeholder={t('settings.embeddingModelPlaceholder')}
-                className="border rounded-md px-2 py-1 text-xs bg-background focus:outline-none focus:ring-1 focus:ring-primary"
-            />
+            <div className="flex flex-col gap-1">
+                <span className="text-[10px] text-muted-foreground">{t('settings.chatModel')}</span>
+                <ProviderModelSelect
+                    providers={chatProviders?.providers}
+                    isLoading={isChatLoading}
+                    provider={value.provider}
+                    model={value.model}
+                    onProviderChange={(provider) => onChange({...value, provider, model: null})}
+                    onModelChange={(model) => onChange({...value, model})}
+                />
+            </div>
+
+            <div className="flex flex-col gap-1">
+                <span className="text-[10px] text-muted-foreground">{t('settings.embeddingModel')}</span>
+                <EmbeddingSelect
+                    value={value.embeddingModel}
+                    onChange={(embeddingModel) => onChange({...value, embeddingModel})}
+                />
+            </div>
         </div>
     )
 }
