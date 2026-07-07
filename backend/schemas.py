@@ -131,3 +131,8 @@ class VocabularyExtraction(BaseModel):
     vocabularies: List[ExtractedVocabularyItem] = Field(
         description="Eine Liste aller aus dem Text extrahierten Schlüsselvokabeln."
     )
+
+
+class ProviderModelsResponse(BaseModel):
+    """Provider -> Liste of available models."""
+    providers: dict[str, list[str]]

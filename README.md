@@ -80,6 +80,13 @@ personal deck, and lets you practice with an AI that knows exactly what you've b
 | **`DELETE`** | `/chats/{chat_id}`                       | Delete Chat                     |
 | **`POST`**   | `/chats/{chat_id}/messages/{message_id}` | Create a response for a message |
 
+### LLM Models
+
+| Method    | Endpoint                | Description             |
+|-----------|-------------------------|-------------------------|
+| **`GET`** | `/llm_models/chat`      | Get chat providers      |
+| **`GET`** | `/llm_models/embedding` | Get embedding providers |
+
 ---
 
 ## Tech Stack
@@ -179,12 +186,13 @@ pnpm dev
 - [ ] Other Media Parsing
 - [ ] Alembic
 - [ ] Add License
-- [ ] PWA
 
 ### Frontend
 
 - [ ] Add Flags
 - [ ] Error handling
+- [ ] Responsive design
+- [ ] PWA
 
 ## Architecture
 
