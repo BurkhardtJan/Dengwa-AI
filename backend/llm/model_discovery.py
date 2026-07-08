@@ -124,5 +124,7 @@ def list_available_embedding_models() -> list[str]:
 if __name__ == "__main__":
     print("--- CHAT MODELS ---")
     print(list_available_chat_models())
+    print("\n--- ALL EMBEDDING MODELS ---")
+    print(list_all_available_embedding_models())
     print("\n--- EMBEDDING MODELS ---")
     print(list_available_embedding_models())

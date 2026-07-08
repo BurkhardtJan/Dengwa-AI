@@ -3,7 +3,7 @@ from fastapi import HTTPException
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 from uuid import UUID
-from models import Vocabulary, MediaVocabulary, LanguageLearning
+from models import Vocabulary, VocabularyCard, MediaVocabulary, LanguageLearning
 
 
 def get_vocab_or_404(db: Session, vocab_id: UUID, user_id: UUID, learning_id: UUID | None = None) -> Vocabulary:
@@ -33,7 +33,7 @@ def create_vocab(
         context_sentence: str | None = None,
         language: str | None = None,
 ) -> Vocabulary:
-    """Create a new vocabulary entry"""
+    """Create a new vocabulary entry, plus a default recognition card for it."""
     vocab = Vocabulary(
         learning_id=learning_id,
         word=word.strip(),
@@ -41,15 +41,25 @@ def create_vocab(
         context_sentence=context_sentence,
         language=language,
         created_at=datetime.now(timezone.utc),
+        llm_mastery_score=0.0,
+        last_interaction=datetime.now(timezone.utc),
+        llm_context=None,
+    )
+    db.add(vocab)
+    db.flush()
+
+    card = VocabularyCard(
+        vocabulary_id=vocab.id,
+        template="recognition",
+        source="manual",
+        queue="new",
         due=datetime.now(timezone.utc),
         interval_days=0,
         ease_factor=2.5,
         repetitions=0,
         lapses=0,
-        llm_mastery_score=0.0,
-        last_interaction=datetime.now(timezone.utc),
-        llm_context=None,
     )
+    db.add(card)
 
     db.add(vocab)
     db.commit()

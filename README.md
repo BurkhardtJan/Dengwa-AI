@@ -181,9 +181,13 @@ pnpm dev
 
 ### Backend
 
+- [ ] Anki Compatibility
 - [ ] Progress endpoint — implement actual logic (currently stub)
 - [ ] Add default Vocab starter set (HSK, JLPT, ...)
 - [ ] Other Media Parsing
+- [ ] Fix RAG providers
+- [ ] Add LLM API Keys for users
+- [ ] Monitoring Token
 - [ ] Alembic
 - [ ] Add License
 
@@ -291,6 +295,8 @@ erDiagram
     media_vocabularies }o--|| media: references
     vocabularies ||--o{ media_vocabularies: references
     vocabularies }o--|| language_learning: references
+    vocabularies ||--o{ vocabulary_cards: references
+    vocabulary_cards ||--o{ review_log: references
     chats }o--|| users: references
 
     users {
@@ -323,14 +329,35 @@ erDiagram
         TEXT context_sentence
         TEXT language
         TIMESTAMP created_at
+        TEXT anki_note_guid
+        FLOAT llm_mastery_score
+        TEXT llm_context
+        TIMESTAMP last_interaction
+    }
+
+    vocabulary_cards {
+        UUID id
+        UUID vocabulary_id
+        TEXT template
+        TEXT source
+        TEXT queue
         TIMESTAMP due
         INTEGER interval_days
         FLOAT ease_factor
         INTEGER repetitions
         INTEGER lapses
-        FLOAT llm_mastery_score
-        TEXT llm_notes
-        TIMESTAMP last_interaction
+        BIGINT anki_card_id
+        TIMESTAMP created_at
+    }
+
+    review_log {
+        UUID id
+        UUID vocabulary_card_id
+        TIMESTAMP reviewed_at
+        SMALLINT ease
+        INTEGER interval_before
+        INTEGER interval_after
+        FLOAT ease_factor_after
     }
 
     chats {

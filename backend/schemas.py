@@ -48,13 +48,16 @@ class MediaResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class VocabularyProgressResponse(BaseModel):
+class VocabularyCardResponse(BaseModel):
+    id: UUID
+    template: Optional[str] = None
+    source: str = "manual"
+    queue: str = "new"
     due: Optional[datetime] = None
     interval_days: int = 0
     ease_factor: float = 2.5
     repetitions: int = 0
     lapses: int = 0
-    llm_mastery_score: float = 0.0
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -65,9 +68,6 @@ class VocabularyResponse(BaseModel):
     translation: Optional[str] = None
     context_sentence: Optional[str] = None
     language: Optional[str] = None
-
-    proficiency_level: Optional[str] = None
-    comment: Optional[str] = None
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
