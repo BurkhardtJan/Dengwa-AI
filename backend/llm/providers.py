@@ -112,6 +112,12 @@ EMBEDDING_CONFIGS: dict[str, dict] = {
         "table": "media_chunks_gemini_embedding_001_3072",
         "extra_kwargs": {},  # 3072 ist die native Ausgabegröße, keine Truncation nötig
     },
+    "full-text": {
+        "provider": "none",  # kein echtes Embedding-Modell, siehe rag_service.py
+        "model": None,
+        "dim": None,
+        "table": None,
+    },
 }
 
 
@@ -172,6 +178,9 @@ def build_chunk_model_registry() -> dict[str, type]:
 
     registry: dict[str, type] = {}
     for key, cfg in EMBEDDING_CONFIGS.items():
+        if cfg.get("table") is None:
+            registry[key] = None
+            continue
         model_cls = table_to_model.get(cfg["table"])
         if model_cls is None:
             raise RuntimeError(

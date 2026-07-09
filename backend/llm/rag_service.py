@@ -55,6 +55,8 @@ def embed_media(db: Session, media: Media, embedding_key: str | None = None) -> 
 
     embedding_key = embedding_key or DEFAULT_EMBEDDING_KEY
     ChunkModel = CHUNK_MODELS[embedding_key]
+    if ChunkModel is None:
+        return 0
 
     db.query(ChunkModel).filter(ChunkModel.media_id == media.id).delete()
     db.flush()
@@ -90,6 +92,9 @@ def retrieve_context(
 ) -> str:
     embedding_key = embedding_key or DEFAULT_EMBEDDING_KEY
     ChunkModel = CHUNK_MODELS[embedding_key]
+    if ChunkModel is None:
+        media = db.query(Media).filter(Media.id == media_id).first()
+        return media.extracted_content if media and media.extracted_content else ""
 
     # Lazy indexing
     count = db.query(ChunkModel).filter(ChunkModel.media_id == media_id).count()

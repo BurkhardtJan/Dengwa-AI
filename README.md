@@ -185,7 +185,6 @@ pnpm dev
 - [ ] Progress endpoint — implement actual logic (currently stub)
 - [ ] Add default Vocab starter set (HSK, JLPT, ...)
 - [ ] Other Media Parsing
-- [ ] Fix RAG providers
 - [ ] Add LLM API Keys for users
 - [ ] Monitoring Token
 - [ ] Alembic
