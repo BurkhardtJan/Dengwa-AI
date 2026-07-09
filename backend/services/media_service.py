@@ -10,6 +10,9 @@ from llm.client import call_llm
 from llm.rag_service import embed_media
 from services.vocabulary_service import get_or_create_vocab
 from pypdf import PdfReader
+from ebooklib import epub
+import ebooklib
+from bs4 import BeautifulSoup
 
 OCTET_STREAM_EXTENSIONS = {".txt", ".srt", ".vtt", ".md"}
 
@@ -25,7 +28,7 @@ def read_text_file(file_path: str) -> str:
 
 
 def extract_pdf_text(file_path: str) -> str | None:
-    """Extrahiert Text aus einer PDF-Datei, Seite für Seite."""
+    """Extracts pages from pdf file"""
     try:
         reader = PdfReader(file_path)
         text_parts = [
@@ -37,18 +40,33 @@ def extract_pdf_text(file_path: str) -> str | None:
         return None
 
 
+def extract_epub_text(file_path: str) -> str | None:
+    """Extract text from epub file"""
+    try:
+        book = epub.read_epub(file_path)
+        text_parts = []
+
+        for item in book.get_items_of_type(ebooklib.ITEM_DOCUMENT):
+            soup = BeautifulSoup(item.get_content(), "html.parser")
+            text = soup.get_text(separator="\n", strip=True)
+            if text:
+                text_parts.append(text)
+
+        return "\n\n".join(text_parts) if text_parts else None
+    except Exception:
+        return None
+
+
 CONTENT_TYPE_EXTRACTORS: dict[str, callable] = {
+    "application/x-subrip": read_text_file,
     "application/pdf": extract_pdf_text,
-    # "application/epub+zip": extract_epub_text,  # später
+    "application/epub+zip": extract_epub_text,
 }
 
 
 def extract_content(content_type: str, file_path: str) -> str | None:
     """Helper function to extract content from files"""
     if content_type.startswith("text/"):
-        return read_text_file(file_path)
-
-    if content_type == "application/x-subrip":
         return read_text_file(file_path)
 
     if content_type in CONTENT_TYPE_EXTRACTORS:

@@ -24,3 +24,5 @@ langchain-text-splitters
 genanki
 zstandard
 pypdf
+ebooklib
+beautifulsoup4
