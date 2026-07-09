@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from uuid import UUID
 from models import Chat, ChatHistory
-from llm.providers import resolve_chat_config, resolve_embedding_provider
+from llm.providers import resolve_chat_config, resolve_embedding_key
 from llm.prompts import build_system_prompt_language_chat
 from llm.client import call_llm
 from llm.rag_service import retrieve_context
@@ -47,10 +47,10 @@ def generate_assistant_reply(
     Common logic to generate the assistant reply.
     """
     resolved_provider, resolved_model = resolve_chat_config(provider, model)
-    resolved_embedding = resolve_embedding_provider(embedding_model)
+    resolved_embedding = resolve_embedding_key(embedding_model)
 
     messages = build_message_history(db, user_message.parent_id, user_message.message)
-    rag_context = retrieve_context(db, chat.media_id, user_message.message, provider=resolved_embedding)
+    rag_context = retrieve_context(db, chat.media_id, user_message.message, embedding_key=resolved_embedding)
     system_prompt = build_system_prompt_language_chat(chat, rag_context)
 
     ai_response = call_llm(

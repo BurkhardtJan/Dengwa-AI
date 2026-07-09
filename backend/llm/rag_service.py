@@ -3,19 +3,14 @@ import re
 from sqlalchemy.orm import Session
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-from llm.providers import get_embedding_model, DEFAULT_EMBEDDING_PROVIDER
-from models import Media, MediaChunkNomic, MediaChunkMxbai, MediaChunkOpenAI, MediaChunkGoogle
+from llm.providers import get_embedding_model, build_chunk_model_registry, DEFAULT_EMBEDDING_KEY
+from models import Media
 
 CHUNK_SIZE = 500
 CHUNK_OVERLAP = 50
 TOP_K = 5
 
-CHUNK_MODELS = {
-    "nomic":  MediaChunkNomic,
-    "mxbai":  MediaChunkMxbai,
-    "openai": MediaChunkOpenAI,
-    "google": MediaChunkGoogle,
-}
+CHUNK_MODELS = build_chunk_model_registry()
 
 
 # ---------------------------------------------------------------------------
@@ -54,12 +49,12 @@ def split_content(content: str, content_type: str | None = None) -> list[str]:
 # Embedding (Offline-Phase)
 # ---------------------------------------------------------------------------
 
-def embed_media(db: Session, media: Media, provider: str | None = None) -> int:
+def embed_media(db: Session, media: Media, embedding_key: str | None = None) -> int:
     if not media.extracted_content:
         return 0
 
-    provider = provider or DEFAULT_EMBEDDING_PROVIDER
-    ChunkModel = CHUNK_MODELS[provider]
+    embedding_key = embedding_key or DEFAULT_EMBEDDING_KEY
+    ChunkModel = CHUNK_MODELS[embedding_key]
 
     db.query(ChunkModel).filter(ChunkModel.media_id == media.id).delete()
     db.flush()
@@ -68,7 +63,7 @@ def embed_media(db: Session, media: Media, provider: str | None = None) -> int:
     if not chunks:
         return 0
 
-    embed_model = get_embedding_model(provider)
+    embed_model = get_embedding_model(embedding_key)
     vectors = embed_model.embed_documents(chunks)
 
     for chunk_text, vector in zip(chunks, vectors):
@@ -87,23 +82,23 @@ def embed_media(db: Session, media: Media, provider: str | None = None) -> int:
 # ---------------------------------------------------------------------------
 
 def retrieve_context(
-    db: Session,
-    media_id,
-    query: str,
-    provider: str | None = None,
-    top_k: int = TOP_K,
+        db: Session,
+        media_id,
+        query: str,
+        embedding_key: str | None = None,
+        top_k: int = TOP_K,
 ) -> str:
-    provider = provider or DEFAULT_EMBEDDING_PROVIDER
-    ChunkModel = CHUNK_MODELS[provider]
+    embedding_key = embedding_key or DEFAULT_EMBEDDING_KEY
+    ChunkModel = CHUNK_MODELS[embedding_key]
 
     # Lazy indexing
     count = db.query(ChunkModel).filter(ChunkModel.media_id == media_id).count()
     if count == 0:
         media = db.query(Media).filter(Media.id == media_id).first()
         if media and media.extracted_content:
-            embed_media(db, media, provider)
+            embed_media(db, media, embedding_key)
 
-    embed_model = get_embedding_model(provider)
+    embed_model = get_embedding_model(embedding_key)
     query_vector = embed_model.embed_query(query)
 
     results = (

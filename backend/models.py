@@ -55,10 +55,16 @@ class Media(Base):
     media_vocabularies = relationship("MediaVocabulary", back_populates="media", cascade="all, delete-orphan")
     learning_progress = relationship("LearningProgress", back_populates="media")
 
-    chunks_nomic = relationship("MediaChunkNomic", back_populates="media", cascade="all, delete-orphan")
-    chunks_mxbai = relationship("MediaChunkMxbai", back_populates="media", cascade="all, delete-orphan")
-    chunks_openai = relationship("MediaChunkOpenAI", back_populates="media", cascade="all, delete-orphan")
-    chunks_google = relationship("MediaChunkGoogle", back_populates="media", cascade="all, delete-orphan")
+    chunks_nomic_embed_text = relationship("MediaChunkNomicEmbedText", back_populates="media",
+                                           cascade="all, delete-orphan")
+    chunks_mxbai_embed_large = relationship("MediaChunkMxbaiEmbedLarge", back_populates="media",
+                                            cascade="all, delete-orphan")
+    chunks_text_embedding_3_small = relationship("MediaChunkTextEmbedding3Small", back_populates="media",
+                                                 cascade="all, delete-orphan")
+    chunks_gemini_embedding_001_768 = relationship("MediaChunkGeminiEmbedding001_768", back_populates="media",
+                                                   cascade="all, delete-orphan")
+    chunks_gemini_embedding_001_3072 = relationship("MediaChunkGeminiEmbedding001_3072", back_populates="media",
+                                                    cascade="all, delete-orphan")
 
 
 class Vocabulary(Base):
@@ -181,45 +187,56 @@ class LearningProgress(Base):
     media = relationship("Media", back_populates="learning_progress")
 
 
-class MediaChunkNomic(Base):
-    __tablename__ = "media_chunks_nomic"  # nomic-embed-text, 768 dims
+class MediaChunkNomicEmbedText(Base):
+    __tablename__ = "media_chunks_nomic_embed_text"  # nomic-embed-text, 768 dims
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     media_id = Column(UUID(as_uuid=True), ForeignKey("media.id", ondelete="CASCADE"), nullable=False)
     content = Column(Text, nullable=False)
     embedding = Column(Vector(768), nullable=True)
 
-    media = relationship("Media", back_populates="chunks_nomic")
+    media = relationship("Media", back_populates="chunks_nomic_embed_text")
 
 
-class MediaChunkMxbai(Base):
-    __tablename__ = "media_chunks_mxbai"  # mxbai-embed-large, 1024 dims
+class MediaChunkMxbaiEmbedLarge(Base):
+    __tablename__ = "media_chunks_mxbai_embed_large"  # mxbai-embed-large, 1024 dims
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     media_id = Column(UUID(as_uuid=True), ForeignKey("media.id", ondelete="CASCADE"), nullable=False)
     content = Column(Text, nullable=False)
     embedding = Column(Vector(1024), nullable=True)
 
-    media = relationship("Media", back_populates="chunks_mxbai")
+    media = relationship("Media", back_populates="chunks_mxbai_embed_large")
 
 
-class MediaChunkOpenAI(Base):
-    __tablename__ = "media_chunks_openai"  # text-embedding-3-small, 1536 dims
+class MediaChunkTextEmbedding3Small(Base):
+    __tablename__ = "media_chunks_text_embedding_3_small"  # OpenAI text-embedding-3-small, 1536 dims
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     media_id = Column(UUID(as_uuid=True), ForeignKey("media.id", ondelete="CASCADE"), nullable=False)
     content = Column(Text, nullable=False)
     embedding = Column(Vector(1536), nullable=True)
 
-    media = relationship("Media", back_populates="chunks_openai")
+    media = relationship("Media", back_populates="chunks_text_embedding_3_small")
 
 
-class MediaChunkGoogle(Base):
-    __tablename__ = "media_chunks_google"  # text-embedding-004, 768 dims
+class MediaChunkGeminiEmbedding001_768(Base):
+    __tablename__ = "media_chunks_gemini_embedding_001_768"  # gemini-embedding-001, truncated to 768 dims
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     media_id = Column(UUID(as_uuid=True), ForeignKey("media.id", ondelete="CASCADE"), nullable=False)
     content = Column(Text, nullable=False)
     embedding = Column(Vector(768), nullable=True)
 
-    media = relationship("Media", back_populates="chunks_google")
+    media = relationship("Media", back_populates="chunks_gemini_embedding_001_768")
+
+
+class MediaChunkGeminiEmbedding001_3072(Base):
+    __tablename__ = "media_chunks_gemini_embedding_001_3072"  # gemini-embedding-001, native 3072 dims
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    media_id = Column(UUID(as_uuid=True), ForeignKey("media.id", ondelete="CASCADE"), nullable=False)
+    content = Column(Text, nullable=False)
+    embedding = Column(Vector(3072), nullable=True)
+
+    media = relationship("Media", back_populates="chunks_gemini_embedding_001_3072")

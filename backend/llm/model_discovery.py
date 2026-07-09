@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from google import genai
 from groq import Groq
 from openai import OpenAI
-from llm.providers import EMBEDDING_MODELS
+from llm.providers import EMBEDDING_CONFIGS
 
 load_dotenv()
 
@@ -115,10 +115,8 @@ def list_all_available_embedding_models() -> dict[str, list[str]]:
 
 
 def list_available_embedding_models() -> list[str]:
-    """
-    Queries curated embedding models
-    """
-    return sorted(EMBEDDING_MODELS.keys())
+    """Queries curated embedding models"""
+    return sorted(EMBEDDING_CONFIGS.keys())
 
 
 if __name__ == "__main__":

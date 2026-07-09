@@ -8,8 +8,7 @@ from langchain_ollama import ChatOllama, OllamaEmbeddings
 load_dotenv()
 
 DEFAULT_CHAT_PROVIDER = os.environ.get("LLM_PROVIDER", "openai")
-DEFAULT_EMBEDDING_PROVIDER = os.environ.get("EMBEDDING_PROVIDER", "openai")
-
+DEFAULT_EMBEDDING_KEY = os.environ.get("EMBEDDING_KEY", "text-embedding-3-small")
 # ---------------------------------------------------------------------------
 # Chat
 # ---------------------------------------------------------------------------
@@ -66,73 +65,6 @@ def get_chat_model(
         )
 
 
-# ---------------------------------------------------------------------------
-# Embeddings
-# ---------------------------------------------------------------------------
-
-
-EMBEDDING_MODELS = {
-    "nomic": "nomic-embed-text",  # Ollama, 768 dim
-    "mxbai": "mxbai-embed-large",  # Ollama, 1024 dim
-    "openai": "text-embedding-3-small",  # OpenAI, 1536 dim
-    "google": "text-embedding-004",  # Google, 768 dim
-}
-
-EMBEDDING_DIMS = {
-    "nomic": 768,
-    "mxbai": 1024,
-    "openai": 1536,
-    "google": 768,
-}
-
-EMBEDDING_TABLES = {
-    "nomic": "media_chunks_nomic",
-    "mxbai": "media_chunks_mxbai",
-    "openai": "media_chunks_openai",
-    "google": "media_chunks_google",
-}
-
-
-def get_embedding_model(provider: str | None = None):
-    """
-    Returns LangChain Embeddings object.
-
-    Provider: nomic | mxbai | openai | google
-
-      nomic  → nomic-embed-text       (768 dim,  Ollama, lokal)
-      mxbai  → mxbai-embed-large      (1024 dim, Ollama, lokal)
-      openai → text-embedding-3-small (1536 dim, OpenAI API)
-      google → text-embedding-004     (768 dim,  Google API)
-    """
-
-    provider = provider or DEFAULT_EMBEDDING_PROVIDER
-
-    if provider in ("nomic", "mxbai"):
-        return OllamaEmbeddings(
-            model=EMBEDDING_MODELS[provider],
-            base_url=os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434"),
-        )
-    elif provider == "openai":
-        return OpenAIEmbeddings(model=EMBEDDING_MODELS["openai"])
-    elif provider == "google":
-        return GoogleGenerativeAIEmbeddings(model=EMBEDDING_MODELS["google"])
-    else:
-        raise ValueError(
-            f"Unknown embedding provider '{provider}'. Available: nomic, mxbai, openai, google"
-        )
-
-
-def get_embedding_dim(provider: str | None = None) -> int:
-    """Returns the vector dimension for the given provider."""
-    provider = provider or DEFAULT_EMBEDDING_PROVIDER
-    return EMBEDDING_DIMS[provider]
-
-
-def get_embedding_table(provider: str | None = None) -> str:
-    provider = provider or DEFAULT_EMBEDDING_PROVIDER
-    return EMBEDDING_TABLES[provider]
-
-
 def resolve_chat_config(provider: str | None = None, model: str | None = None) -> tuple[str, str]:
     """
     Resolves chat config or uses default
@@ -142,6 +74,109 @@ def resolve_chat_config(provider: str | None = None, model: str | None = None) -
     return resolved_provider, resolved_model
 
 
-def resolve_embedding_provider(embedding_model: str | None = None) -> str:
-    """Resolves embedding provider or uses default"""
-    return embedding_model or DEFAULT_EMBEDDING_PROVIDER
+# ---------------------------------------------------------------------------
+# Embeddings
+# ---------------------------------------------------------------------------
+
+
+EMBEDDING_CONFIGS: dict[str, dict] = {
+    "nomic-embed-text": {
+        "provider": "ollama",
+        "model": "nomic-embed-text",
+        "dim": 768,
+        "table": "media_chunks_nomic_embed_text",
+    },
+    "mxbai-embed-large": {
+        "provider": "ollama",
+        "model": "mxbai-embed-large",
+        "dim": 1024,
+        "table": "media_chunks_mxbai_embed_large",
+    },
+    "text-embedding-3-small": {
+        "provider": "openai",
+        "model": "text-embedding-3-small",
+        "dim": 1536,
+        "table": "media_chunks_text_embedding_3_small",
+    },
+    "gemini-embedding-001-768": {
+        "provider": "google",
+        "model": "gemini-embedding-001",
+        "dim": 768,
+        "table": "media_chunks_gemini_embedding_001_768",
+        "extra_kwargs": {"output_dimensionality": 768},
+    },
+    "gemini-embedding-001-3072": {
+        "provider": "google",
+        "model": "gemini-embedding-001",
+        "dim": 3072,
+        "table": "media_chunks_gemini_embedding_001_3072",
+        "extra_kwargs": {},  # 3072 ist die native Ausgabegröße, keine Truncation nötig
+    },
+}
+
+
+def get_embedding_model(key: str | None = None):
+    """
+    Returns LangChain Embeddings object for the given embedding-config key.
+    """
+    key = key or DEFAULT_EMBEDDING_KEY
+    cfg = EMBEDDING_CONFIGS.get(key)
+    if cfg is None:
+        raise ValueError(
+            f"Unknown embedding key '{key}'. Available: {', '.join(EMBEDDING_CONFIGS)}"
+        )
+
+    provider = cfg["provider"]
+    model = cfg["model"]
+    extra = cfg.get("extra_kwargs", {})
+
+    if provider == "ollama":
+        return OllamaEmbeddings(
+            model=model,
+            base_url=os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434"),
+        )
+    elif provider == "openai":
+        return OpenAIEmbeddings(model=model, **extra)
+    elif provider == "google":
+        return GoogleGenerativeAIEmbeddings(model=model, **extra)
+    else:
+        raise ValueError(f"Unknown embedding provider '{provider}' for key '{key}'")
+
+
+def get_embedding_dim(key: str | None = None) -> int:
+    """Returns the vector dimension for the given provider."""
+    key = key or DEFAULT_EMBEDDING_KEY
+    return EMBEDDING_CONFIGS[key]["dim"]
+
+
+def get_embedding_table(key: str | None = None) -> str:
+    key = key or DEFAULT_EMBEDDING_KEY
+    return EMBEDDING_CONFIGS[key]["table"]
+
+
+def resolve_embedding_key(key: str | None = None) -> str:
+    """Resolves embedding key or falls back to default."""
+    return key or DEFAULT_EMBEDDING_KEY
+
+
+def build_chunk_model_registry() -> dict[str, type]:
+    """
+    Maps key to embedding table.
+    """
+    from models import Base  # lokal, um zirkuläre Imports zu vermeiden
+
+    table_to_model = {
+        mapper.class_.__tablename__: mapper.class_
+        for mapper in Base.registry.mappers
+    }
+
+    registry: dict[str, type] = {}
+    for key, cfg in EMBEDDING_CONFIGS.items():
+        model_cls = table_to_model.get(cfg["table"])
+        if model_cls is None:
+            raise RuntimeError(
+                f"Kein SQLAlchemy-Model mit __tablename__ = '{cfg['table']}' "
+                f"gefunden (für Embedding-Key '{key}'). Model vergessen?"
+            )
+        registry[key] = model_cls
+    return registry
