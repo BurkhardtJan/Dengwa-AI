@@ -51,7 +51,6 @@ class MediaResponse(BaseModel):
 class VocabularyCardResponse(BaseModel):
     id: UUID
     template: Optional[str] = None
-    source: str = "manual"
     queue: str = "new"
     due: Optional[datetime] = None
     interval_days: int = 0

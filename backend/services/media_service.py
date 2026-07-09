@@ -9,6 +9,7 @@ from llm.prompts import build_vocab_extract_prompt
 from llm.client import call_llm
 from llm.rag_service import embed_media
 from services.vocabulary_service import get_or_create_vocab
+from pypdf import PdfReader
 
 OCTET_STREAM_EXTENSIONS = {".txt", ".srt", ".vtt", ".md"}
 
@@ -23,6 +24,25 @@ def read_text_file(file_path: str) -> str:
             return f.read()
 
 
+def extract_pdf_text(file_path: str) -> str | None:
+    """Extrahiert Text aus einer PDF-Datei, Seite für Seite."""
+    try:
+        reader = PdfReader(file_path)
+        text_parts = [
+            text for page in reader.pages
+            if (text := page.extract_text())
+        ]
+        return "\n\n".join(text_parts) if text_parts else None
+    except Exception:
+        return None
+
+
+CONTENT_TYPE_EXTRACTORS: dict[str, callable] = {
+    "application/pdf": extract_pdf_text,
+    # "application/epub+zip": extract_epub_text,  # später
+}
+
+
 def extract_content(content_type: str, file_path: str) -> str | None:
     """Helper function to extract content from files"""
     if content_type.startswith("text/"):
@@ -30,6 +50,9 @@ def extract_content(content_type: str, file_path: str) -> str | None:
 
     if content_type == "application/x-subrip":
         return read_text_file(file_path)
+
+    if content_type in CONTENT_TYPE_EXTRACTORS:
+        return CONTENT_TYPE_EXTRACTORS[content_type](file_path)
 
     if content_type == "application/octet-stream":
         ext = os.path.splitext(file_path)[1].lower()

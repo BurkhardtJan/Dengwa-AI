@@ -21,3 +21,6 @@ python-multipart
 pgvector
 alembic
 langchain-text-splitters
+genanki
+zstandard
+pypdf
