@@ -1,5 +1,6 @@
 import uuid
-from sqlalchemy import Column, String, Text, ForeignKey, DateTime, UniqueConstraint, Float, Integer, SmallInteger, UUID, BigInteger
+from sqlalchemy import Column, String, Text, ForeignKey, DateTime, UniqueConstraint, Float, Integer, SmallInteger, UUID, \
+    BigInteger
 from sqlalchemy.orm import relationship
 from pgvector.sqlalchemy import Vector
 from database import Base
@@ -74,26 +75,18 @@ class Vocabulary(Base):
     # Anki-Interop, optional — nur befüllt wenn aus einem .apkg importiert
     anki_note_guid = Column(String, unique=True, nullable=True)
 
-    # aggregiert über alle Karten hinweg, nicht kartenspezifisch
-    llm_mastery_score = Column(Float, default=0.0)
-    llm_context = Column(Text)
-    last_interaction = Column(DateTime)
-
     language_learning = relationship("LanguageLearning", back_populates="vocabularies")
     media_vocabularies = relationship("MediaVocabulary", back_populates="vocabulary", cascade="all, delete-orphan")
     cards = relationship("VocabularyCard", back_populates="vocabulary", cascade="all, delete-orphan")
 
 
 class VocabularyCard(Base):
-    """Card-Ebene: ein Wort kann mehrere Karten haben (recognition/production/llm_assessment),
-    jede mit eigenem SM-2-Lernstand — analog zu Ankis Note/Card-Trennung."""
     __tablename__ = "vocabulary_cards"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     vocabulary_id = Column(UUID(as_uuid=True), ForeignKey("vocabularies.id"), nullable=False)
 
     template = Column(String, nullable=True)  # 'recognition' | 'production' | 'cloze' | None
-    source = Column(String, nullable=False, default="manual")  # 'anki_export' | 'chat_review' | 'manual'
     queue = Column(String, default="new")  # 'new' | 'learning' | 'review'
 
     due = Column(DateTime)

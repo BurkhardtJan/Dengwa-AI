@@ -330,16 +330,12 @@ erDiagram
         TEXT language
         TIMESTAMP created_at
         TEXT anki_note_guid
-        FLOAT llm_mastery_score
-        TEXT llm_context
-        TIMESTAMP last_interaction
     }
 
     vocabulary_cards {
         UUID id
         UUID vocabulary_id
         TEXT template
-        TEXT source
         TEXT queue
         TIMESTAMP due
         INTEGER interval_days
@@ -398,4 +394,5 @@ erDiagram
         UUID media_id
         UUID vocabulary_id
     }
+
 ```

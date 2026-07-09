@@ -41,9 +41,6 @@ def create_vocab(
         context_sentence=context_sentence,
         language=language,
         created_at=datetime.now(timezone.utc),
-        llm_mastery_score=0.0,
-        last_interaction=datetime.now(timezone.utc),
-        llm_context=None,
     )
     db.add(vocab)
     db.flush()
@@ -51,7 +48,6 @@ def create_vocab(
     card = VocabularyCard(
         vocabulary_id=vocab.id,
         template="recognition",
-        source="manual",
         queue="new",
         due=datetime.now(timezone.utc),
         interval_days=0,
