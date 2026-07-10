@@ -26,3 +26,5 @@ zstandard
 pypdf
 ebooklib
 beautifulsoup4
+odfpy
+python-docx

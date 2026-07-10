@@ -13,6 +13,10 @@ from pypdf import PdfReader
 from ebooklib import epub
 import ebooklib
 from bs4 import BeautifulSoup
+from docx import Document as DocxDocument
+from odf import text as odf_text
+from odf import teletype
+from odf.opendocument import load as odf_load
 
 OCTET_STREAM_EXTENSIONS = {".txt", ".srt", ".vtt", ".md"}
 
@@ -57,10 +61,46 @@ def extract_epub_text(file_path: str) -> str | None:
         return None
 
 
+def extract_docx_text(file_path: str) -> str | None:
+    """Extract text from docx"""
+    try:
+        doc = DocxDocument(file_path)
+        text_parts = [p.text for p in doc.paragraphs if p.text.strip()]
+
+        # Auch Text aus Tabellen mitnehmen
+        for table in doc.tables:
+            for row in table.rows:
+                for cell in row.cells:
+                    if cell.text.strip():
+                        text_parts.append(cell.text)
+
+        return "\n\n".join(text_parts) if text_parts else None
+    except Exception:
+        return None
+
+
+def extract_odt_text(file_path: str) -> str | None:
+    """Extract text from odt"""
+    try:
+        doc = odf_load(file_path)
+        paragraphs = doc.getElementsByType(odf_text.P)
+        text_parts = [
+            "".join(node.data for node in p.childNodes if node.nodeType == node.TEXT_NODE)
+            for p in paragraphs
+        ]
+        text_parts = [teletype.extractText(p) for p in paragraphs]
+
+        return "\n\n".join(text_parts) if text_parts else None
+    except Exception:
+        return None
+
+
 CONTENT_TYPE_EXTRACTORS: dict[str, callable] = {
     "application/x-subrip": read_text_file,
     "application/pdf": extract_pdf_text,
     "application/epub+zip": extract_epub_text,
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": extract_docx_text,
+    "application/vnd.oasis.opendocument.text": extract_odt_text,
 }
 
 
