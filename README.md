@@ -178,12 +178,13 @@ pnpm dev
 - [x] RAG — inject vocabulary context into chat prompts (pgvector)
 - [x] Add Chat branching
 - [x] Comparison of LLMs
+- [x] Spaced Repetition System (SRS)
 
 ### Backend
 
-- [ ] Progress endpoint — implement actual logic (currently stub)
 - [ ] Add default Vocab starter set (HSK, JLPT, ...)
 - [ ] Other Media Parsing
+- [ ] Add Multiple Choice & Free text entry to SRS
 - [ ] Add LLM API Keys for users
 - [ ] Monitoring Token
 - [ ] Alembic
@@ -192,6 +193,8 @@ pnpm dev
 
 ### Frontend
 
+- [ ] SRS in frontend
+- [ ] Progress visualization
 - [ ] Add Flags
 - [ ] Error handling
 - [ ] Responsive design
@@ -329,7 +332,6 @@ erDiagram
         TEXT context_sentence
         TEXT language
         TIMESTAMP created_at
-        TEXT anki_note_guid
     }
 
     vocabulary_cards {
@@ -342,7 +344,6 @@ erDiagram
         FLOAT ease_factor
         INTEGER repetitions
         INTEGER lapses
-        BIGINT anki_card_id
         TIMESTAMP created_at
     }
 
@@ -394,5 +395,4 @@ erDiagram
         UUID media_id
         UUID vocabulary_id
     }
-
 ```

@@ -1,4 +1,5 @@
 from uuid import UUID
+from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
@@ -50,3 +51,28 @@ def get_review_count(
 ):
     """Return due-card counts per queue, optionally scoped to a language and/or a medium."""
     return review_service.get_queue_counts(db, user.id, learning_id, media_id, template)
+
+
+@router.get("/stats")
+def get_vocab_review_stats(
+        learning_id: UUID | None = None,
+        media_id: UUID | None = None,
+        template: str | None = None,
+        db: Session = Depends(get_db),
+        user=Depends(get_current_user),
+):
+    """Return raw vocabulary progress numbers for frontend rendering."""
+    return review_service.get_vocab_stats(db, user.id, learning_id, media_id, template)
+
+
+@router.get("/timeline")
+def get_review_timeline(
+        learning_id: UUID | None = None,
+        media_id: UUID | None = None,
+        template: str | None = None,
+        days: int = 30,
+        db: Session = Depends(get_db),
+        user=Depends(get_current_user),
+):
+    """Return a day-by-day review history for charting."""
+    return review_service.get_review_timeline(db, user.id, learning_id, media_id, template, days)
