@@ -78,8 +78,6 @@ class Vocabulary(Base):
     language = Column(String)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
-    # Anki-Interop, optional — nur befüllt wenn aus einem .apkg importiert
-    anki_note_guid = Column(String, unique=True, nullable=True)
 
     language_learning = relationship("LanguageLearning", back_populates="vocabularies")
     media_vocabularies = relationship("MediaVocabulary", back_populates="vocabulary", cascade="all, delete-orphan")
@@ -100,8 +98,6 @@ class VocabularyCard(Base):
     ease_factor = Column(Float, default=2.5)
     repetitions = Column(Integer, default=0)
     lapses = Column(Integer, default=0)
-
-    anki_card_id = Column(BigInteger, nullable=True)
 
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 

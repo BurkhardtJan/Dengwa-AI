@@ -181,7 +181,6 @@ pnpm dev
 
 ### Backend
 
-- [ ] Anki Compatibility
 - [ ] Progress endpoint — implement actual logic (currently stub)
 - [ ] Add default Vocab starter set (HSK, JLPT, ...)
 - [ ] Other Media Parsing
@@ -189,6 +188,7 @@ pnpm dev
 - [ ] Monitoring Token
 - [ ] Alembic
 - [ ] Add License
+- [ ] Anki Compatibility
 
 ### Frontend
 
@@ -196,6 +196,7 @@ pnpm dev
 - [ ] Error handling
 - [ ] Responsive design
 - [ ] PWA
+- [ ] TTS & STT
 
 ## Architecture
 
