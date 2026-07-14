@@ -136,6 +136,27 @@ class ProviderModelsResponse(BaseModel):
     """Provider -> Liste of available models."""
     providers: dict[str, list[str]]
 
+
 class EmbeddingModelsResponse(BaseModel):
     """List of curated Embedding-Provider-Keys."""
     models: list[str]
+
+
+class ReviewCardOut(BaseModel):
+    """Card + its vocabulary data flattened, so the frontend doesn't need a follow-up lookup."""
+    id: UUID
+    vocabulary_id: UUID
+    word: str
+    translation: str | None
+    context_sentence: str | None
+    language: str | None
+    template: str | None
+    queue: str
+    due: datetime
+    interval_days: int
+    ease_factor: float
+    repetitions: int
+    lapses: int
+
+    class Config:
+        from_attributes = True

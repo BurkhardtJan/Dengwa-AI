@@ -57,7 +57,6 @@ def create_vocab(
     )
     db.add(card)
 
-    db.add(vocab)
     db.commit()
     db.refresh(vocab)
 

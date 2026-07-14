@@ -36,3 +36,4 @@ lerna-debug.log*
 *.sw?
 
 docker-compose.override.yml
+reset-db.sh

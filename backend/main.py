@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from database import Base, engine
-from routers import system, users, languages, media, chats, vocabularies, llm_models
+from routers import system, users, languages, media, chats, vocabularies, llm_models, reviews
 from sqlalchemy import text
 
 with engine.connect() as conn:
@@ -32,6 +32,7 @@ app.include_router(media.router)
 app.include_router(chats.router)
 app.include_router(vocabularies.router)
 app.include_router(llm_models.router)
+app.include_router(reviews.router)
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
