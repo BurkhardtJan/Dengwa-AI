@@ -78,7 +78,7 @@ def extract_docx_text(file_path: str) -> str | None:
     except Exception:
         return None
 
-q 
+
 def extract_odt_text(file_path: str) -> str | None:
     """Extract text from odt"""
     try:
