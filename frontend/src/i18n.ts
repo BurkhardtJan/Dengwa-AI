@@ -5,6 +5,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import enCommon from './locales/en/common.json';
 import enDashboard from './locales/en/dashboard.json';
 import enVocabulary from './locales/en/vocabulary.json';
+import enReview from './locales/en/review.json';
 import enMedia from './locales/en/media.json';
 import enChat from './locales/en/chat.json';
 import enAuth from './locales/en/auth.json';
@@ -13,6 +14,7 @@ import enLanding from './locales/en/landing.json';
 import deCommon from './locales/de/common.json';
 import deDashboard from './locales/de/dashboard.json';
 import deVocabulary from './locales/de/vocabulary.json';
+import deReview from './locales/de/review.json';
 import deMedia from './locales/de/media.json';
 import deChat from './locales/de/chat.json';
 import deAuth from './locales/de/auth.json';
@@ -27,6 +29,7 @@ i18n
                 common: enCommon,
                 dashboard: enDashboard,
                 vocabulary: enVocabulary,
+                review: enReview,
                 media: enMedia,
                 chat: enChat,
                 auth: enAuth,
@@ -36,6 +39,7 @@ i18n
                 common: deCommon,
                 dashboard: deDashboard,
                 vocabulary: deVocabulary,
+                review: deReview,
                 media: deMedia,
                 chat: deChat,
                 auth: deAuth,
