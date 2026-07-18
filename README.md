@@ -193,7 +193,7 @@ pnpm dev
 
 ### Frontend
 
-- [ ] SRS in frontend
+- [ ] Big uploads in background
 - [ ] Progress visualization
 - [ ] Add Flags
 - [ ] Error handling

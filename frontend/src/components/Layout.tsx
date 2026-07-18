@@ -62,6 +62,15 @@ function Layout() {
                     {t('nav.vocabulary')}
                 </NavLink>
                 <NavLink
+                    to="/review"
+                    onClick={() => setSidebarOpen(false)}
+                    className={({isActive}) =>
+                        `px-4 py-2 rounded-lg text-sm font-medium ${isActive ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`
+                    }
+                >
+                    {t('nav.review')}
+                </NavLink>
+                <NavLink
                     to="/media"
                     onClick={() => setSidebarOpen(false)}
                     className={({isActive}) =>

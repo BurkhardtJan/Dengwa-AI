@@ -15,6 +15,7 @@
   "nav": {
     "dashboard": "Dashboard",
     "vocabulary": "Vocabulary",
+    "review": "Review",
     "media": "Media",
     "chats": "Chats"
   },

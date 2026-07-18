@@ -1,0 +1,18 @@
+{
+  "title": "Review",
+  "reveal": "Show answer",
+  "again": "Again",
+  "hard": "Hard",
+  "good": "Good",
+  "easy": "Easy",
+  "new": "New",
+  "learning": "Learning",
+  "due": "Due",
+  "allDone": "All done!",
+  "allDoneHint": "No cards due right now. Come back later.",
+  "queue": {
+    "new": "New",
+    "learning": "Learning",
+    "review": "Review"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "title": "Wiederholen",
+  "reveal": "Antwort zeigen",
+  "again": "Nochmal",
+  "hard": "Schwer",
+  "good": "Gut",
+  "easy": "Leicht",
+  "new": "Neu",
+  "learning": "Lernphase",
+  "due": "Fällig",
+  "allDone": "Alles erledigt!",
+  "allDoneHint": "Aktuell sind keine Karten fällig. Schau später wieder vorbei.",
+  "queue": {
+    "new": "Neu",
+    "learning": "Lernphase",
+    "review": "Wiederholung"
+  }
+}

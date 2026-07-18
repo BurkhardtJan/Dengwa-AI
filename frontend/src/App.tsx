@@ -6,6 +6,7 @@ import DashboardPage from './pages/DashboardPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import VocabularyPage from './pages/VocabularyPage'
 import VocabularyDetailPage from './pages/VocabularyDetailPage'
+import ReviewPage from './pages/ReviewPage.tsx';
 import ChatPage from './pages/ChatPage'
 import ChatDetailPage from "@/pages/ChatDetailPage.tsx";
 import MediaPage from './pages/MediaPage';
@@ -23,6 +24,7 @@ function App() {
                     <Route path="/dashboard" element={<DashboardPage/>}/>
                     <Route path="/vocabulary" element={<VocabularyPage/>}/>
                     <Route path="/vocabulary/:id" element={<VocabularyDetailPage/>}/>
+                    <Route path="/review" element={<ReviewPage/>}/>
                     <Route path="/chat" element={<ChatPage/>}/>
                     <Route path="/chat/:id" element={<ChatDetailPage/>}/>
                     <Route path="/media" element={<MediaPage/>}/>

@@ -390,6 +390,106 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/reviews/next": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Next Review
+         * @description Return the next due card, optionally scoped to a language and/or a medium.
+         */
+        get: operations["get_next_review_reviews_next_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reviews/{card_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Submit Review
+         * @description Submit a review grade (1-4) for a card and get back its updated schedule.
+         */
+        post: operations["submit_review_reviews__card_id__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reviews/count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Review Count
+         * @description Return due-card counts per queue, optionally scoped to a language and/or a medium.
+         */
+        get: operations["get_review_count_reviews_count_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reviews/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Vocab Review Stats
+         * @description Return raw vocabulary progress numbers for frontend rendering.
+         */
+        get: operations["get_vocab_review_stats_reviews_stats_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reviews/timeline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Review Timeline
+         * @description Return a day-by-day review history for charting.
+         */
+        get: operations["get_review_timeline_reviews_timeline_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -553,6 +653,52 @@ export interface components {
                 [key: string]: string[];
             };
         };
+        /**
+         * ReviewCardOut
+         * @description Card + its vocabulary data flattened, so the frontend doesn't need a follow-up lookup.
+         */
+        ReviewCardOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Vocabulary Id
+             * Format: uuid
+             */
+            vocabulary_id: string;
+            /** Word */
+            word: string;
+            /** Translation */
+            translation: string | null;
+            /** Context Sentence */
+            context_sentence: string | null;
+            /** Language */
+            language: string | null;
+            /** Template */
+            template: string | null;
+            /** Queue */
+            queue: string;
+            /**
+             * Due
+             * Format: date-time
+             */
+            due: string;
+            /** Interval Days */
+            interval_days: number;
+            /** Ease Factor */
+            ease_factor: number;
+            /** Repetitions */
+            repetitions: number;
+            /** Lapses */
+            lapses: number;
+        };
+        /** ReviewRequest */
+        ReviewRequest: {
+            /** Ease */
+            ease: number;
+        };
         /** UserRegister */
         UserRegister: {
             /** Username */
@@ -602,10 +748,6 @@ export interface components {
             context_sentence?: string | null;
             /** Language */
             language?: string | null;
-            /** Proficiency Level */
-            proficiency_level?: string | null;
-            /** Comment */
-            comment?: string | null;
             /**
              * Created At
              * Format: date-time
@@ -1508,6 +1650,174 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["EmbeddingModelsResponse"];
+                };
+            };
+        };
+    };
+    get_next_review_reviews_next_get: {
+        parameters: {
+            query?: {
+                learning_id?: string | null;
+                media_id?: string | null;
+                template?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewCardOut"] | null;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    submit_review_reviews__card_id__post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                card_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReviewRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewCardOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_review_count_reviews_count_get: {
+        parameters: {
+            query?: {
+                learning_id?: string | null;
+                media_id?: string | null;
+                template?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_vocab_review_stats_reviews_stats_get: {
+        parameters: {
+            query?: {
+                learning_id?: string | null;
+                media_id?: string | null;
+                template?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_review_timeline_reviews_timeline_get: {
+        parameters: {
+            query?: {
+                learning_id?: string | null;
+                media_id?: string | null;
+                template?: string | null;
+                days?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
