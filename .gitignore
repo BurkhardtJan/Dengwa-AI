@@ -37,3 +37,7 @@ lerna-debug.log*
 
 docker-compose.override.yml
 reset-db.sh
+test-assets
+
+dev-dist/
+*.pnpm-store/

@@ -1,6 +1,7 @@
 # --- DEVELOPMENT STAGE ---
 FROM node:22-slim
 WORKDIR /app
+ENV CI=true
 COPY package.json pnpm-lock.yaml ./
 RUN corepack enable pnpm && pnpm install
 COPY . .

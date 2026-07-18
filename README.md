@@ -179,6 +179,7 @@ pnpm dev
 - [x] Add Chat branching
 - [x] Comparison of LLMs
 - [x] Spaced Repetition System (SRS)
+- [x] PWA
 
 ### Backend
 
@@ -198,7 +199,7 @@ pnpm dev
 - [ ] Add Flags
 - [ ] Error handling
 - [ ] Responsive design
-- [ ] PWA
+- [ ] PWA offline features
 - [ ] TTS & STT
 
 ## Architecture
