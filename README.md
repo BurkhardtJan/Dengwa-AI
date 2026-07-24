@@ -165,7 +165,7 @@ pnpm dev
 - [x] Full CRUD for media, chats, languages
 - [x] Code refactoring (routers/, llm/, services/ structure)
 - [x] Architecture diagrams (Mermaid)
-- [x] Switch to LangGraph as AI wrapper
+- [x] Switch to LangChain as AI wrapper
 - [x] JWT authentication (login/register)
 - [x] UUID instead of serial ID for endpoints
 - [x] Frontend setup (React 18 + Vite + TypeScript + Tailwind + shadcn/ui)

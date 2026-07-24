@@ -3,8 +3,8 @@ import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query'
 import {useTranslation} from 'react-i18next'
 import {useLanguage} from '@/context/TargetLanguageContext.tsx'
 import {fetchLanguages} from '@/services/language.service'
-import {fetchNextReviewCard, fetchReviewCounts, submitReview} from '@/services/review.service'
-import type {ReviewEase} from '@/services/review.service'
+import {fetchNextReviewCard, fetchReviewCounts, submitReview} from '@/services/review.service.ts'
+import type {ReviewEase} from '@/services/review.service.ts'
 
 const GRADES: { ease: ReviewEase; labelKey: string; className: string }[] = [
     {ease: 1, labelKey: 'review:again', className: 'bg-destructive text-destructive-foreground hover:opacity-90'},

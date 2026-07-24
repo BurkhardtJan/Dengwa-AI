@@ -54,8 +54,8 @@ function DashboardPage() {
         }
     })
 
-    if (isLoading) return <p className="p-8">Lädt...</p>
-    if (isError) return <p className="p-8 text-destructive">Fehler beim Laden</p>
+    if (isLoading) return <p className="p-8">{t('common:loading')}</p>
+    if (isError) return <p className="p-8 text-destructive">{t('common:errorLoading')}</p>
 
     return (
         <div className="min-h-screen p-8">

@@ -77,7 +77,7 @@ function VocabularyPage() {
             </div>
             {showForm && (
                 <Modal onClose={() => setShowForm(false)}>
-                    <h2 className="text-lg font-bold mb-4">Neue Vokabel</h2>
+                    <h2 className="text-lg font-bold mb-4">{t('vocabulary:newVocabulary')}</h2>
                     <div className="flex flex-col gap-3">
                         <div>
                             <label className="text-xs font-medium text-muted-foreground block mb-1">{t('vocabulary:wordLabel')}</label>
