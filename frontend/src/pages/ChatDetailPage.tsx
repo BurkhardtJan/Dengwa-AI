@@ -51,14 +51,15 @@ export default function ChatDetailPage() {
             navigate('/chat')
         }
     })
-
-    if (isLoading) return <p className="p-8">{t('loading')}</p>
-    if (isError) return <p className="p-8 text-destructive">{t('errorLoading')}</p>
     const {setMediumId} = useMedium()
 
     useEffect(() => {
         if (chatMeta?.media_id) setMediumId(chatMeta.media_id)
     }, [chatMeta?.media_id, setMediumId])
+
+    if (isLoading) return <p className="p-8">{t('loading')}</p>
+    if (isError) return <p className="p-8 text-destructive">{t('errorLoading')}</p>
+
 
     return (
         <div className="p-8 max-w-2xl mx-auto flex flex-col h-[calc(100vh-2rem)]">
