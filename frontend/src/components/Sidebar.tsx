@@ -8,6 +8,7 @@ import {useMedium} from '@/context/MediumContext'
 import CreateLanguageModal from '@/components/CreateLanguageModal'
 import CreateMediaModal from '@/components/CreateMediaModal'
 import {LanguageSwitcher} from './LanguageSwitcher'
+import {authStorage} from '@/lib/authStorage'
 import {useTranslation} from 'react-i18next'
 
 type Props = {
@@ -43,7 +44,7 @@ function Sidebar({isOpen, onNavigate}: Props) {
     })
 
     function handleLogout() {
-        localStorage.removeItem('token')
+        authStorage.clearToken()
         navigate('/login')
     }
 

@@ -1,11 +1,12 @@
 import axios from 'axios'
+import {authStorage} from '@/lib/authStorage'
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000',
+    baseURL: 'http://localhost:8000',
 })
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token')
+    const token = authStorage.getToken()
     if (token) {
         config.headers.Authorization = `Bearer ${token}`
     }
@@ -16,7 +17,7 @@ api.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
-            localStorage.removeItem('token')
+            authStorage.clearToken()
             window.location.href = '/login'
         }
         return Promise.reject(error)

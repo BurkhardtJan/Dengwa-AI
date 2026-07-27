@@ -2,6 +2,7 @@ import {useState} from 'react'
 import {login} from '../services/auth.service'
 import {useNavigate} from 'react-router-dom'
 import {LanguageSwitcher} from '../components/LanguageSwitcher'
+import {authStorage} from '@/lib/authStorage'
 import {useTranslation} from 'react-i18next'
 
 function LoginPage() {
@@ -16,7 +17,7 @@ function LoginPage() {
         setError('')
         try {
             const data = await login(username, password)
-            localStorage.setItem('token', data.access_token)
+            authStorage.setToken(data.access_token)
             navigate('/dashboard')
         } catch {
             setError(t('loginError'))

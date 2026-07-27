@@ -194,6 +194,7 @@ pnpm dev
 
 ### Frontend
 
+- [ ] Media Upload automatic language recognition
 - [ ] Big uploads in background
 - [ ] Progress visualization
 - [ ] Add Flags
