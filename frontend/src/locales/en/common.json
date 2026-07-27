@@ -22,5 +22,7 @@
   "targetLanguage": "Learning language",
   "selectLanguage": "Select language...",
   "addLanguage": "+ Add language",
+  "medium": "Medium",
+  "allMedia": "All media",
   "logout": "Logout"
 }

@@ -1,6 +1,6 @@
 import {useTranslation} from 'react-i18next'
 import {X} from 'lucide-react'
-import {useChatProviders, useEmbeddingProviders} from '@/hooks/useModelOptions'
+import {useChatProviders} from '@/hooks/useModelOptions'
 import ProviderModelSelect from './ProviderModelSelect'
 import EmbeddingSelect from './EmbeddingSelect'
 import type {ModelChoice} from '@/hooks/useChatTree'
@@ -15,7 +15,6 @@ interface Props {
 export default function ModelConfigFields({value, onChange, onRemove, label}: Props) {
     const {t} = useTranslation('chat')
     const {data: chatProviders, isLoading: isChatLoading} = useChatProviders()
-    const {data: embeddingProviders, isLoading: isEmbeddingLoading} = useEmbeddingProviders()
 
     return (
         <div className="border rounded-md p-2 flex flex-col gap-2 bg-background/50">

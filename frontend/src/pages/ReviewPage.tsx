@@ -2,6 +2,7 @@ import {useState} from 'react'
 import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query'
 import {useTranslation} from 'react-i18next'
 import {useLanguage} from '@/context/TargetLanguageContext.tsx'
+import {useMedium} from '@/context/MediumContext'
 import {fetchLanguages} from '@/services/language.service'
 import {fetchNextReviewCard, fetchReviewCounts, submitReview} from '@/services/review.service.ts'
 import type {ReviewEase} from '@/services/review.service.ts'
@@ -15,6 +16,7 @@ const GRADES: { ease: ReviewEase; labelKey: string; className: string }[] = [
 
 function ReviewPage() {
     const {selectedLan} = useLanguage()
+    const {mediumId} = useMedium()
     const queryClient = useQueryClient()
     const [revealed, setRevealed] = useState(false)
     const {t} = useTranslation(['common', 'review'])
@@ -26,14 +28,20 @@ function ReviewPage() {
     const learningId = languages?.find(l => l.learning_language === selectedLan)?.id
 
     const {data: card, isLoading, isError} = useQuery({
-        queryKey: ['review-next', learningId],
-        queryFn: () => fetchNextReviewCard({learning_id: learningId}),
+        queryKey: ['review-next', learningId, mediumId],
+        queryFn: () => fetchNextReviewCard({
+            learning_id: learningId,
+            ...(mediumId ? {media_id: mediumId} : {}),
+        }),
         enabled: !!learningId,
     })
 
     const {data: counts} = useQuery({
-        queryKey: ['review-count', learningId],
-        queryFn: () => fetchReviewCounts({learning_id: learningId}),
+        queryKey: ['review-count', learningId, mediumId],
+        queryFn: () => fetchReviewCounts({
+            learning_id: learningId,
+            ...(mediumId ? {media_id: mediumId} : {}),
+        }),
         enabled: !!learningId,
     })
 
@@ -41,8 +49,8 @@ function ReviewPage() {
         mutationFn: (ease: ReviewEase) => submitReview(card!.id, ease),
         onSuccess: () => {
             setRevealed(false)
-            queryClient.invalidateQueries({queryKey: ['review-next', learningId]})
-            queryClient.invalidateQueries({queryKey: ['review-count', learningId]})
+            queryClient.invalidateQueries({queryKey: ['review-next', learningId, mediumId]})
+            queryClient.invalidateQueries({queryKey: ['review-count', learningId, mediumId]})
         },
     })
 
@@ -56,9 +64,12 @@ function ReviewPage() {
                 <h1 className="text-3xl font-bold">{t('review:title')}</h1>
                 {counts && (
                     <div className="flex gap-2 text-xs font-medium">
-                        <span className="px-2.5 py-1 rounded-full bg-primary/10 text-primary">{t('review:new')}: {counts.new}</span>
-                        <span className="px-2.5 py-1 rounded-full bg-destructive/10 text-destructive">{t('review:learning')}: {counts.learning}</span>
-                        <span className="px-2.5 py-1 rounded-full bg-muted text-muted-foreground">{t('review:due')}: {counts.review}</span>
+                        <span
+                            className="px-2.5 py-1 rounded-full bg-primary/10 text-primary">{t('review:new')}: {counts.new}</span>
+                        <span
+                            className="px-2.5 py-1 rounded-full bg-destructive/10 text-destructive">{t('review:learning')}: {counts.learning}</span>
+                        <span
+                            className="px-2.5 py-1 rounded-full bg-muted text-muted-foreground">{t('review:due')}: {counts.review}</span>
                     </div>
                 )}
             </div>
@@ -70,7 +81,8 @@ function ReviewPage() {
                 </div>
             ) : (
                 <div className="border rounded-lg p-10 text-center min-h-64 flex flex-col justify-center gap-4">
-                    <span className="text-xs uppercase tracking-wide text-muted-foreground">{t(`review:queue.${card.queue}`)}</span>
+                    <span
+                        className="text-xs uppercase tracking-wide text-muted-foreground">{t(`review:queue.${card.queue}`)}</span>
                     <p className="text-2xl font-bold">{card.word}</p>
 
                     {revealed ? (

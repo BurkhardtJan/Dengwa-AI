@@ -1,3 +1,4 @@
+import {useEffect} from "react";
 import {useParams, useNavigate} from 'react-router-dom'
 import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query'
 import {deleteChat, fetchChats} from '@/services/chat.service.ts'
@@ -8,6 +9,7 @@ import ChatSettings from '@/components/chat/ChatSettings'
 import ChatMessageList from '@/components/chat/ChatMessageList'
 import ChatMessageInput from '@/components/chat/ChatMessageInput'
 import {useTranslation} from 'react-i18next'
+import {useMedium} from '@/context/MediumContext'
 
 export default function ChatDetailPage() {
     const {id} = useParams<{ id: string }>()
@@ -52,6 +54,11 @@ export default function ChatDetailPage() {
 
     if (isLoading) return <p className="p-8">{t('loading')}</p>
     if (isError) return <p className="p-8 text-destructive">{t('errorLoading')}</p>
+    const {setMediumId} = useMedium()
+
+    useEffect(() => {
+        if (chatMeta?.media_id) setMediumId(chatMeta.media_id)
+    }, [chatMeta?.media_id, setMediumId])
 
     return (
         <div className="p-8 max-w-2xl mx-auto flex flex-col h-[calc(100vh-2rem)]">

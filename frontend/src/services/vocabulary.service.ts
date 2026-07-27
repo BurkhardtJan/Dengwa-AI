@@ -5,8 +5,10 @@ type Vocabulary = components['schemas']['VocabularyResponse']
 type VocabularyCreate = components['schemas']['VocabularyCreate']
 type VocabularyUpdate = components['schemas']['VocabularyUpdate']
 
-export async function fetchVocabularies(lan?: string): Promise<Vocabulary[]> {
-    const response = await api.get('/vocabularies', {params: lan ? {lan} : {}})
+export async function fetchVocabularies(lan?: string, mediaId?: string): Promise<Vocabulary[]> {
+    const response = await api.get('/vocabularies', {
+        params: {...(lan ? {lan} : {}), ...(mediaId ? {media_id: mediaId} : {})},
+    })
     return response.data
 }
 

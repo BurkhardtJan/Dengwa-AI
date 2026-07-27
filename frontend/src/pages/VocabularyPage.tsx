@@ -5,6 +5,7 @@ import Modal from '../components/Modal'
 import {fetchVocabularies, createVocabulary} from '../services/vocabulary.service'
 import type {components} from '../types/api'
 import {useLanguage} from "@/context/TargetLanguageContext.tsx";
+import {useMedium} from '@/context/MediumContext'
 import {useTranslation} from 'react-i18next'
 
 type Vocabulary = components['schemas']['VocabularyResponse']
@@ -14,6 +15,7 @@ function VocabularyPage() {
     const navigate = useNavigate()
     const queryClient = useQueryClient()
     const {selectedLan} = useLanguage()
+    const {mediumId} = useMedium()
     const [newWord, setNewWord] = useState('')
     const [newTranslation, setNewTranslation] = useState('')
     const [showForm, setShowForm] = useState(false)
@@ -22,8 +24,8 @@ function VocabularyPage() {
     const {t} = useTranslation(['common', 'vocabulary'])
 
     const {data, isLoading, isError} = useQuery({
-        queryKey: ['vocabularies', selectedLan],
-        queryFn: () => fetchVocabularies(selectedLan ?? undefined)
+        queryKey: ['vocabularies', selectedLan, mediumId],
+        queryFn: () => fetchVocabularies(selectedLan ?? undefined, mediumId ?? undefined)
     })
 
 
@@ -80,7 +82,8 @@ function VocabularyPage() {
                     <h2 className="text-lg font-bold mb-4">{t('vocabulary:newVocabulary')}</h2>
                     <div className="flex flex-col gap-3">
                         <div>
-                            <label className="text-xs font-medium text-muted-foreground block mb-1">{t('vocabulary:wordLabel')}</label>
+                            <label
+                                className="text-xs font-medium text-muted-foreground block mb-1">{t('vocabulary:wordLabel')}</label>
                             <input
                                 value={newWord}
                                 onChange={e => setNewWord(e.target.value)}
@@ -89,7 +92,8 @@ function VocabularyPage() {
                             />
                         </div>
                         <div>
-                            <label className="text-xs font-medium text-muted-foreground block mb-1">{t('vocabulary:translationLabel')}</label>
+                            <label
+                                className="text-xs font-medium text-muted-foreground block mb-1">{t('vocabulary:translationLabel')}</label>
                             <input
                                 value={newTranslation}
                                 onChange={e => setNewTranslation(e.target.value)}
@@ -98,7 +102,8 @@ function VocabularyPage() {
                             />
                         </div>
                         <div>
-                            <label className="text-xs font-medium text-muted-foreground block mb-1">{t('vocabulary:contextLabel')}</label>
+                            <label
+                                className="text-xs font-medium text-muted-foreground block mb-1">{t('vocabulary:contextLabel')}</label>
                             <input
                                 value={newContextSentence}
                                 onChange={e => setNewContextSentence(e.target.value)}

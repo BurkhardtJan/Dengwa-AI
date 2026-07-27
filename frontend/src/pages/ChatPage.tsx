@@ -1,10 +1,11 @@
-import {useState} from 'react'
+import {useState, useMemo} from 'react'
 import {useNavigate} from 'react-router-dom'
 import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query'
 import Modal from '../components/Modal'
 import {fetchChats, createChat} from '@/services/chat.service.ts'
 import {fetchMedia} from '@/services/media.service.ts'
 import {useLanguage} from '@/context/TargetLanguageContext.tsx'
+import {useMedium} from '@/context/MediumContext'
 import type {components} from '../types/api'
 import {useTranslation} from 'react-i18next'
 
@@ -15,6 +16,7 @@ function ChatPage() {
     const navigate = useNavigate()
     const queryClient = useQueryClient()
     const {selectedLan} = useLanguage()
+    const {mediumId} = useMedium()
     const {t} = useTranslation(['chat', 'common'])
 
     const [showForm, setShowForm] = useState(false)
@@ -45,6 +47,11 @@ function ChatPage() {
         }
     })
 
+    const visibleChats = useMemo(
+        () => mediumId ? (chat ?? []).filter((c: Chat) => c.media_id === mediumId) : (chat ?? []),
+        [chat, mediumId]
+    )
+
     if (isChatsLoading) return <p className="p-8">{t('loading')}</p>
     if (isChatsError) return <p className="p-8 text-destructive">{t('errorLoading')}</p>
 
@@ -63,14 +70,14 @@ function ChatPage() {
             </div>
 
             <div className="grid gap-4">
-                {(chat ?? []).length === 0 ? (
+                {(visibleChats ?? []).length === 0 ? (
                     <p className="text-muted-foreground text-sm italic">
                         {selectedLan
                             ? t('noChats', {language: selectedLan})
                             : t('common:noLanguageSelected')}
                     </p>
                 ) : (
-                    (chat ?? []).map((chat: Chat) => (
+                    (visibleChats ?? []).map((chat: Chat) => (
                         <div
                             key={chat.id}
                             className="border rounded-lg p-4 cursor-pointer hover:bg-muted transition-colors flex justify-between items-center"

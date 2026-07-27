@@ -1,9 +1,10 @@
 import {useParams, useNavigate} from 'react-router-dom'
 import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query'
 import {deleteMedia, fetchMedium, extractVocabulary} from "@/services/media.service.ts"
-import {useState} from 'react'
+import {useState, useEffect} from 'react'
 import {MediaViewer} from '../components/MediaViewer'
 import {useTranslation} from 'react-i18next'
+import {useMedium} from '@/context/MediumContext'
 
 export default function MediaDetailPage() {
     const {id} = useParams<{ id: string }>()
@@ -11,6 +12,11 @@ export default function MediaDetailPage() {
     const queryClient = useQueryClient()
     const {t} = useTranslation(['media', 'common'])
     const [extractSuccess, setExtractSuccess] = useState(false)
+    const {setMediumId} = useMedium()
+
+    useEffect(() => {
+        if (id) setMediumId(id)
+    }, [id, setMediumId])
 
     const {data, isLoading, isError} = useQuery({
         queryKey: ['media', id],

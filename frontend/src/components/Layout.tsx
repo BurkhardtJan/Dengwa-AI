@@ -1,8 +1,10 @@
 import {NavLink, Outlet, useNavigate} from 'react-router-dom'
-import {useState} from 'react'
+import {useState, useEffect} from 'react'
 import {fetchLanguages} from '@/services/language.service'
 import {useQuery} from '@tanstack/react-query'
 import {useLanguage} from '@/context/TargetLanguageContext.tsx'
+import {useMedium} from '@/context/MediumContext'
+import {fetchMedia} from '@/services/media.service'
 import CreateLanguageModal from '@/components/CreateLanguageModal'
 import {LanguageSwitcher} from '../components/LanguageSwitcher';
 import {useTranslation} from 'react-i18next'
@@ -11,12 +13,25 @@ function Layout() {
     const navigate = useNavigate()
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const {selectedLan, setSelectedLan} = useLanguage()
+    const {mediumId, setMediumId} = useMedium()
     const [showCreate, setShowCreate] = useState(false)
     const {t} = useTranslation()
     const {data: languages} = useQuery({
         queryKey: ['languages'],
         queryFn: fetchLanguages
     })
+
+    const {data: media} = useQuery({
+        queryKey: ['media', 'list', selectedLan],
+        queryFn: () => fetchMedia(selectedLan ?? undefined),
+        enabled: !!selectedLan,
+    })
+
+    useEffect(() => {
+        if (mediumId && media && !media.some(m => m.id === mediumId)) {
+            setMediumId(null)
+        }
+    }, [media, mediumId, setMediumId])
 
 
     function handleLogout() {
@@ -112,6 +127,23 @@ function Layout() {
                         </option>
                     </select>
                 </div>
+
+                <div className="mt-4">
+                    <p className="text-xs text-muted-foreground mb-2 px-4">{t('medium')}</p>
+                    <select
+                        value={mediumId ?? ''}
+                        onChange={e => setMediumId(e.target.value || null)}
+                        disabled={!selectedLan}
+                        className="w-full border rounded-lg px-3 py-2 text-sm bg-background"
+                    >
+                        <option value="">{t('allMedia')}</option>
+                        {media?.map(m => (
+                            <option key={m.id} value={m.id}>{m.title}</option>
+                        ))}
+                    </select>
+                </div>
+
+
                 <div className="mt-auto flex flex-col gap-2">
                     <LanguageSwitcher/>
                     <button

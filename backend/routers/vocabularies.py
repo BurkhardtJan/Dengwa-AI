@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from uuid import UUID
 from database import get_db
 from services.user_service import get_current_user
-from models import Vocabulary, LanguageLearning
+from models import Vocabulary, LanguageLearning, MediaVocabulary
 from schemas import (
     VocabularyResponse, VocabularyCreate, VocabularyUpdate
 )
@@ -15,17 +15,23 @@ router = APIRouter(prefix="/vocabularies", tags=["Vocabularies"])
 
 
 @router.get("", response_model=List[VocabularyResponse])
-async def get_vocabularies(lan: Optional[str] = None, db: Session = Depends(get_db),
+async def get_vocabularies(lan: Optional[str] = None, media_id: Optional[UUID] = None, db: Session = Depends(get_db),
                            current_user=Depends(get_current_user)):
     """Get vocabulary list"""
+    query = db.query(Vocabulary).join(
+        LanguageLearning, Vocabulary.learning_id == LanguageLearning.id
+    ).filter(LanguageLearning.user_id == current_user.id)
+
     if lan:
         learning = get_learning_or_404(db, lan, current_user.id)
-        query = db.query(Vocabulary).filter(Vocabulary.learning_id == learning.id)
-        return query.all()
-    else:
-        query = db.query(Vocabulary).join(LanguageLearning, Vocabulary.learning_id == LanguageLearning.id).filter(
-            LanguageLearning.user_id == current_user.id)
-        return query.all()
+        query = query.filter(Vocabulary.learning_id == learning.id)
+
+    if media_id:
+        query = query.join(
+            MediaVocabulary, MediaVocabulary.vocabulary_id == Vocabulary.id
+        ).filter(MediaVocabulary.media_id == media_id)
+
+    return query.all()
 
 
 @router.post("", response_model=VocabularyResponse)
