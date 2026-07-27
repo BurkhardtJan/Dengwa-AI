@@ -15,7 +15,7 @@ function VocabularyPage() {
     const navigate = useNavigate()
     const queryClient = useQueryClient()
     const {selectedLan} = useLanguage()
-    const {mediumId} = useMedium()
+    const {mediumId, medium} = useMedium()
     const [newWord, setNewWord] = useState('')
     const [newTranslation, setNewTranslation] = useState('')
     const [showForm, setShowForm] = useState(false)
@@ -60,9 +60,11 @@ function VocabularyPage() {
             <div className="grid gap-4">
                 {(data ?? []).length === 0 ? (
                         <p className="text-muted-foreground text-sm italic">
-                            {selectedLan
-                                ? t('vocabulary:noVocabulary', {language: selectedLan})
-                                : t('common:noLanguageSelected')}
+                            {mediumId
+                                ? t('vocabulary:noVocabularyForMedium', {medium: medium?.title})
+                                : selectedLan
+                                    ? t('vocabulary:noVocabulary', {language: selectedLan})
+                                    : t('common:noLanguageSelected')}
                         </p>
                     ) :
                     (data ?? []).map((vocab: Vocabulary) => (

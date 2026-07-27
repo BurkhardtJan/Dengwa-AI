@@ -16,7 +16,7 @@ function ChatPage() {
     const navigate = useNavigate()
     const queryClient = useQueryClient()
     const {selectedLan} = useLanguage()
-    const {mediumId} = useMedium()
+    const {mediumId, medium} = useMedium()
     const {t} = useTranslation(['chat', 'common'])
 
     const [showForm, setShowForm] = useState(false)
@@ -38,7 +38,7 @@ function ChatPage() {
     )
 
     const createChatMutation = useMutation({
-        mutationFn: () => createChat(selectedMediaId),
+        mutationFn: (mediaId: string) => createChat(mediaId),
         onSuccess: (newChat) => {
             queryClient.invalidateQueries({queryKey: ['chat']})
             setSelectedMediaId('')
@@ -52,6 +52,15 @@ function ChatPage() {
         [chat, mediumId]
     )
 
+
+    function handleAddChat() {
+        if (mediumId) {
+            createChatMutation.mutate(mediumId)
+        } else {
+            setShowForm(true)
+        }
+    }
+
     if (isChatsLoading) return <p className="p-8">{t('loading')}</p>
     if (isChatsError) return <p className="p-8 text-destructive">{t('errorLoading')}</p>
 
@@ -61,10 +70,11 @@ function ChatPage() {
                 <h1 className="text-3xl font-bold">{t('common:nav.chats')}</h1>
                 {selectedLan && (
                     <button
-                        onClick={() => setShowForm(true)}
-                        className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
+                        onClick={handleAddChat}
+                        disabled={createChatMutation.isPending}
+                        className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
                     >
-                        {t('addButton')}
+                        {createChatMutation.isPending ? t('starting') : t('addButton')}
                     </button>
                 )}
             </div>
@@ -72,9 +82,11 @@ function ChatPage() {
             <div className="grid gap-4">
                 {(visibleChats ?? []).length === 0 ? (
                     <p className="text-muted-foreground text-sm italic">
-                        {selectedLan
-                            ? t('noChats', {language: selectedLan})
-                            : t('common:noLanguageSelected')}
+                        {mediumId
+                            ? t('noChatsForMedium', {medium: medium?.title})
+                            : selectedLan
+                                ? t('noChats', {language: selectedLan})
+                                : t('common:noLanguageSelected')}
                     </p>
                 ) : (
                     (visibleChats ?? []).map((chat: Chat) => (
@@ -107,34 +119,30 @@ function ChatPage() {
                     <p className="text-sm text-muted-foreground mb-4">
                         {t('selectMediaLabel', {language: selectedLan})}
                     </p>
-                    <div className="flex flex-col gap-4">
-                        <select
-                            value={selectedMediaId}
-                            onChange={e => setSelectedMediaId(e.target.value)}
-                            className="border rounded-lg px-3 py-2 bg-background text-sm"
+                    <select
+                        value={selectedMediaId}
+                        onChange={e => setSelectedMediaId(e.target.value)}
+                        className="border rounded-lg px-3 py-2 bg-background text-sm"
+                    >
+                        <option value="">{t('selectMediaPlaceholder')}</option>
+                        {(mediaList ?? []).map((media: Media) => (
+                            <option key={media.id} value={media.id}>{media.title}</option>
+                        ))}
+                    </select>
+                    <div className="flex gap-2 justify-end mt-2">
+                        <button
+                            onClick={() => setShowForm(false)}
+                            className="px-4 py-2 border rounded-lg text-sm hover:bg-muted"
                         >
-                            <option value="">{t('selectMediaPlaceholder')}</option>
-                            {(mediaList ?? []).map((media: Media) => (
-                                <option key={media.id} value={media.id}>
-                                    {media.title}
-                                </option>
-                            ))}
-                        </select>
-                        <div className="flex gap-2 justify-end mt-2">
-                            <button
-                                onClick={() => setShowForm(false)}
-                                className="px-4 py-2 border rounded-lg text-sm hover:bg-muted"
-                            >
-                                {t('common:buttons.cancel')}
-                            </button>
-                            <button
-                                onClick={() => createChatMutation.mutate()}
-                                disabled={!selectedMediaId || createChatMutation.isPending}
-                                className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm disabled:opacity-50"
-                            >
-                                {createChatMutation.isPending ? t('starting') : t('startButton')}
-                            </button>
-                        </div>
+                            {t('common:buttons.cancel')}
+                        </button>
+                        <button
+                            onClick={() => createChatMutation.mutate(selectedMediaId)}
+                            disabled={!selectedMediaId || createChatMutation.isPending}
+                            className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm disabled:opacity-50"
+                        >
+                            {createChatMutation.isPending ? t('starting') : t('startButton')}
+                        </button>
                     </div>
                 </Modal>
             )}

@@ -2,6 +2,7 @@
   "title": "Vokabeln",
   "addButton": "+ Vokabel hinzufügen",
   "noVocabulary": "Noch keine Vokabeln für {{language}} vorhanden. Klicke auf \"+ Vokabel hinzufügen\".",
+  "noVocabularyForMedium": "Noch keine Vokabeln für \"{{medium}}\" vorhanden.",
   "newVocabulary": "Neue Vokabel",
   "wordLabel": "Wort / Ausdruck",
   "wordPlaceholder": "z.B. ephemeral",

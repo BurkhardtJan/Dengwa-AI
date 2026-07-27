@@ -2,6 +2,7 @@
   "title": "Vocabulary",
   "addButton": "+ Add vocabulary",
   "noVocabulary": "No vocabulary for {{language}} yet. Click \"+ Add vocabulary\".",
+  "noVocabularyForMedium": "No vocabulary for \"{{medium}}\" yet.",
   "newVocabulary": "New vocabulary",
   "wordLabel": "Word / Expression",
   "wordPlaceholder": "e.g. ephemeral",
