@@ -183,6 +183,8 @@ pnpm dev
 
 ### Backend
 
+- [ ] Message Streaming
+- [ ] LiteLLM as LLM wrapper
 - [ ] Add default Vocab starter set (HSK, JLPT, ...)
 - [ ] Other Media Parsing
 - [ ] Add Multiple Choice & Free text entry to SRS
@@ -194,10 +196,12 @@ pnpm dev
 
 ### Frontend
 
+- [ ] Message Streaming
+- [ ] Add Games
+- [ ] Try WebLLM
 - [ ] Media Upload automatic language recognition
 - [ ] Big uploads in background
 - [ ] Progress visualization
-- [ ] Add Flags
 - [ ] Error handling
 - [ ] Responsive design
 - [ ] PWA offline features

@@ -99,6 +99,7 @@ class ChatResponse(BaseModel):
 class ChatMessageRequest(BaseModel):
     message: str
     parent_id: Optional[UUID] = None
+    role: str = "user"
 
 
 class ChatMessageResponse(BaseModel):

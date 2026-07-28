@@ -14,7 +14,7 @@ from schemas import (
 from llm.client import call_llm
 from llm.providers import resolve_embedding_key
 from llm.rag_service import retrieve_context
-from services.chat_service import get_chat_or_404, build_message_history, generate_assistant_reply
+from services.chat_service import get_chat_or_404, build_message_history, generate_assistant_reply, save_chat_message
 from services.media_service import get_media_or_404
 from services.language_service import get_learning_or_404
 
@@ -85,24 +85,11 @@ async def post_chat_message(
     """Send a message to the AI"""
     chat = get_chat_or_404(db, chat_id, current_user.id)
 
-    resolved_embedding = resolve_embedding_key(embedding_model)
-
-    user_message = ChatHistory(
-        chat_id=chat.id,
-        role="user",
-        message=request.message,
-        parent_id=request.parent_id,
-    )
-    db.add(user_message)
-    db.flush()
+    user_message = save_chat_message(db, chat.id, "user", request.message, request.parent_id)
 
     assistant_message = generate_assistant_reply(
         db, chat, user_message, provider, model, embedding_model
     )
-    db.add(assistant_message)
-    db.commit()
-    db.refresh(user_message)
-    db.refresh(assistant_message)
 
     return [user_message, assistant_message]
 
@@ -118,7 +105,7 @@ async def create_response(
         current_user=Depends(get_current_user)
 ):
     """
-    Creates alternative answer to existing promt.
+    Creates alternative answer to existing prompt.
     """
     chat = get_chat_or_404(db, chat_id, current_user.id)
 
@@ -129,9 +116,6 @@ async def create_response(
     assistant_message = generate_assistant_reply(
         db, chat, user_message, provider, model, embedding_model
     )
-    db.add(assistant_message)
-    db.commit()
-    db.refresh(assistant_message)
 
     return [assistant_message]
 
@@ -142,3 +126,20 @@ async def delete_chat(chat_id: UUID, db: Session = Depends(get_db), current_user
     db.delete(chat)
     db.commit()
     return {"status": f"Chat {chat_id} deleted"}
+
+
+@router.post("/{chat_id}/write", response_model=ChatMessageResponse)
+async def write_chat_message(
+        chat_id: UUID,
+        request: ChatMessageRequest,
+        db: Session = Depends(get_db),
+        current_user=Depends(get_current_user)
+):
+    """
+    Writes a finished message to the chat history.
+    """
+    chat = get_chat_or_404(db, chat_id, current_user.id)
+
+    return save_chat_message(
+        db, chat.id, request.role, request.message, request.parent_id
+    )

@@ -16,6 +16,34 @@ def get_chat_or_404(db: Session, chat_id: UUID, user_id: UUID) -> Chat:
     return chat
 
 
+def save_chat_message(
+        db: Session,
+        chat_id: UUID,
+        role: str,
+        message: str,
+        parent_id: UUID | None,
+        provider: str | None = None,
+        model: str | None = None,
+        embedding_model: str | None = None,
+) -> ChatHistory:
+    """
+    Writes a single message to the chat history.
+    """
+    entry = ChatHistory(
+        chat_id=chat_id,
+        role=role,
+        message=message,
+        parent_id=parent_id,
+        provider=provider,
+        model=model,
+        embedding_model=embedding_model,
+    )
+    db.add(entry)
+    db.commit()
+    db.refresh(entry)
+    return entry
+
+
 def build_message_history(db: Session, parent_id: UUID | None, new_message: str, limit: int = 20) -> list[dict]:
     """
     Loads the last {limit} messages for a chat and appends the new user message.
@@ -60,12 +88,7 @@ def generate_assistant_reply(
         model=resolved_model,
     )
 
-    return ChatHistory(
-        chat_id=chat.id,
-        role="assistant",
-        message=ai_response,
-        parent_id=user_message.id,
-        provider=resolved_provider,
-        model=resolved_model,
-        embedding_model=resolved_embedding,
+    return save_chat_message(
+        db, chat.id, "assistant", ai_response, user_message.id,
+        provider=resolved_provider, model=resolved_model, embedding_model=resolved_embedding,
     )
