@@ -1,9 +1,9 @@
+import json
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import StreamingResponse
 from typing import List, Optional
 from sqlalchemy.orm import Session
 from uuid import UUID
-from llm.prompts import build_system_prompt_language_chat
-from llm.providers import DEFAULT_CHAT_PROVIDER
 from services.user_service import get_current_user
 from database import get_db
 from models import Chat, ChatHistory, Media
@@ -11,12 +11,14 @@ from schemas import (
     ChatCreate, ChatResponse,
     ChatMessageRequest, ChatMessageResponse
 )
-from llm.client import call_llm
-from llm.providers import resolve_embedding_key
-from llm.rag_service import retrieve_context
-from services.chat_service import get_chat_or_404, build_message_history, generate_assistant_reply, save_chat_message
+from services.chat_service import get_chat_or_404, generate_assistant_reply, stream_assistant_reply, save_chat_message
 from services.media_service import get_media_or_404
 from services.language_service import get_learning_or_404
+
+
+def sse(event: dict) -> str:
+    return f"data: {json.dumps(event)}\n\n"
+
 
 router = APIRouter(prefix="/chats", tags=["Chats"])
 
@@ -84,7 +86,6 @@ async def post_chat_message(
 ):
     """Send a message to the AI"""
     chat = get_chat_or_404(db, chat_id, current_user.id)
-
     user_message = save_chat_message(db, chat.id, "user", request.message, request.parent_id)
 
     assistant_message = generate_assistant_reply(
@@ -92,6 +93,37 @@ async def post_chat_message(
     )
 
     return [user_message, assistant_message]
+
+
+@router.post("/{chat_id}/stream")
+async def post_chat_message_stream(
+        chat_id: UUID,
+        request: ChatMessageRequest,
+        provider: str | None = None,
+        model: str | None = None,
+        embedding_model: str | None = None,
+        db: Session = Depends(get_db),
+        current_user=Depends(get_current_user)
+):
+    """Send a message to the AI, streaming the assistant's reply token by token."""
+    chat = get_chat_or_404(db, chat_id, current_user.id)
+    user_message = save_chat_message(db, chat.id, "user", request.message, request.parent_id)
+
+    def event_stream():
+        yield sse({
+            "type": "user_message",
+            "message": ChatMessageResponse.model_validate(user_message).model_dump(mode="json"),
+        })
+        for kind, payload in stream_assistant_reply(db, chat, user_message, provider, model, embedding_model):
+            if kind == "chunk":
+                yield sse({"type": "chunk", "content": payload})
+            else:
+                yield sse({
+                    "type": "done",
+                    "message": ChatMessageResponse.model_validate(payload).model_dump(mode="json"),
+                })
+
+    return StreamingResponse(event_stream(), media_type="text/event-stream")
 
 
 @router.post("/{chat_id}/messages/{user_message_id}", response_model=List[ChatMessageResponse])
@@ -118,6 +150,36 @@ async def create_response(
     )
 
     return [assistant_message]
+
+
+@router.post("/{chat_id}/messages/{user_message_id}/stream")
+async def create_response_stream(
+        chat_id: UUID,
+        user_message_id: UUID,
+        provider: str | None = None,
+        model: str | None = None,
+        embedding_model: str | None = None,
+        db: Session = Depends(get_db),
+        current_user=Depends(get_current_user)
+):
+    """Creates a streamed alternative answer to an existing prompt."""
+    chat = get_chat_or_404(db, chat_id, current_user.id)
+
+    user_message = db.get(ChatHistory, user_message_id)
+    if not user_message or user_message.chat_id != chat.id or user_message.role != "user":
+        raise HTTPException(status_code=404, detail="User message not found")
+
+    def event_stream():
+        for kind, payload in stream_assistant_reply(db, chat, user_message, provider, model, embedding_model):
+            if kind == "chunk":
+                yield sse({"type": "chunk", "content": payload})
+            else:
+                yield sse({
+                    "type": "done",
+                    "message": ChatMessageResponse.model_validate(payload).model_dump(mode="json"),
+                })
+
+    return StreamingResponse(event_stream(), media_type="text/event-stream")
 
 
 @router.delete("/{chat_id}")

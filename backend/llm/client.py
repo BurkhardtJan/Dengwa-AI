@@ -25,6 +25,25 @@ def build_messages(
     return messages
 
 
+def prepare_chat(
+        messages: list[dict],
+        system_prompt: str = "",
+        provider: str | None = None,
+        model: str | None = None,
+        temperature: float = 1.0,
+        max_tokens: int | None = None,
+):
+    """
+    Resolves the provider/model and builds LangChain messages.
+    Returns the raw LangChain Runnable + messages — callers use
+    .invoke(), .stream(), .with_structured_output(), .bind_tools()
+    directly, whatever they need.
+    """
+    lc_model = get_model(provider=provider, model=model, temperature=temperature, max_tokens=max_tokens)
+    lc_messages = build_messages(messages, system_prompt=system_prompt)
+    return lc_model, lc_messages
+
+
 def call_llm(
         messages: list[dict],
         system_prompt: str = "",
@@ -38,14 +57,7 @@ def call_llm(
     """
     Wrapper for LLM providers
     """
-    lc_model = get_model(
-        provider=provider,
-        model=model,
-        temperature=temperature,
-        max_tokens=max_tokens,
-    )
-
-    lc_messages = build_messages(messages, system_prompt=system_prompt)
+    lc_model, lc_messages = prepare_chat(messages, system_prompt, provider, model, temperature, max_tokens)
 
     # Structured Output
     if response_schema:
