@@ -1,5 +1,5 @@
 import os
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 from typing import List, Optional
 from sqlalchemy.orm import Session
@@ -12,7 +12,7 @@ from schemas import (
     VocabularyExtraction
 )
 from services.media_service import get_media_or_404, create_media_record, save_uploaded_file, \
-    extract_and_save_vocabulary
+    extract_and_save_vocabulary, generate_media_metadata, embed_media_safe
 from services.language_service import get_learning_or_404, get_or_create_learning
 
 router = APIRouter(prefix="/media", tags=["Media"])
@@ -34,12 +34,21 @@ async def get_media(lan: Optional[str] = None, db: Session = Depends(get_db), cu
 
 
 @router.post("", response_model=MediaResponse)
-async def post_media(lan: str, title: str = Form(...), file: UploadFile = File(...), db: Session = Depends(get_db),
-                     current_user=Depends(get_current_user)):
+async def post_media(
+        background_tasks: BackgroundTasks,
+        lan: str, title: str = Form(...), file: UploadFile = File(...),
+        db: Session = Depends(get_db),
+        current_user=Depends(get_current_user)
+):
     """Upload a Medium"""
     learning = get_or_create_learning(db, lan, current_user.id)
     file_path = save_uploaded_file(file, current_user.id, lan)
-    return create_media_record(db, title, file, file_path, learning.id)
+    media = create_media_record(db, title, file, file_path, learning.id)
+
+    background_tasks.add_task(generate_media_metadata, db, media.id)
+    background_tasks.add_task(embed_media_safe, db, media)
+
+    return media
 
 
 @router.post("/{media_id}/vocabulary")

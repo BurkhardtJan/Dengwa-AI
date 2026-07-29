@@ -4,7 +4,6 @@ erDiagram
     media_chunks }o--|| media: references
     language_learning }o--|| users: references
     language_learning ||--o{ media: references
-    learning_progress }o--|| media: references
     media_vocabularies }o--|| media: references
     vocabularies ||--o{ media_vocabularies: references
     vocabularies }o--|| language_learning: references
@@ -25,6 +24,10 @@ erDiagram
         TEXT content_type
         TEXT file_path
         TEXT extracted_content
+        TEXT summary
+        ARRAY topics
+        TEXT difficulty_estimate
+        TEXT genre
         UUID learning_id
     }
     media_chunks {
@@ -91,13 +94,6 @@ erDiagram
         TEXT learning_language
         TEXT proficiency_level
         TEXT user_motivation
-    }
-
-    learning_progress {
-        UUID id
-        UUID media_id
-        TEXT proficiency_level
-        TEXT comment
     }
 
     media_vocabularies {

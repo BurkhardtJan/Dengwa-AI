@@ -4,8 +4,8 @@ from fastapi import HTTPException, UploadFile
 from sqlalchemy.orm import Session
 from uuid import UUID
 from models import Media, MediaVocabulary, LanguageLearning
-from schemas import VocabularyExtraction
-from llm.prompts import build_vocab_extract_prompt
+from schemas import VocabularyExtraction, MediaMetadataExtraction
+from llm.prompts import build_vocab_extract_prompt, build_media_metadata_prompt
 from llm.client import call_llm
 from llm.rag_service import embed_media
 from services.vocabulary_service import get_or_create_vocab
@@ -17,7 +17,9 @@ from docx import Document as DocxDocument
 from odf import text as odf_text
 from odf import teletype
 from odf.opendocument import load as odf_load
+import logging
 
+logger = logging.getLogger(__name__)
 OCTET_STREAM_EXTENSIONS = {".txt", ".srt", ".vtt", ".md"}
 
 
@@ -244,8 +246,45 @@ def create_media_record(db: Session, title: str, file: UploadFile, file_path: st
     db.add(media)
     db.commit()
     db.refresh(media)
+    return media
+
+
+def embed_media_safe(db: Session, media: Media) -> None:
+    """
+    Embeds a medium's content for RAG. Runs as a BackgroundTask — failures
+    are logged instead of silently swallowed, so a broken embedding
+    provider is visible without blocking or breaking the upload itself.
+    """
     try:
         embed_media(db, media)
     except Exception:
-        pass
-    return media
+        logger.exception("Failed to embed media %s", media.id)
+
+
+def generate_media_metadata(db: Session, media_id: UUID, provider: str | None = None, model: str | None = None) -> None:
+    """
+    Summarizes a medium's content via LLM and persists summary/topics/
+    genre/difficulty_estimate. Runs as a BackgroundTask after upload, so
+    it doesn't delay the upload response.
+    """
+    media = db.get(Media, media_id)
+    if not media or not media.extracted_content:
+        return
+
+    system_prompt = build_media_metadata_prompt(media)
+    messages = [{"role": "user", "content": media.extracted_content}]
+
+    result = call_llm(
+        messages=messages,
+        system_prompt=system_prompt,
+        provider=provider,
+        model=model,
+        temperature=0.2,
+        response_schema=MediaMetadataExtraction,
+    )
+
+    media.summary = result.summary
+    media.topics = result.topics
+    media.difficulty_estimate = result.difficulty_estimate
+    media.genre = result.genre
+    db.commit()

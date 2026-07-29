@@ -38,14 +38,13 @@ personal deck, and lets you practice with an AI that knows exactly what you've b
 
 ### Languages
 
-| Method       | Endpoint                    | Description             |
-|--------------|-----------------------------|-------------------------|
-| **`GET`**    | `/languages`                | List learning languages |
-| **`POST`**   | `/languages`                | Create language         |
-| **`GET`**    | `/languages/{lan}`          | Get language info       |
-| **`PUT`**    | `/languages/{lan}`          | Update language         |
-| **`DELETE`** | `/languages/{lan}`          | Delete language         |
-| **`GET`**    | `/languages/{lan}/progress` | Get learning progress   |
+| Method       | Endpoint           | Description             |
+|--------------|--------------------|-------------------------|
+| **`GET`**    | `/languages`       | List learning languages |
+| **`POST`**   | `/languages`       | Create language         |
+| **`GET`**    | `/languages/{lan}` | Get language info       |
+| **`PUT`**    | `/languages/{lan}` | Update language         |
+| **`DELETE`** | `/languages/{lan}` | Delete language         |
 
 ### Vocabularies
 
@@ -70,15 +69,17 @@ personal deck, and lets you practice with an AI that knows exactly what you've b
 
 ### Chats
 
-| Method       | Endpoint                                 | Description                     |
-|--------------|------------------------------------------|---------------------------------|
-| **`GET`**    | `/chats`                                 | Get all chats for current user  |
-| **`POST`**   | `/chats`                                 | Create a new chat for a medium  |
-| **`GET`**    | `/languages/{lan}/chats`                 | Get all chats for a language    |
-| **`GET`**    | `/chats/{chat_id}`                       | Get chat history                |
-| **`POST`**   | `/chats/{chat_id}`                       | Send a message to the AI        |
-| **`DELETE`** | `/chats/{chat_id}`                       | Delete Chat                     |
-| **`POST`**   | `/chats/{chat_id}/messages/{message_id}` | Create a response for a message |
+| Method       | Endpoint                                        | Description                                 |
+|--------------|-------------------------------------------------|---------------------------------------------|
+| **`GET`**    | `/chats`                                        | Get all chats for current user              |
+| **`POST`**   | `/chats`                                        | Create a new chat for a medium              |
+| **`GET`**    | `/chats/{chat_id}`                              | Get chat history                            |
+| **`POST`**   | `/chats/{chat_id}`                              | Send a message to the AI and recieve answer |
+| **`POST`**   | `/chats/{chat_id}/stream`                       | Send a message to the AI and recieve stream |
+| **`DELETE`** | `/chats/{chat_id}`                              | Delete Chat                                 |
+| **`POST`**   | `/chats/{chat_id}/messages/{message_id}`        | Create a response for a message             |
+| **`POST`**   | `/chats/{chat_id}/messages/{message_id}/stream` | Stream a response for a message             |
+| **`POST`**   | `/chats/{chat_id}/write`                        | Inject a message to the DB                  |
 
 ### LLM Models
 
@@ -181,7 +182,6 @@ pnpm dev
 - [x] Spaced Repetition System (SRS)
 - [x] PWA
 - [x] Added Message Streaming
-
 
 ### Backend
 
@@ -300,7 +300,6 @@ erDiagram
     media_chunks }o--|| media: references
     language_learning }o--|| users: references
     language_learning ||--o{ media: references
-    learning_progress }o--|| media: references
     media_vocabularies }o--|| media: references
     vocabularies ||--o{ media_vocabularies: references
     vocabularies }o--|| language_learning: references
@@ -321,6 +320,10 @@ erDiagram
         TEXT content_type
         TEXT file_path
         TEXT extracted_content
+        TEXT summary
+        ARRAY topics
+        TEXT difficulty_estimate
+        TEXT genre
         UUID learning_id
     }
     media_chunks {
@@ -389,16 +392,10 @@ erDiagram
         TEXT user_motivation
     }
 
-    learning_progress {
-        UUID id
-        UUID media_id
-        TEXT proficiency_level
-        TEXT comment
-    }
-
     media_vocabularies {
         UUID id
         UUID media_id
         UUID vocabulary_id
     }
+
 ```

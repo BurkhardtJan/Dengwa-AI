@@ -2,6 +2,7 @@ import uuid
 from sqlalchemy import Column, String, Text, ForeignKey, DateTime, UniqueConstraint, Float, Integer, SmallInteger, UUID, \
     BigInteger
 from sqlalchemy.orm import relationship
+from sqlalchemy.dialects.postgresql import ARRAY
 from pgvector.sqlalchemy import Vector
 from database import Base
 from datetime import datetime, timezone
@@ -48,12 +49,15 @@ class Media(Base):
     content_type = Column(String, nullable=False)  # srt, txt, pdf
     file_path = Column(String)
     extracted_content = Column(Text)
+    summary = Column(Text, nullable=True)
+    topics = Column(ARRAY(String), nullable=True)
+    difficulty_estimate = Column(String, nullable=True)
+    genre = Column(String, nullable=True)
     learning_id = Column(UUID(as_uuid=True), ForeignKey("language_learning.id"), nullable=False)
 
     language_learning = relationship("LanguageLearning", back_populates="media")
     chats = relationship("Chat", back_populates="media", cascade="all, delete-orphan")
     media_vocabularies = relationship("MediaVocabulary", back_populates="media", cascade="all, delete-orphan")
-    learning_progress = relationship("LearningProgress", back_populates="media")
 
     chunks_nomic_embed_text = relationship("MediaChunkNomicEmbedText", back_populates="media",
                                            cascade="all, delete-orphan")
@@ -77,7 +81,6 @@ class Vocabulary(Base):
     context_sentence = Column(Text)
     language = Column(String)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
-
 
     language_learning = relationship("LanguageLearning", back_populates="vocabularies")
     media_vocabularies = relationship("MediaVocabulary", back_populates="vocabulary", cascade="all, delete-orphan")
@@ -168,19 +171,6 @@ class ChatHistory(Base):
         back_populates="parent",
         cascade="all, delete-orphan"
     )
-
-
-class LearningProgress(Base):
-    __tablename__ = "learning_progress"
-
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
-    media_id = Column(UUID(as_uuid=True), ForeignKey("media.id"), nullable=False)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
-    proficiency_level = Column(String)
-    comment = Column(Text)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
-
-    media = relationship("Media", back_populates="learning_progress")
 
 
 class MediaChunkNomicEmbedText(Base):

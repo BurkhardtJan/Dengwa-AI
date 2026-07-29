@@ -59,13 +59,3 @@ async def delete_language(lan: str, db: Session = Depends(get_db), current_user=
     db.delete(learning)
     db.commit()
     return {"status": f"Language learning profile {lan} deleted"}
-
-
-@router.get("/{lan}/progress")
-async def get_progress(lan: str):
-    """Get learning progress"""
-    # TODO
-    return {
-        "language": lan,
-        "message": "progress"
-    }

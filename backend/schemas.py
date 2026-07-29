@@ -39,11 +39,22 @@ class LanguageLearningResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class MediaMetadataExtraction(BaseModel):
+    summary: str = Field(description="Eine knappe Zusammenfassung des Inhalts, 2-4 Sätze.")
+    topics: List[str] = Field(description="Ein paar thematische Schlagworte zum Inhalt.")
+    difficulty_estimate: str = Field(description="Grobe CEFR-Einschätzung (A1-C2) des Sprachniveaus im Text.")
+    genre: str = Field(description="Grobe Art/Gattung des Textes, z.B. Dialog, Nachrichtenartikel, Erzählung, Anleitung.")
+
+
 class MediaResponse(BaseModel):
     id: UUID
     title: str
     content_type: str
     learning_id: UUID
+    summary: Optional[str] = None
+    topics: Optional[List[str]] = None
+    difficulty_estimate: Optional[str] = None
+    genre: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
 

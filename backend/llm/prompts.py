@@ -5,6 +5,7 @@ def build_system_prompt_language_chat(chat: Chat, rag_context: str | None = None
     """Build system prompt for language chat"""
     learning = chat.media.language_learning
     user = learning.user
+    media = chat.media
 
     parts = [
         "Du bist ein Sprachlernassistent.",
@@ -12,6 +13,19 @@ def build_system_prompt_language_chat(chat: Chat, rag_context: str | None = None
         f"Der User lernt: {learning.learning_language} (Sprachkürzel) auf Niveau {learning.proficiency_level}.",
         "Antworte immer in der Lernsprache des Users, außer der User schreibt in der Muttersprache oder bittet dich explizit darum.",
     ]
+
+    if media.summary:
+        parts += [
+            "",
+            "Grober Kontext zum Medium, auf das sich dieses Gespräch bezieht:",
+            f"Zusammenfassung: {media.summary}",
+        ]
+        if media.topics:
+            parts.append(f"Themen: {', '.join(media.topics)}")
+        if media.genre:
+            parts.append(f"Art: {media.genre}")
+        if media.difficulty_estimate:
+            parts.append(f"Geschätztes Sprachniveau des Textes: {media.difficulty_estimate}")
 
     context = rag_context or chat.media.extracted_content
     if context:
@@ -50,3 +64,23 @@ def build_vocab_extract_prompt(media: Media) -> str:
         ]
 
     return "\n".join(parts)
+
+
+# backend/llm/prompts.py
+def build_media_metadata_prompt(media: Media) -> str:
+    """Build system prompt for summarizing a medium and extracting metadata"""
+    learning = media.language_learning
+
+    return "\n".join([
+        "Du bist ein Sprachlernassistent und fasst fremdsprachige Texte für Sprachlernende zusammen.",
+        f"Der Text ist in der Sprache: {learning.learning_language} (Sprachkürzel).",
+        "Fasse den folgenden Text kurz und knapp zusammen (2-8 Sätze) und nenne ein paar thematische Schlagworte.",
+        "",
+        "Schätze außerdem das Sprachniveau nach CEFR (A1-C2) ein, anhand dieser Kriterien:",
+        "- A1/A2: einfache, kurze Hauptsätze, Alltagswortschatz, Präsens/einfache Vergangenheit, kaum Nebensätze",
+        "- B1/B2: variablere Satzstrukturen, Nebensätze, abstraktere Themen, breiterer Wortschatz",
+        "- C1/C2: komplexe Satzgefüge, idiomatische Wendungen, Fachvokabular, implizite Bedeutungen",
+        "Bewerte streng nach dem, was tatsächlich im Text an Satzbau und Wortschatz vorkommt — nicht nach dem Thema.",
+        "",
+        "Schätze außerdem die Art/Gattung des Textes ein (z.B. Dialog, Nachrichtenartikel, Erzählung, Anleitung).",
+    ])
