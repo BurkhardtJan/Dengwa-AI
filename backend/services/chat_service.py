@@ -147,7 +147,7 @@ def stream_assistant_reply(
     system_prompt = build_system_prompt_language_chat(chat, rag_context)
 
     lc_model, lc_messages = prepare_chat(
-        messages=messages, system_prompt=system_prompt, provider=resolved_provider, model=resolved_model
+        messages=messages, system_prompt=system_prompt, provider=resolved_provider, model=resolved_model, streaming=True
     )
 
     full_text = ""

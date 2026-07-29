@@ -32,6 +32,7 @@ def prepare_chat(
         model: str | None = None,
         temperature: float = 1.0,
         max_tokens: int | None = None,
+        streaming: bool = False,
 ):
     """
     Resolves the provider/model and builds LangChain messages.
@@ -39,7 +40,7 @@ def prepare_chat(
     .invoke(), .stream(), .with_structured_output(), .bind_tools()
     directly, whatever they need.
     """
-    lc_model = get_model(provider=provider, model=model, temperature=temperature, max_tokens=max_tokens)
+    lc_model = get_model(provider=provider, model=model, temperature=temperature, max_tokens=max_tokens, streaming=streaming)
     lc_messages = build_messages(messages, system_prompt=system_prompt)
     return lc_model, lc_messages
 

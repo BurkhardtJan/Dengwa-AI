@@ -18,7 +18,7 @@ export default function ChatDetailPage() {
     const {t} = useTranslation('chat')
 
     const {
-        displayPath, isLoading, isError, isSending, isRegenerating, pendingReplyForId,
+        displayPath, isLoading, isError, isSending, isRegenerating, pendingReplyForId, streamingText,
         switchSibling, getSiblingInfo, getSiblingMessages, selectBranch,
         sendNew, sendEdit, regenerate,
         configs, addConfig, removeConfig, updateConfig, viewMode, setViewMode
@@ -84,6 +84,7 @@ export default function ChatDetailPage() {
                 isSending={isSending}
                 isRegenerating={isRegenerating}
                 pendingReplyForId={pendingReplyForId}
+                streamingText={streamingText}
                 viewMode={viewMode}
                 getSiblingInfo={getSiblingInfo}
                 getSiblingMessages={getSiblingMessages}

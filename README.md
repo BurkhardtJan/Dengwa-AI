@@ -180,10 +180,11 @@ pnpm dev
 - [x] Comparison of LLMs
 - [x] Spaced Repetition System (SRS)
 - [x] PWA
+- [x] Added Message Streaming
+
 
 ### Backend
 
-- [ ] Message Streaming
 - [ ] LiteLLM as LLM wrapper
 - [ ] Add default Vocab starter set (HSK, JLPT, ...)
 - [ ] Other Media Parsing
@@ -196,7 +197,6 @@ pnpm dev
 
 ### Frontend
 
-- [ ] Message Streaming
 - [ ] Add Games
 - [ ] Try WebLLM
 - [ ] Media Upload automatic language recognition

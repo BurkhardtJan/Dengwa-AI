@@ -14,6 +14,7 @@ interface Props {
     isSending: boolean
     isRegenerating: boolean
     pendingReplyForId: string | null
+    streamingText: string | null
     viewMode: ViewMode
     getSiblingInfo: (messageId: string) => { index: number; count: number }
     getSiblingMessages: (messageId: string) => ChatMessage[]
@@ -23,17 +24,40 @@ interface Props {
     onRegenerate: (userMessageId: string) => void
 }
 
+function StreamingBubble({text}: { text: string }) {
+    const {t} = useTranslation('chat')
+    return (
+        <div className="flex flex-col max-w-[80%] mr-auto items-start">
+            <span className="text-[10px] text-muted-foreground mb-0.5 px-1 uppercase tracking-wider">
+                {t('aiLabel')}
+            </span>
+            <div className="rounded-2xl px-4 py-2.5 text-sm bg-background border text-foreground rounded-tl-none">
+                <p className="whitespace-pre-wrap">{text}</p>
+            </div>
+        </div>
+    )
+}
+
 export default function ChatMessageList({
-                                            messages, isSending, isRegenerating, pendingReplyForId, viewMode,
-                                            getSiblingInfo, getSiblingMessages, onSwitchSibling, onSelectBranch,
-                                            onEditSubmit, onRegenerate
+                                            messages,
+                                            isSending,
+                                            isRegenerating,
+                                            pendingReplyForId,
+                                            streamingText,
+                                            viewMode,
+                                            getSiblingInfo,
+                                            getSiblingMessages,
+                                            onSwitchSibling,
+                                            onSelectBranch,
+                                            onEditSubmit,
+                                            onRegenerate
                                         }: Props) {
     const {t} = useTranslation('chat')
     const endRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
         endRef.current?.scrollIntoView({behavior: 'smooth'})
-    }, [messages])
+    }, [messages, streamingText])
 
     return (
         <div className="flex-1 border rounded-lg p-4 bg-muted/20 overflow-y-auto min-h-[350px] space-y-4 mb-4">
@@ -56,7 +80,9 @@ export default function ChatMessageList({
                                         <p className="whitespace-pre-wrap">{msg.message}</p>
                                     </div>
                                 </div>
-                                {isSending && <LoadingBubble/>}
+                                {isSending && (
+                                    streamingText ? <StreamingBubble text={streamingText}/> : <LoadingBubble/>
+                                )}
                             </Fragment>
                         )
                     }
@@ -72,7 +98,9 @@ export default function ChatMessageList({
                                     activeId={msg.id}
                                     onSelect={onSelectBranch}
                                 />
-                                {showRegenLoading && <LoadingBubble/>}
+                                {showRegenLoading && (
+                                    streamingText ? <StreamingBubble text={streamingText}/> : <LoadingBubble/>
+                                )}
                             </Fragment>
                         )
                     }
@@ -89,7 +117,9 @@ export default function ChatMessageList({
                                 onEditSubmit={(newText) => onEditSubmit(msg.id, newText, msg.parent_id)}
                                 onRegenerate={() => isAi && msg.parent_id && onRegenerate(msg.parent_id)}
                             />
-                            {showRegenLoading && <LoadingBubble/>}
+                            {showRegenLoading && (
+                                streamingText ? <StreamingBubble text={streamingText}/> : <LoadingBubble/>
+                            )}
                         </Fragment>
                     )
                 })
