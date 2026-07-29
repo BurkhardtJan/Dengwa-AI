@@ -81,6 +81,7 @@ function Sidebar({isOpen, onNavigate}: Props) {
                                 setShowCreateLanguage(true)
                             } else {
                                 setSelectedLan(e.target.value)
+                                setMediumId(null)
                             }
                         }}
                         className="w-full border rounded-lg px-3 py-2 text-sm bg-background"
@@ -97,7 +98,7 @@ function Sidebar({isOpen, onNavigate}: Props) {
                     </select>
                 </div>
 
-                {/* Only shown once a language is picked — a medium can't exist without one anyway */}
+                {/* Only shown once a language is picked */}
                 {selectedLan && (
                     <div className="mt-4">
                         <p className="text-xs text-muted-foreground mb-2 px-4">{t('medium')}</p>

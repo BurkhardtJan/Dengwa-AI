@@ -3,6 +3,7 @@ import {createLanguage} from '@/services/language.service'
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import Modal from '../components/Modal'
 import {useLanguage} from "@/context/TargetLanguageContext.tsx";
+import {useMedium} from '@/context/MediumContext'
 import {useTranslation} from 'react-i18next'
 
 
@@ -15,6 +16,7 @@ function CreateLanguageModal({onClose}: Props) {
     const [lanLevel, setLanLevel] = useState('')
     const [lanMotivation, setLanMotivation] = useState('')
     const {setSelectedLan} = useLanguage()
+    const {setMediumId} = useMedium()
 
     const {t} = useTranslation(['common', 'dashboard'])
 
@@ -31,6 +33,7 @@ function CreateLanguageModal({onClose}: Props) {
             queryClient.invalidateQueries({queryKey: ['languages']})
             setNewLan('')
             setSelectedLan(newLan)
+            setMediumId(null)
             onClose()
         }
     })

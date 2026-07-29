@@ -3,6 +3,7 @@ import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query'
 import {fetchMe} from '../services/user.service'
 import {deleteLanguage, fetchLanguages, updateLanguage} from "@/services/language.service.ts"
 import {useLanguage} from '@/context/TargetLanguageContext.tsx'
+import {useMedium} from '@/context/MediumContext'
 import type {components} from '../types/api'
 import Modal from '../components/Modal'
 import CreateLanguageModal from '@/components/CreateLanguageModal'
@@ -18,6 +19,7 @@ function DashboardPage() {
     const [proficiencyLevel, setProficiencyLevel] = useState('')
     const [userMotivation, setUserMotivation] = useState('')
     const [showCreate, setShowCreate] = useState(false)
+    const {setMediumId} = useMedium()
 
     const {t} = useTranslation(['common', 'dashboard'])
 
@@ -186,6 +188,7 @@ function DashboardPage() {
                                     onClick={() => {
                                         setGlobalLan(selectedLan.learning_language)
                                         setSelectedLan(null)
+                                        setMediumId(null)
                                     }}
                                     className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium"
                                 >
