@@ -20,15 +20,24 @@ router = APIRouter(prefix="/media", tags=["Media"])
 
 @router.get("", response_model=List[MediaResponse])
 async def get_media(lan: Optional[str] = None, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
-    """Returns all media for the current user, optionally filtered by language."""
+    """Returns all media for the current user, optionally filtered by language.
+
+    Excludes the implicit dummy medium created per language (id == learning_id,
+    used as the media_id fallback for chats without a real medium) — it's an
+    internal placeholder, not something the user uploaded.
+    """
     if lan:
         learning = get_learning_or_404(db, lan, current_user.id)
-        return db.query(Media).filter(Media.learning_id == learning.id).all()
+        return (
+            db.query(Media)
+            .filter(Media.learning_id == learning.id, Media.id != Media.learning_id)
+            .all()
+        )
     else:
         return (
             db.query(Media)
             .join(LanguageLearning, Media.learning_id == LanguageLearning.id)
-            .filter(LanguageLearning.user_id == current_user.id)
+            .filter(LanguageLearning.user_id == current_user.id, Media.id != Media.learning_id)
             .all()
         )
 
