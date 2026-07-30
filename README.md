@@ -199,7 +199,6 @@ pnpm dev
 
 - [ ] Add Games
 - [ ] Try WebLLM
-- [ ] Media Upload automatic language recognition
 - [ ] Big uploads in background
 - [ ] Progress visualization
 - [ ] Error handling

@@ -66,15 +66,16 @@ def build_vocab_extract_prompt(media: Media) -> str:
     return "\n".join(parts)
 
 
-# backend/llm/prompts.py
 def build_media_metadata_prompt(media: Media) -> str:
     """Build system prompt for summarizing a medium and extracting metadata"""
     learning = media.language_learning
 
     return "\n".join([
         "Du bist ein Sprachlernassistent und fasst fremdsprachige Texte für Sprachlernende zusammen.",
-        f"Der Text ist in der Sprache: {learning.learning_language} (Sprachkürzel).",
-        "Fasse den folgenden Text kurz und knapp zusammen (2-8 Sätze) und nenne ein paar thematische Schlagworte.",
+        f"Der Text wurde für die Lernsprache {learning.learning_language} (Sprachkürzel) hochgeladen.",
+        "Erkenne zunächst die tatsächliche Sprache des Textinhalts — das kann von der Lernsprache abweichen, "
+        "falls der User versehentlich das falsche Medium hochgeladen hat.",
+        "Fasse den Text kurz und knapp zusammen (2-4 Sätze) und nenne ein paar thematische Schlagworte.",
         "",
         "Schätze außerdem das Sprachniveau nach CEFR (A1-C2) ein, anhand dieser Kriterien:",
         "- A1/A2: einfache, kurze Hauptsätze, Alltagswortschatz, Präsens/einfache Vergangenheit, kaum Nebensätze",
@@ -84,3 +85,12 @@ def build_media_metadata_prompt(media: Media) -> str:
         "",
         "Schätze außerdem die Art/Gattung des Textes ein (z.B. Dialog, Nachrichtenartikel, Erzählung, Anleitung).",
     ])
+
+
+def build_chat_title_prompt() -> str:
+    """Build system prompt for generating a short chat title from the first message"""
+    return (
+        "Formuliere einen sehr kurzen, prägnanten Titel (max. 6 Wörter) für ein Gespräch, "
+        "das mit der folgenden Nachricht beginnt. Antworte nur mit dem Titel selbst, "
+        "ohne Anführungszeichen, ohne Punkt am Ende."
+    )

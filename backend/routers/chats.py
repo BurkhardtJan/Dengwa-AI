@@ -1,5 +1,5 @@
 import json
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from typing import List, Optional
 from sqlalchemy.orm import Session
@@ -11,7 +11,7 @@ from schemas import (
     ChatCreate, ChatResponse,
     ChatMessageRequest, ChatMessageResponse
 )
-from services.chat_service import get_chat_or_404, generate_assistant_reply, stream_assistant_reply, save_chat_message
+from services.chat_service import get_chat_or_404, generate_assistant_reply, stream_assistant_reply, save_chat_message, generate_chat_title
 from services.media_service import get_media_or_404
 from services.language_service import get_learning_or_404
 
@@ -46,11 +46,12 @@ async def create_chat(
         current_user=Depends(get_current_user)
 ):
     """Create a new chat for a medium"""
-    get_media_or_404(db, media_id, current_user.id)
+    media = get_media_or_404(db, media_id, current_user.id)
 
     new_chat = Chat(
         media_id=media_id,
         user_id=current_user.id,
+        title=f"Chat: {media.title}",
     )
 
     db.add(new_chat)
@@ -78,6 +79,7 @@ async def get_chat_history(
 async def post_chat_message(
         chat_id: UUID,
         request: ChatMessageRequest,
+        background_tasks: BackgroundTasks,
         provider: str | None = None,
         model: str | None = None,
         embedding_model: str | None = None,
@@ -87,6 +89,9 @@ async def post_chat_message(
     """Send a message to the AI"""
     chat = get_chat_or_404(db, chat_id, current_user.id)
     user_message = save_chat_message(db, chat.id, "user", request.message, request.parent_id)
+
+    if request.parent_id is None:
+        background_tasks.add_task(generate_chat_title, db, chat.id, request.message)
 
     assistant_message = generate_assistant_reply(
         db, chat, user_message, provider, model, embedding_model
@@ -99,6 +104,7 @@ async def post_chat_message(
 async def post_chat_message_stream(
         chat_id: UUID,
         request: ChatMessageRequest,
+        background_tasks: BackgroundTasks,
         provider: str | None = None,
         model: str | None = None,
         embedding_model: str | None = None,
@@ -108,6 +114,9 @@ async def post_chat_message_stream(
     """Send a message to the AI, streaming the assistant's reply token by token."""
     chat = get_chat_or_404(db, chat_id, current_user.id)
     user_message = save_chat_message(db, chat.id, "user", request.message, request.parent_id)
+
+    if request.parent_id is None:
+        background_tasks.add_task(generate_chat_title, db, chat.id, request.message)
 
     def event_stream():
         yield sse({

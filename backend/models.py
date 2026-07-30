@@ -53,6 +53,7 @@ class Media(Base):
     topics = Column(ARRAY(String), nullable=True)
     difficulty_estimate = Column(String, nullable=True)
     genre = Column(String, nullable=True)
+    detected_language = Column(String, nullable=True)
     learning_id = Column(UUID(as_uuid=True), ForeignKey("language_learning.id"), nullable=False)
 
     language_learning = relationship("LanguageLearning", back_populates="media")
@@ -140,6 +141,7 @@ class Chat(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     media_id = Column(UUID(as_uuid=True), ForeignKey("media.id"), nullable=False)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    title = Column(String, nullable=True)
 
     media = relationship("Media", back_populates="chats")
     user = relationship("User", back_populates="chats")

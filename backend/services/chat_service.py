@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from uuid import UUID
 from models import Chat, ChatHistory
 from llm.providers import resolve_chat_config, resolve_embedding_key
-from llm.prompts import build_system_prompt_language_chat
+from llm.prompts import build_system_prompt_language_chat, build_chat_title_prompt
 from llm.client import call_llm
 from llm.rag_service import retrieve_context
 
@@ -161,3 +161,22 @@ def stream_assistant_reply(
         provider=resolved_provider, model=resolved_model, embedding_model=resolved_embedding,
     )
     yield "done", assistant_message
+
+
+def generate_chat_title(db: Session, chat_id: UUID, first_message: str) -> None:
+    """
+    Generates a short, descriptive chat title from the first user message.
+    Runs as a BackgroundTask so it doesn't delay the reply.
+    """
+    chat = db.get(Chat, chat_id)
+    if not chat:
+        return
+
+    title = call_llm(
+        messages=[{"role": "user", "content": first_message}],
+        system_prompt=build_chat_title_prompt(),
+        temperature=0.3,
+    )
+
+    chat.title = title.strip()
+    db.commit()

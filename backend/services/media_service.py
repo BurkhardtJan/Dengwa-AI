@@ -3,9 +3,9 @@ import shutil
 from fastapi import HTTPException, UploadFile
 from sqlalchemy.orm import Session
 from uuid import UUID
-from models import Media, MediaVocabulary, LanguageLearning
+from models import Media, MediaVocabulary, LanguageLearning, Chat
 from schemas import VocabularyExtraction, MediaMetadataExtraction
-from llm.prompts import build_vocab_extract_prompt, build_media_metadata_prompt
+from llm.prompts import build_vocab_extract_prompt, build_media_metadata_prompt, build_chat_title_prompt
 from llm.client import call_llm
 from llm.rag_service import embed_media
 from services.vocabulary_service import get_or_create_vocab
@@ -287,4 +287,8 @@ def generate_media_metadata(db: Session, media_id: UUID, provider: str | None = 
     media.topics = result.topics
     media.difficulty_estimate = result.difficulty_estimate
     media.genre = result.genre
+    media.detected_language = result.detected_language
     db.commit()
+
+
+
