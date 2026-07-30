@@ -4,6 +4,7 @@ import {streamMessage, streamResponse, createResponse} from '@/services/chat.ser
 import type {components} from '@/types/api'
 
 type ChatMessage = components['schemas']['ChatMessageResponse']
+type Chat = components['schemas']['ChatResponse']
 
 export interface ModelChoice {
     provider: string | null
@@ -53,6 +54,11 @@ export function useChatMessaging(chatId: string | undefined, onNewLeaf: (id: str
                     setStreamingText(prev => (prev ?? '') + event.content)
                 } else if (event.type === 'done') {
                     onNewLeaf(event.message.id)
+                } else if (event.type === 'title') {
+                    queryClient.setQueryData(['chatMeta', chatId], (old: Chat | undefined) =>
+                        old ? {...old, title: event.title} : old
+                    )
+                    void queryClient.invalidateQueries({queryKey: ['chat']})
                 }
             }
 

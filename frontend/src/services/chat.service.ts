@@ -63,6 +63,7 @@ export type StreamEvent =
     | { type: 'user_message'; message: ChatMessage }
     | { type: 'chunk'; content: string }
     | { type: 'done'; message: ChatMessage }
+    | { type: 'title'; title: string }
 
 async function* readSSE(response: Response): AsyncGenerator<StreamEvent> {
     if (!response.body) throw new Error('No response body')
@@ -130,3 +131,4 @@ export async function* streamResponse(
 
     yield* readSSE(response)
 }
+

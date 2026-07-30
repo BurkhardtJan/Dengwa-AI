@@ -101,7 +101,6 @@ async def post_chat_message(
 async def post_chat_message_stream(
         chat_id: UUID,
         request: ChatMessageRequest,
-        background_tasks: BackgroundTasks,
         provider: str | None = None,
         model: str | None = None,
         embedding_model: str | None = None,
@@ -111,9 +110,6 @@ async def post_chat_message_stream(
     """Send a message to the AI, streaming the assistant's reply token by token."""
     chat = get_chat_or_404(db, chat_id, current_user.id)
     user_message = save_chat_message(db, chat.id, "user", request.message, request.parent_id)
-
-    if request.parent_id is None:
-        background_tasks.add_task(generate_chat_title, db, chat.id, request.message)
 
     def event_stream():
         yield sse({
@@ -128,6 +124,10 @@ async def post_chat_message_stream(
                     "type": "done",
                     "message": ChatMessageResponse.model_validate(payload).model_dump(mode="json"),
                 })
+
+        if request.parent_id is None:
+            generate_chat_title(db, chat.id, request.message)
+            yield sse({"type": "title", "title": chat.title})
 
     return StreamingResponse(event_stream(), media_type="text/event-stream")
 
