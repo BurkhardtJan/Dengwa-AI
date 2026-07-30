@@ -132,3 +132,12 @@ export async function* streamResponse(
     yield* readSSE(response)
 }
 
+export async function writeMessage(
+    chatId: string,
+    message: string,
+    role: string,
+    parentId?: string | null
+): Promise<ChatMessage> {
+    const response = await api.post(`/chats/${chatId}/write`, {message, role, parent_id: parentId ?? null})
+    return response.data
+}

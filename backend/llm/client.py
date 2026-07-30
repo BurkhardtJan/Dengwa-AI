@@ -17,7 +17,7 @@ def build_messages(
         messages.append(SystemMessage(content=system_prompt))
 
     for msg in history:
-        if msg["role"] == "user":
+        if msg["role"] in ("user", "context"):
             messages.append(HumanMessage(content=msg["content"]))
         elif msg["role"] in ("assistant", "model"):
             messages.append(AIMessage(content=msg["content"]))

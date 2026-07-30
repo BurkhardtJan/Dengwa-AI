@@ -26,6 +26,8 @@
   "regenerate": "Regenerate response",
   "defaultModel": "Default",
   "thinking": "Thinking…",
+  "miniChatTitle": "Chat",
+  "openFullChat": "Full Chat view",
   "settings": {
     "title": "Model Settings",
     "provider": "Provider",

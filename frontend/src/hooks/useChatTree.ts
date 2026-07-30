@@ -45,6 +45,13 @@ export function useChatTree(chatId: string | undefined) {
         messaging.send(message, parentId)
     }
 
+    const sendNewWithContext = (message: string, context: string) => {
+        const parentId = branches.activePath.length > 0
+            ? branches.activePath[branches.activePath.length - 1].id
+            : null
+        messaging.sendWithContext(message, context, parentId)
+    }
+
     const sendEdit = (message: string, originalParentId: string | null | undefined) => {
         messaging.send(message, originalParentId ?? null)
     }
@@ -64,6 +71,7 @@ export function useChatTree(chatId: string | undefined) {
         getSiblingMessages: branches.getSiblingMessages,
         selectBranch: branches.selectBranch,
         sendNew,
+        sendNewWithContext,
         sendEdit,
         regenerate: messaging.regenerate,
         configs: messaging.configs,

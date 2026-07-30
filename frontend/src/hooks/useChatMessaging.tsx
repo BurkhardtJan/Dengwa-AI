@@ -1,6 +1,6 @@
 import {useState} from 'react'
 import {useQueryClient} from '@tanstack/react-query'
-import {streamMessage, streamResponse, createResponse} from '@/services/chat.service.ts'
+import {streamMessage, streamResponse, createResponse, writeMessage} from '@/services/chat.service.ts'
 import type {components} from '@/types/api'
 
 type ChatMessage = components['schemas']['ChatMessageResponse']
@@ -77,6 +77,11 @@ export function useChatMessaging(chatId: string | undefined, onNewLeaf: (id: str
         }
     }
 
+    async function sendWithContext(message: string, context: string, parentId: string | null) {
+        const contextNode = await writeMessage(chatId!, context, 'context', parentId)
+        await send(message, contextNode.id)
+    }
+
     async function regenerate(userMessageId: string) {
         const primary = configs[0] ?? EMPTY_CHOICE
 
@@ -109,7 +114,7 @@ export function useChatMessaging(chatId: string | undefined, onNewLeaf: (id: str
         setConfigs(prev => prev.map((c, i) => i === index ? choice : c))
 
     return {
-        send, regenerate,
+        send, sendWithContext, regenerate,
         isSending, isRegenerating, pendingUserText, pendingReplyForId, streamingText,
         configs, addConfig, removeConfig, updateConfig,
         viewMode, setViewMode,

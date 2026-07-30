@@ -25,7 +25,16 @@ export default function ChatMessageBubble({
     const [editText, setEditText] = useState(message.message)
 
     const isAi = message.role === 'assistant' || message.role === 'ai'
+    const isContext = message.role === 'context'
     const hasSiblings = siblingCount > 1
+
+    if (isContext) {
+        return (
+            <div className="max-w-[80%] ml-auto mr-0 px-3 py-1 text-[11px] text-muted-foreground italic opacity-70">
+                {message.message}
+            </div>
+        )
+    }
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()

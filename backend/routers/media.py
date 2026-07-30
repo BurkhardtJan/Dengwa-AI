@@ -102,6 +102,10 @@ async def get_media_file(media_id: UUID, db: Session = Depends(get_db), current_
 async def delete_medium(media_id: UUID, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     """Delete medium by its UUID."""
     media = get_media_or_404(db, media_id, current_user.id)
+
+    if media.id == media.learning_id:
+        raise HTTPException(status_code=400, detail="Das Sprach-Dummy-Medium kann nicht gelöscht werden")
+
     db.delete(media)
     db.commit()
     return {"status": "Media deleted"}

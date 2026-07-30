@@ -26,6 +26,8 @@
   "regenerate": "Antwort neu generieren",
   "defaultModel": "Standard",
   "thinking": "Denkt nach…",
+  "miniChatTitle": "Chat",
+  "openFullChat": "Zur Chatansicht",
   "settings": {
     "title": "Modell-Einstellungen",
     "provider": "Anbieter",
