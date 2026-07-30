@@ -96,11 +96,7 @@ function ChatPage() {
                             onClick={() => navigate(`/chat/${chat.id}`)}
                         >
                             <div>
-                                <p className="font-medium">
-                                    {mediaMap.get(chat.media_id)
-                                        ? `${t('title')}: ${mediaMap.get(chat.media_id)}`
-                                        : t('conversation')}
-                                </p>
+                                <p className="font-medium">{chat.title}</p>
                                 {mediaMap.get(chat.media_id) && (
                                     <p className="text-xs text-muted-foreground mt-0.5">
                                         {t('medium')}: {mediaMap.get(chat.media_id)}

@@ -124,26 +124,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/languages/{lan}/progress": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Progress
-         * @description Get learning progress
-         */
-        get: operations["get_progress_languages__lan__progress_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/media": {
         parameters: {
             query?: never;
@@ -281,6 +261,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/chats/{chat_id}/stream": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Post Chat Message Stream
+         * @description Send a message to the AI, streaming the assistant's reply token by token.
+         */
+        post: operations["post_chat_message_stream_chats__chat_id__stream_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/chats/{chat_id}/messages/{user_message_id}": {
         parameters: {
             query?: never;
@@ -292,9 +292,49 @@ export interface paths {
         put?: never;
         /**
          * Create Response
-         * @description Creates alternative answer to existing promt.
+         * @description Creates alternative answer to existing prompt.
          */
         post: operations["create_response_chats__chat_id__messages__user_message_id__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/chats/{chat_id}/messages/{user_message_id}/stream": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create Response Stream
+         * @description Creates a streamed alternative answer to an existing prompt.
+         */
+        post: operations["create_response_stream_chats__chat_id__messages__user_message_id__stream_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/chats/{chat_id}/write": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Write Chat Message
+         * @description Writes a finished message to the chat history.
+         */
+        post: operations["write_chat_message_chats__chat_id__write_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -531,6 +571,11 @@ export interface components {
             message: string;
             /** Parent Id */
             parent_id?: string | null;
+            /**
+             * Role
+             * @default user
+             */
+            role: string;
         };
         /** ChatMessageResponse */
         ChatMessageResponse: {
@@ -574,6 +619,8 @@ export interface components {
              * Format: uuid
              */
             user_id: string;
+            /** Title */
+            title?: string | null;
         };
         /**
          * EmbeddingModelsResponse
@@ -642,6 +689,16 @@ export interface components {
              * Format: uuid
              */
             learning_id: string;
+            /** Summary */
+            summary?: string | null;
+            /** Topics */
+            topics?: string[] | null;
+            /** Difficulty Estimate */
+            difficulty_estimate?: string | null;
+            /** Genre */
+            genre?: string | null;
+            /** Detected Language */
+            detected_language?: string | null;
         };
         /**
          * ProviderModelsResponse
@@ -1028,37 +1085,6 @@ export interface operations {
             };
         };
     };
-    get_progress_languages__lan__progress_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                lan: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
     get_media_media_get: {
         parameters: {
             query?: {
@@ -1415,6 +1441,45 @@ export interface operations {
             };
         };
     };
+    post_chat_message_stream_chats__chat_id__stream_post: {
+        parameters: {
+            query?: {
+                provider?: string | null;
+                model?: string | null;
+                embedding_model?: string | null;
+            };
+            header?: never;
+            path: {
+                chat_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChatMessageRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     create_response_chats__chat_id__messages__user_message_id__post: {
         parameters: {
             query?: {
@@ -1451,10 +1516,82 @@ export interface operations {
             };
         };
     };
+    create_response_stream_chats__chat_id__messages__user_message_id__stream_post: {
+        parameters: {
+            query?: {
+                provider?: string | null;
+                model?: string | null;
+                embedding_model?: string | null;
+            };
+            header?: never;
+            path: {
+                chat_id: string;
+                user_message_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    write_chat_message_chats__chat_id__write_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                chat_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChatMessageRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChatMessageResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_vocabularies_vocabularies_get: {
         parameters: {
             query?: {
                 lan?: string | null;
+                media_id?: string | null;
             };
             header?: never;
             path?: never;

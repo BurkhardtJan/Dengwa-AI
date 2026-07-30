@@ -67,9 +67,26 @@ export default function MediaDetailPage() {
                 </button>
             </div>
 
-            <div className="mb-8">
-                <p className="text-muted-foreground mb-4">{data?.learning_id}</p>
-            </div>
+
+            {(data?.summary || data?.topics || data?.genre || data?.difficulty_estimate) && (
+                <div className="mb-8 p-4 border rounded-lg bg-muted/20">
+                    {data?.summary && (
+                        <p className="text-sm mb-3">{data.summary}</p>
+                    )}
+                    <div className="flex flex-wrap gap-2 text-xs">
+                        {data?.genre && (
+                            <span className="px-2 py-1 rounded-full bg-background border">{data.genre}</span>
+                        )}
+                        {data?.difficulty_estimate && (
+                            <span
+                                className="px-2 py-1 rounded-full bg-background border">{data.difficulty_estimate}</span>
+                        )}
+                        {data?.topics?.map(topic => (
+                            <span key={topic} className="px-2 py-1 rounded-full bg-background border">{topic}</span>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             <div className="mb-8">
                 <p className="text-muted-foreground mb-1">{data?.content_type}</p>

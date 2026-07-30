@@ -47,7 +47,7 @@ export default function ChatDetailPage() {
     const deleteMutation = useMutation({
         mutationFn: () => deleteChat(id!),
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['chat']})
+            void queryClient.invalidateQueries({queryKey: ['chat']})
             navigate('/chat')
         }
     })
@@ -65,6 +65,7 @@ export default function ChatDetailPage() {
         <div className="p-8 max-w-2xl mx-auto flex flex-col h-[calc(100vh-2rem)]">
             <ChatHeader
                 chatId={id!}
+                title={chatMeta?.title}
                 media={media}
                 isDeleting={deleteMutation.isPending}
                 onDelete={() => deleteMutation.mutate()}

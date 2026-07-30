@@ -6,12 +6,13 @@ type Media = components['schemas']['MediaResponse']
 
 interface Props {
     chatId: string
+    title: string | null | undefined
     media: Media | undefined
     isDeleting: boolean
     onDelete: () => void
 }
 
-export default function ChatHeader({chatId, media, isDeleting, onDelete}: Props) {
+export default function ChatHeader({chatId, title, media, isDeleting, onDelete}: Props) {
     const navigate = useNavigate()
     const {t} = useTranslation(['chat', 'common'])
 
@@ -25,7 +26,7 @@ export default function ChatHeader({chatId, media, isDeleting, onDelete}: Props)
                     {t('backToChats')}
                 </button>
                 <h1 className="text-3xl font-bold">
-                    {media ? `${t('title')}: ${media.title}` : t('conversation')}
+                    {title ?? (media ? `${t('title')}: ${media.title}` : t('conversation'))}
                 </h1>
                 {media && (
                     <p className="text-sm text-muted-foreground mt-1">
