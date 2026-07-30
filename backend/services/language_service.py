@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
-from models import LanguageLearning
+from models import LanguageLearning, Media
 
 
 def get_learning_or_404(db: Session, lan: str, user_id: int) -> LanguageLearning:
@@ -50,4 +50,13 @@ def create_learning_record(
     db.add(learning)
     db.commit()
     db.refresh(learning)
+    language_medium = Media(
+        id=learning.id,
+        title=learning.learning_language,
+        content_type="language",
+        extracted_content="",
+        learning_id=learning.id,
+    )
+    db.add(language_medium)
+    db.commit()
     return learning
