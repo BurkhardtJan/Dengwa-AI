@@ -126,7 +126,7 @@ async def post_chat_message_stream(
                 })
 
         if request.parent_id is None:
-            generate_chat_title(db, chat.id, request.message)
+            generate_chat_title(db, chat.id, request.message, provider, model)
             yield sse({"type": "title", "title": chat.title})
 
     return StreamingResponse(event_stream(), media_type="text/event-stream")

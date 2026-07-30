@@ -163,18 +163,33 @@ def stream_assistant_reply(
     yield "done", assistant_message
 
 
-def generate_chat_title(db: Session, chat_id: UUID, first_message: str) -> None:
+def generate_chat_title(
+        db: Session,
+        chat_id: UUID,
+        first_message: str,
+        provider: str | None = None,
+        model: str | None = None,
+) -> None:
     """
-    Generates a short, descriptive chat title from the first user message.
-    Runs as a BackgroundTask so it doesn't delay the reply.
+    Generates a short, descriptive chat title from the first user message,
+    with the medium's title/summary as context so short opening messages
+    (e.g. "Hallo!") still produce a meaningful title.
     """
     chat = db.get(Chat, chat_id)
     if not chat:
         return
 
+    media = chat.media
+    context_lines = [f"Medium: {media.title}"]
+    if media.summary:
+        context_lines.append(f"Zusammenfassung des Mediums: {media.summary}")
+    context_lines.append(f"Erste Nachricht des Users: {first_message}")
+
     title = call_llm(
-        messages=[{"role": "user", "content": first_message}],
+        messages=[{"role": "user", "content": "\n".join(context_lines)}],
         system_prompt=build_chat_title_prompt(),
+        provider=provider,
+        model=model,
         temperature=0.3,
     )
 

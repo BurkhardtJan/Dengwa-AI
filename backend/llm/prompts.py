@@ -90,7 +90,10 @@ def build_media_metadata_prompt(media: Media) -> str:
 def build_chat_title_prompt() -> str:
     """Build system prompt for generating a short chat title from the first message"""
     return (
-        "Formuliere einen sehr kurzen, prägnanten Titel (max. 6 Wörter) für ein Gespräch, "
-        "das mit der folgenden Nachricht beginnt. Antworte nur mit dem Titel selbst, "
-        "ohne Anführungszeichen, ohne Punkt am Ende."
+        "Formuliere einen sehr kurzen, prägnanten Titel (max. 6 Wörter) für ein Gespräch. "
+        "Du bekommst den Titel und ggf. eine Zusammenfassung des Mediums, um das es geht, sowie "
+        "die erste Nachricht des Users. Orientiere dich am Thema des Mediums, nicht nur an der "
+        "Formulierung der ersten Nachricht — bei einer reinen Begrüßung wie 'Hallo!' den Titel "
+        "stattdessen aus dem Medienkontext ableiten. "
+        "Antworte nur mit dem Titel selbst, ohne Anführungszeichen, ohne Punkt am Ende."
     )
