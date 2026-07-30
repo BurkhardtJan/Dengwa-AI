@@ -1,18 +1,15 @@
 import {useNavigate} from 'react-router-dom'
 import {useTranslation} from 'react-i18next'
-import type {components} from '@/types/api'
-
-type Media = components['schemas']['MediaResponse']
 
 interface Props {
     chatId: string
     title: string | null | undefined
-    media: Media | undefined
+    mediaTitle: string | undefined
     isDeleting: boolean
     onDelete: () => void
 }
 
-export default function ChatHeader({chatId, title, media, isDeleting, onDelete}: Props) {
+export default function ChatHeader({title, mediaTitle, isDeleting, onDelete}: Props) {
     const navigate = useNavigate()
     const {t} = useTranslation(['chat', 'common'])
 
@@ -26,14 +23,13 @@ export default function ChatHeader({chatId, title, media, isDeleting, onDelete}:
                     {t('backToChats')}
                 </button>
                 <h1 className="text-3xl font-bold">
-                    {title ?? (media ? `${t('title')}: ${media.title}` : t('conversation'))}
+                    {title ?? (mediaTitle ? `${t('title')}: ${mediaTitle}` : t('conversation'))}
                 </h1>
-                {media && (
+                {mediaTitle && (
                     <p className="text-sm text-muted-foreground mt-1">
-                        {t('medium')}: <span className="font-medium">{media.title}</span>
+                        {t('medium')}: <span className="font-medium">{mediaTitle}</span>
                     </p>
                 )}
-                <p className="text-xs text-muted-foreground font-mono mt-1">ID: {chatId}</p>
             </div>
             <button
                 onClick={() => {

@@ -621,6 +621,8 @@ export interface components {
             user_id: string;
             /** Title */
             title?: string | null;
+            /** Media Title */
+            media_title: string;
         };
         /**
          * EmbeddingModelsResponse

@@ -147,6 +147,10 @@ class Chat(Base):
     user = relationship("User", back_populates="chats")
     chat_histories = relationship("ChatHistory", back_populates="chat", cascade="all, delete-orphan")
 
+    @property
+    def media_title(self) -> str:
+        return self.media.title
+
 
 class ChatHistory(Base):
     __tablename__ = "chat_histories"

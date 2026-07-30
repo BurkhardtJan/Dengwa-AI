@@ -52,7 +52,6 @@ function MediaPage() {
                             onClick={() => navigate(`/media/${media.id}`)}
                         >
                             <p className="font-medium">{media.title}</p>
-                            <p className="text-muted-foreground">{media.learning_id}</p>
                         </div>
                     ))
                 )}

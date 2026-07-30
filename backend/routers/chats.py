@@ -2,7 +2,7 @@ import json
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from typing import List, Optional
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from uuid import UUID
 from services.user_service import get_current_user
 from database import get_db
@@ -11,7 +11,8 @@ from schemas import (
     ChatCreate, ChatResponse,
     ChatMessageRequest, ChatMessageResponse
 )
-from services.chat_service import get_chat_or_404, generate_assistant_reply, stream_assistant_reply, save_chat_message, generate_chat_title
+from services.chat_service import get_chat_or_404, generate_assistant_reply, stream_assistant_reply, save_chat_message, \
+    generate_chat_title
 from services.media_service import get_media_or_404
 from services.language_service import get_learning_or_404
 
@@ -26,17 +27,13 @@ router = APIRouter(prefix="/chats", tags=["Chats"])
 @router.get("", response_model=List[ChatResponse])
 async def get_chats(lan: Optional[str] = None, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     """Get all chats for current user"""
+    query = db.query(Chat).options(joinedload(Chat.media)).filter(Chat.user_id == current_user.id)
+
     if lan:
         learning = get_learning_or_404(db, lan, current_user.id)
+        query = query.join(Media, Chat.media_id == Media.id).filter(Media.learning_id == learning.id)
 
-        return (
-            db.query(Chat)
-            .join(Media, Chat.media_id == Media.id)
-            .filter(Chat.user_id == current_user.id, Media.learning_id == learning.id)
-            .all()
-        )
-    else:
-        return db.query(Chat).filter(Chat.user_id == current_user.id).all()
+    return query.all()
 
 
 @router.post("", response_model=ChatResponse)

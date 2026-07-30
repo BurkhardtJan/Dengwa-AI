@@ -33,9 +33,6 @@ function ChatPage() {
         enabled: !!selectedLan
     })
 
-    const mediaMap = new Map<string, string>(
-        (mediaList ?? []).map((m: Media) => [m.id, m.title])
-    )
 
     const createChatMutation = useMutation({
         mutationFn: (mediaId: string) => createChat(mediaId),
@@ -97,12 +94,9 @@ function ChatPage() {
                         >
                             <div>
                                 <p className="font-medium">{chat.title}</p>
-                                {mediaMap.get(chat.media_id) && (
-                                    <p className="text-xs text-muted-foreground mt-0.5">
-                                        {t('medium')}: {mediaMap.get(chat.media_id)}
-                                    </p>
-                                )}
-                                <p className="text-xs text-muted-foreground font-mono mt-1">ID: {chat.id}</p>
+                                <p className="text-xs text-muted-foreground mt-0.5">
+                                    {t('medium')}: {chat.media_title}
+                                </p>
                             </div>
                         </div>
                     ))

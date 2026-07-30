@@ -2,7 +2,6 @@ import {useEffect} from "react";
 import {useParams, useNavigate} from 'react-router-dom'
 import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query'
 import {deleteChat, fetchChats} from '@/services/chat.service.ts'
-import {fetchMedium} from '@/services/media.service.ts'
 import {useChatTree} from '@/hooks/useChatTree'
 import ChatHeader from '@/components/chat/ChatHeader'
 import ChatSettings from '@/components/chat/ChatSettings'
@@ -38,11 +37,6 @@ export default function ChatDetailPage() {
         enabled: !!id
     })
 
-    const {data: media} = useQuery({
-        queryKey: ['media', chatMeta?.media_id],
-        queryFn: () => fetchMedium(chatMeta!.media_id),
-        enabled: !!chatMeta?.media_id
-    })
 
     const deleteMutation = useMutation({
         mutationFn: () => deleteChat(id!),
@@ -66,7 +60,7 @@ export default function ChatDetailPage() {
             <ChatHeader
                 chatId={id!}
                 title={chatMeta?.title}
-                media={media}
+                mediaTitle={chatMeta?.media_title}
                 isDeleting={deleteMutation.isPending}
                 onDelete={() => deleteMutation.mutate()}
             />

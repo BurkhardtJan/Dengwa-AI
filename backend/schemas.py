@@ -98,6 +98,7 @@ class ChatResponse(BaseModel):
     media_id: UUID
     user_id: UUID
     title: Optional[str] = None
+    media_title: str
 
     model_config = ConfigDict(from_attributes=True)
 
