@@ -1,13 +1,25 @@
+import {useEffect} from 'react'
 import {Link} from 'react-router-dom'
 import {ExternalLink} from 'lucide-react'
+import {useQuery, useQueryClient} from '@tanstack/react-query'
+import {isAxiosError} from 'axios'
 import {useTranslation} from 'react-i18next'
+import {createChat} from '@/services/chat.service.ts'
 import {useChatTree} from '@/hooks/useChatTree'
 import ChatMessageList from '@/components/chat/ChatMessageList'
 import ChatMessageInput from '@/components/chat/ChatMessageInput'
 
 interface Props {
-    /** Chat this widget talks to — the host module owns creation/reuse of this id. */
-    chatId: string
+    /** Medium (or a language's dummy medium) the created chat is scoped to. */
+    mediaId: string
+    /**
+     * Identifies this specific mini-chat usage site (e.g. a vocab card's id)
+     * so each instance gets/keeps its own chat, even when several instances
+     * share the same mediaId (e.g. the language dummy medium). Defaults to
+     * mediaId, which is only correct if there's exactly one mini-chat per
+     * mediaId.
+     */
+    instanceKey?: string
     /**
      * Builds the context text injected as a hidden "context" node before
      * each message, e.g. the current vocab card or game state. Called
@@ -16,13 +28,41 @@ interface Props {
     getContext?: () => string
 }
 
-export default function MiniChat({chatId, getContext}: Props) {
+export default function MiniChat({mediaId, instanceKey, getContext}: Props) {
     const {t} = useTranslation('chat')
+    const cacheKey = instanceKey ?? mediaId
+
+    // Creates its own chat as soon as it's mounted (i.e. once the host
+    // module actually opens the mini-chat) — no chat is created just by
+    // visiting a page that could show one. Modeled as a query (not a
+    // mutation triggered from an effect) so React Query owns the fetch
+    // scheduling instead of us setting state synchronously in an effect.
+    // Default gcTime is kept (NOT 0) — with gcTime 0, React 18 StrictMode's
+    // dev-mode double-mount discards the cache between the two mounts and
+    // creates two chats instead of deduping to one.
+    const {data: chat} = useQuery({
+        queryKey: ['miniChatCreate', cacheKey],
+        queryFn: () => createChat(mediaId),
+        staleTime: Infinity,
+        retry: false,
+    })
+    const chatId = chat?.id
+    const queryClient = useQueryClient()
+
     const {
         displayPath, isSending, isRegenerating, pendingReplyForId, streamingText,
         switchSibling, getSiblingInfo, getSiblingMessages, selectBranch,
-        sendNew, sendNewWithContext, sendEdit, regenerate, viewMode
+        sendNew, sendNewWithContext, sendEdit, regenerate, viewMode, error: historyError
     } = useChatTree(chatId)
+
+    // The cached chat can outlive the actual chat on the server (e.g. a
+    // dev DB reset). If loading its history 404s, drop the stale cache
+    // entry so the query above creates a fresh chat on the next render.
+    useEffect(() => {
+        if (chatId && isAxiosError(historyError) && historyError.response?.status === 404) {
+            queryClient.removeQueries({queryKey: ['miniChatCreate', cacheKey], exact: true})
+        }
+    }, [chatId, historyError, cacheKey, queryClient])
 
     const handleSend = (message: string) => {
         const context = getContext?.()
@@ -39,30 +79,38 @@ export default function MiniChat({chatId, getContext}: Props) {
                 <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     {t('miniChatTitle')}
                 </span>
-                <Link
-                    to={`/chat/${chatId}`}
-                    className="text-xs text-primary hover:underline flex items-center gap-1"
-                >
-                    {t('openFullChat')}
-                    <ExternalLink size={12}/>
-                </Link>
+                {chatId && (
+                    <Link
+                        to={`/chat/${chatId}`}
+                        className="text-xs text-primary hover:underline flex items-center gap-1"
+                    >
+                        {t('openFullChat')}
+                        <ExternalLink size={12}/>
+                    </Link>
+                )}
             </div>
 
-            <ChatMessageList
-                messages={displayPath}
-                isSending={isSending}
-                isRegenerating={isRegenerating}
-                pendingReplyForId={pendingReplyForId}
-                streamingText={streamingText}
-                viewMode={viewMode}
-                getSiblingInfo={getSiblingInfo}
-                getSiblingMessages={getSiblingMessages}
-                onSwitchSibling={switchSibling}
-                onSelectBranch={selectBranch}
-                onEditSubmit={(_id, newText, originalParentId) => sendEdit(newText, originalParentId)}
-                onRegenerate={regenerate}
-            />
-            <ChatMessageInput isSending={isSending} onSend={handleSend}/>
+            {!chatId ? (
+                <p className="text-xs text-muted-foreground italic flex-1 flex items-center justify-center">
+                    {t('starting')}
+                </p>
+            ) : (
+                <ChatMessageList
+                    messages={displayPath}
+                    isSending={isSending}
+                    isRegenerating={isRegenerating}
+                    pendingReplyForId={pendingReplyForId}
+                    streamingText={streamingText}
+                    viewMode={viewMode}
+                    getSiblingInfo={getSiblingInfo}
+                    getSiblingMessages={getSiblingMessages}
+                    onSwitchSibling={switchSibling}
+                    onSelectBranch={selectBranch}
+                    onEditSubmit={(_id, newText, originalParentId) => sendEdit(newText, originalParentId)}
+                    onRegenerate={regenerate}
+                />
+            )}
+            <ChatMessageInput isSending={isSending || !chatId} onSend={handleSend}/>
         </div>
     )
 }

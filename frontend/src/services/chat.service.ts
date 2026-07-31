@@ -141,3 +141,8 @@ export async function writeMessage(
     const response = await api.post(`/chats/${chatId}/write`, {message, role, parent_id: parentId ?? null})
     return response.data
 }
+
+export async function updateChatTitle(chatId: string, title: string): Promise<Chat> {
+    const response = await api.put(`/chats/${chatId}`, {title})
+    return response.data
+}

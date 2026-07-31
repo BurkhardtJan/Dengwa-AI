@@ -134,6 +134,10 @@ export interface paths {
         /**
          * Get Media
          * @description Returns all media for the current user, optionally filtered by language.
+         *
+         *     Excludes the implicit dummy medium created per language (id == learning_id,
+         *     used as the media_id fallback for chats without a real medium) — it's an
+         *     internal placeholder, not something the user uploaded.
          */
         get: operations["get_media_media_get"];
         put?: never;
@@ -248,7 +252,11 @@ export interface paths {
          * @description Get chat history
          */
         get: operations["get_chat_history_chats__chat_id__get"];
-        put?: never;
+        /**
+         * Update Chat Title
+         * @description Manually rename a chat's title.
+         */
+        put: operations["update_chat_title_chats__chat_id__put"];
         /**
          * Post Chat Message
          * @description Send a message to the AI
@@ -615,6 +623,11 @@ export interface components {
              */
             media_id: string;
             /**
+             * Learning Id
+             * Format: uuid
+             */
+            learning_id: string;
+            /**
              * User Id
              * Format: uuid
              */
@@ -623,6 +636,11 @@ export interface components {
             title?: string | null;
             /** Media Title */
             media_title: string;
+        };
+        /** ChatTitleUpdate */
+        ChatTitleUpdate: {
+            /** Title */
+            title: string;
         };
         /**
          * EmbeddingModelsResponse
@@ -799,6 +817,11 @@ export interface components {
              * Format: uuid
              */
             id: string;
+            /**
+             * Learning Id
+             * Format: uuid
+             */
+            learning_id: string;
             /** Word */
             word: string;
             /** Translation */
@@ -1360,6 +1383,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ChatMessageResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_chat_title_chats__chat_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                chat_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChatTitleUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChatResponse"];
                 };
             };
             /** @description Validation Error */

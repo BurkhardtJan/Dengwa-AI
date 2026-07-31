@@ -9,7 +9,7 @@ from database import get_db
 from models import Chat, ChatHistory, Media
 from schemas import (
     ChatCreate, ChatResponse,
-    ChatMessageRequest, ChatMessageResponse
+    ChatMessageRequest, ChatMessageResponse, ChatTitleUpdate
 )
 from services.chat_service import get_chat_or_404, generate_assistant_reply, stream_assistant_reply, save_chat_message, \
     generate_chat_title
@@ -70,6 +70,21 @@ async def get_chat_history(
     return db.query(ChatHistory).filter(
         ChatHistory.chat_id == chat.id
     ).order_by(ChatHistory.timestamp).all()
+
+
+@router.put("/{chat_id}", response_model=ChatResponse)
+async def update_chat_title(
+        chat_id: UUID,
+        request: ChatTitleUpdate,
+        db: Session = Depends(get_db),
+        current_user=Depends(get_current_user)
+):
+    """Manually rename a chat's title."""
+    chat = get_chat_or_404(db, chat_id, current_user.id)
+    chat.title = request.title
+    db.commit()
+    db.refresh(chat)
+    return chat
 
 
 @router.post("/{chat_id}", response_model=List[ChatMessageResponse])

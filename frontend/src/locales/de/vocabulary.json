@@ -18,5 +18,7 @@
   "foreignWord": "Vokabel / Fremdwort",
   "deleteConfirm": "Möchtest du das Wort \"{{word}}\" wirklich unwiderruflich aus deiner Lernkartei löschen?",
   "deleteButton": "Vokabel Löschen",
-  "deleting": "Löscht..."
+  "deleting": "Löscht...",
+  "openChat": "Mini-Chat öffnen",
+  "closeChat": "Mini-Chat schließen"
 }

@@ -1,8 +1,10 @@
-import {useState, useEffect} from 'react'
+import {useState} from 'react'
 import {useParams, useNavigate} from 'react-router-dom'
 import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query'
 import {fetchVocabulary, deleteVocabulary, updateVocabulary} from '../services/vocabulary.service'
 import {useTranslation} from 'react-i18next'
+import {MessageCircle} from 'lucide-react'
+import MiniChat from '@/components/chat/MiniChat'
 
 export default function VocabularyDetailPage() {
     const {id} = useParams<{ id: string }>()
@@ -10,6 +12,7 @@ export default function VocabularyDetailPage() {
     const queryClient = useQueryClient()
 
     const [editing, setEditing] = useState(false)
+    const [showChat, setShowChat] = useState(false)
     const [word, setWord] = useState('')
     const [translation, setTranslation] = useState('')
     const [contextSentence, setContextSentence] = useState('')
@@ -22,14 +25,6 @@ export default function VocabularyDetailPage() {
         queryFn: () => fetchVocabulary(id!),
     })
 
-    useEffect(() => {
-        if (data) {
-            setWord(data.word)
-            setTranslation(data.translation ?? '')
-            setContextSentence(data.context_sentence ?? '')
-        }
-    }, [data])
-
     const updateMutation = useMutation({
         mutationFn: () => updateVocabulary(id!, {
             word,
@@ -37,8 +32,8 @@ export default function VocabularyDetailPage() {
             context_sentence: contextSentence
         }),
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['vocabulary', id]})
-            queryClient.invalidateQueries({queryKey: ['vocabularies']})
+            void queryClient.invalidateQueries({queryKey: ['vocabulary', id]})
+            void queryClient.invalidateQueries({queryKey: ['vocabularies']})
             setEditing(false)
         }
     })
@@ -46,7 +41,7 @@ export default function VocabularyDetailPage() {
     const deleteMutation = useMutation({
         mutationFn: () => deleteVocabulary(id!),
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['vocabularies']})
+            void queryClient.invalidateQueries({queryKey: ['vocabularies']})
             navigate('/vocabulary')
         }
     })
@@ -138,21 +133,41 @@ export default function VocabularyDetailPage() {
                                 <span className="italic">"{data.context_sentence}"</span>
                             </p>
                         )}
-                        {data?.comment && (
-                            <p className="text-sm">
-                                <span
-                                    className="text-muted-foreground block text-xs">{t('vocabulary:commentField')}:</span>
-                                <span>{data.comment}</span>
-                            </p>
-                        )}
                     </div>
 
-                    <button
-                        onClick={() => setEditing(true)}
-                        className="px-4 py-2 border rounded-lg text-sm font-medium hover:bg-muted transition-colors"
-                    >
-                        {t('common:buttons.edit')}
-                    </button>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => {
+                                setWord(data?.word ?? '')
+                                setTranslation(data?.translation ?? '')
+                                setContextSentence(data?.context_sentence ?? '')
+                                setEditing(true)
+                            }}
+                            className="px-4 py-2 border rounded-lg text-sm font-medium hover:bg-muted transition-colors"
+                        >
+                            {t('common:buttons.edit')}
+                        </button>
+                        <button
+                            onClick={() => setShowChat(v => !v)}
+                            className="px-4 py-2 border rounded-lg text-sm font-medium hover:bg-muted transition-colors flex items-center gap-1.5"
+                        >
+                            <MessageCircle size={14}/>
+                            {showChat ? t('vocabulary:closeChat') : t('vocabulary:openChat')}
+                        </button>
+                    </div>
+
+                    {showChat && data && (
+                        <MiniChat
+                            mediaId={data.learning_id}
+                            instanceKey={data.id}
+                            getContext={() => {
+                                const parts = [`Vokabel: "${data.word}"`]
+                                if (data.translation) parts.push(`Übersetzung: "${data.translation}"`)
+                                if (data.context_sentence) parts.push(`Beispielsatz: "${data.context_sentence}"`)
+                                return parts.join(', ')
+                            }}
+                        />
+                    )}
                 </div>
             )}
         </div>

@@ -1,17 +1,31 @@
+import {useState} from 'react'
 import {useNavigate} from 'react-router-dom'
 import {useTranslation} from 'react-i18next'
+import {Pencil} from 'lucide-react'
 
 interface Props {
     chatId: string
     title: string | null | undefined
     mediaTitle: string | undefined
     isDeleting: boolean
+    isRenaming: boolean
     onDelete: () => void
+    onRename: (newTitle: string) => void
 }
 
-export default function ChatHeader({title, mediaTitle, isDeleting, onDelete}: Props) {
+export default function ChatHeader({title, mediaTitle, isDeleting, isRenaming, onDelete, onRename}: Props) {
     const navigate = useNavigate()
     const {t} = useTranslation(['chat', 'common'])
+    const [isEditingTitle, setIsEditingTitle] = useState(false)
+    const [titleDraft, setTitleDraft] = useState('')
+
+    const displayTitle = title ?? (mediaTitle ? `${t('title')}: ${mediaTitle}` : t('conversation'))
+
+    const handleTitleSubmit = () => {
+        const trimmed = titleDraft.trim()
+        if (trimmed && trimmed !== title) onRename(trimmed)
+        setIsEditingTitle(false)
+    }
 
     return (
         <div className="flex justify-between items-start mb-6">
@@ -22,9 +36,52 @@ export default function ChatHeader({title, mediaTitle, isDeleting, onDelete}: Pr
                 >
                     {t('backToChats')}
                 </button>
-                <h1 className="text-3xl font-bold">
-                    {title ?? (mediaTitle ? `${t('title')}: ${mediaTitle}` : t('conversation'))}
-                </h1>
+
+                {isEditingTitle ? (
+                    <form
+                        onSubmit={(e) => {
+                            e.preventDefault()
+                            handleTitleSubmit()
+                        }}
+                        className="flex items-center gap-2"
+                    >
+                        <input
+                            value={titleDraft}
+                            onChange={(e) => setTitleDraft(e.target.value)}
+                            autoFocus
+                            className="text-3xl font-bold border-b bg-transparent focus:outline-none"
+                        />
+                        <button
+                            type="submit"
+                            disabled={isRenaming}
+                            className="text-sm text-primary hover:underline disabled:opacity-50"
+                        >
+                            {isRenaming ? t('common:buttons.saving') : t('common:buttons.save')}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setIsEditingTitle(false)}
+                            className="text-sm text-muted-foreground hover:underline"
+                        >
+                            {t('common:buttons.cancel')}
+                        </button>
+                    </form>
+                ) : (
+                    <h1 className="text-3xl font-bold flex items-center gap-2 group">
+                        {displayTitle}
+                        <button
+                            onClick={() => {
+                                setTitleDraft(title ?? displayTitle)
+                                setIsEditingTitle(true)
+                            }}
+                            className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground"
+                            title={t('common:buttons.edit')}
+                        >
+                            <Pencil size={16}/>
+                        </button>
+                    </h1>
+                )}
+
                 {mediaTitle && (
                     <p className="text-sm text-muted-foreground mt-1">
                         {t('medium')}: <span className="font-medium">{mediaTitle}</span>

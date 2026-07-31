@@ -369,6 +369,7 @@ erDiagram
         UUID id
         UUID media_id
         UUID user_id
+        TEXT title
     }
 
     chat_histories {

@@ -68,6 +68,7 @@ class VocabularyCardResponse(BaseModel):
 
 class VocabularyResponse(BaseModel):
     id: UUID
+    learning_id: UUID
     word: str
     translation: Optional[str] = None
     context_sentence: Optional[str] = None
@@ -96,11 +97,16 @@ class ChatCreate(BaseModel):
 class ChatResponse(BaseModel):
     id: UUID
     media_id: UUID
+    learning_id: UUID
     user_id: UUID
     title: Optional[str] = None
     media_title: str
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class ChatTitleUpdate(BaseModel):
+    title: str
 
 
 class ChatMessageRequest(BaseModel):

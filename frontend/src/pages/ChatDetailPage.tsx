@@ -1,7 +1,7 @@
 import {useEffect} from "react";
 import {useParams, useNavigate} from 'react-router-dom'
 import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query'
-import {deleteChat, fetchChats} from '@/services/chat.service.ts'
+import {deleteChat, fetchChats, updateChatTitle} from '@/services/chat.service.ts'
 import {useChatTree} from '@/hooks/useChatTree'
 import ChatHeader from '@/components/chat/ChatHeader'
 import ChatSettings from '@/components/chat/ChatSettings'
@@ -45,11 +45,24 @@ export default function ChatDetailPage() {
             navigate('/chat')
         }
     })
+
+    const renameMutation = useMutation({
+        mutationFn: (title: string) => updateChatTitle(id!, title),
+        onSuccess: () => {
+            void queryClient.invalidateQueries({queryKey: ['chatMeta', id]})
+            void queryClient.invalidateQueries({queryKey: ['chat']})
+        }
+    })
     const {setMediumId} = useMedium()
 
     useEffect(() => {
-        if (chatMeta?.media_id) setMediumId(chatMeta.media_id)
-    }, [chatMeta?.media_id, setMediumId])
+        // Skip the language's implicit dummy medium (media_id === learning_id) —
+        // it's not a real, selectable medium and would make the global filter
+        // (used by e.g. the vocabulary list) show nothing.
+        if (chatMeta?.media_id && chatMeta.media_id !== chatMeta.learning_id) {
+            setMediumId(chatMeta.media_id)
+        }
+    }, [chatMeta?.media_id, chatMeta?.learning_id, setMediumId])
 
     if (isLoading) return <p className="p-8">{t('loading')}</p>
     if (isError) return <p className="p-8 text-destructive">{t('errorLoading')}</p>
@@ -62,7 +75,9 @@ export default function ChatDetailPage() {
                 title={chatMeta?.title}
                 mediaTitle={chatMeta?.media_title}
                 isDeleting={deleteMutation.isPending}
+                isRenaming={renameMutation.isPending}
                 onDelete={() => deleteMutation.mutate()}
+                onRename={(newTitle) => renameMutation.mutate(newTitle)}
             />
             <div className="mb-4">
                 <ChatSettings

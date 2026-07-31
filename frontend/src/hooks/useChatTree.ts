@@ -11,7 +11,7 @@ export type {ModelChoice, ViewMode} from './useChatMessaging'
 type ChatMessage = components['schemas']['ChatMessageResponse']
 
 export function useChatTree(chatId: string | undefined) {
-    const {data: history, isLoading, isError} = useQuery({
+    const {data: history, isLoading, isError, error} = useQuery({
         queryKey: ['chatHistory', chatId],
         queryFn: () => fetchChatHistory(chatId!),
         enabled: !!chatId
@@ -62,6 +62,7 @@ export function useChatTree(chatId: string | undefined) {
         displayPath,
         isLoading,
         isError,
+        error,
         isSending: messaging.isSending,
         isRegenerating: messaging.isRegenerating,
         pendingReplyForId: messaging.pendingReplyForId,

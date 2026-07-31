@@ -18,5 +18,7 @@
   "foreignWord": "Vocabulary / Foreign word",
   "deleteConfirm": "Do you really want to permanently delete \"{{word}}\" from your flashcards?",
   "deleteButton": "Delete vocabulary",
-  "deleting": "Deleting..."
+  "deleting": "Deleting...",
+  "openChat": "Open mini chat",
+  "closeChat": "Close mini chat"
 }
