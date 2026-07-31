@@ -2,6 +2,7 @@ import {useState} from 'react'
 import {useTranslation} from 'react-i18next'
 import {ChevronLeft, ChevronRight, Pencil, RotateCw} from 'lucide-react'
 import type {components} from '@/types/api'
+import MarkdownContent from '@/components/chat/MarkdownContent'
 
 type ChatMessage = components['schemas']['ChatMessageResponse']
 
@@ -99,7 +100,9 @@ export default function ChatMessageBubble({
                             ? 'bg-background border text-foreground rounded-tl-none'
                             : 'bg-primary text-primary-foreground rounded-tr-none'
                     }`}>
-                        <p className="whitespace-pre-wrap">{message.message}</p>
+                        {isAi
+                            ? <MarkdownContent content={message.message}/>
+                            : <p className="whitespace-pre-wrap">{message.message}</p>}
                     </div>
                     {isAi && (
                         <button

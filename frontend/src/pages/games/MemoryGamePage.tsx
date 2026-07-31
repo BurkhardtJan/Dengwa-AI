@@ -11,7 +11,7 @@ const PAIR_COUNT = 6
 const MIN_PAIRS = 4
 
 export default function MemoryGamePage() {
-    const {t} = useTranslation(['common', 'vocabulary'])
+    const {t} = useTranslation(['common', 'vocabulary', 'game'])
     const {selectedLan} = useLanguage()
 
     const {data: vocabularies, isLoading, isError} = useQuery({
@@ -41,7 +41,7 @@ export default function MemoryGamePage() {
                 {t('common:buttons.back')}
             </Link>
 
-            <h1 className="text-xl font-semibold my-4">Memory</h1>
+            <h1 className="text-xl font-semibold my-4">{t('game:memory.title')}</h1>
 
             {!selectedLan ? (
                 <p className="text-sm text-muted-foreground">{t('common:noLanguageSelected')}</p>
