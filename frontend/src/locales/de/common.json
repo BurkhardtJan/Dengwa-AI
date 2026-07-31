@@ -7,7 +7,8 @@
     "add": "Hinzufügen",
     "back": "← Zurück",
     "saving": "Speichert...",
-    "deleting": "Löscht..."
+    "deleting": "Löscht...",
+    "retry": "Erneut versuchen"
   },
   "loading": "Wird geladen...",
   "errorLoading": "Fehler beim Laden",

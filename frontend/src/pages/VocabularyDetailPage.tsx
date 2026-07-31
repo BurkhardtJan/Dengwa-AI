@@ -153,7 +153,7 @@ export default function VocabularyDetailPage() {
                 <MiniChatLauncher
                     mediaId={data.learning_id}
                     instanceKey={data.id}
-                    name={`${t('vocabulary:foreignWord')}: ${data.word}`}
+                    title={`${t('vocabulary:foreignWord')}: ${data.word}`}
                     getContext={() => {
                         const parts = [`${t('vocabulary:foreignWord')}: "${data.word}"`]
                         if (data.translation) {

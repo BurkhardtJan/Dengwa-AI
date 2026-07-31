@@ -10,8 +10,8 @@ export async function fetchChats(lan?: string): Promise<Chat[]> {
     return response.data
 }
 
-export async function createChat(mediaId: string): Promise<Chat> {
-    const response = await api.post('/chats', null, {params: {media_id: mediaId}})
+export async function createChat(mediaId: string, title?: string): Promise<Chat> {
+    const response = await api.post('/chats', null, {params: {media_id: mediaId, title}})
     return response.data
 }
 

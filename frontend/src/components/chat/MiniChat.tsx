@@ -4,7 +4,7 @@ import {ExternalLink} from 'lucide-react'
 import {useQuery, useQueryClient} from '@tanstack/react-query'
 import {isAxiosError} from 'axios'
 import {useTranslation} from 'react-i18next'
-import {createChat, updateChatTitle} from '@/services/chat.service.ts'
+import {createChat} from '@/services/chat.service.ts'
 import {useChatTree} from '@/hooks/useChatTree'
 import ChatMessageList from '@/components/chat/ChatMessageList'
 import ChatMessageInput from '@/components/chat/ChatMessageInput'
@@ -20,11 +20,8 @@ interface Props {
      * mediaId.
      */
     instanceKey?: string
-    /**
-     * Optional title to rename the chat to (via PUT /chats/{id}) once it
-     * exists, e.g. "Vokabel: casa". Re-runs whenever this value changes.
-     */
-    name?: string
+    /** Title to create the chat with, e.g. "Vokabel: casa". */
+    title?: string
     /**
      * Builds the context text injected as a hidden "context" node before
      * each message, e.g. the current vocab card or game state. Called
@@ -33,8 +30,8 @@ interface Props {
     getContext?: () => string
 }
 
-export default function MiniChat({mediaId, instanceKey, name, getContext}: Props) {
-    const {t} = useTranslation('chat')
+export default function MiniChat({mediaId, instanceKey, title, getContext}: Props) {
+    const {t} = useTranslation(['common', 'chat'])
     const cacheKey = instanceKey ?? mediaId
 
     // Creates its own chat as soon as it's mounted (i.e. once the host
@@ -45,25 +42,14 @@ export default function MiniChat({mediaId, instanceKey, name, getContext}: Props
     // Default gcTime is kept (NOT 0) — with gcTime 0, React 18 StrictMode's
     // dev-mode double-mount discards the cache between the two mounts and
     // creates two chats instead of deduping to one.
-    const {data: chat} = useQuery({
+    const {data: chat, isError: isCreateError, refetch: retryCreate} = useQuery({
         queryKey: ['miniChatCreate', cacheKey],
-        queryFn: () => createChat(mediaId),
+        queryFn: () => createChat(mediaId, title),
         staleTime: Infinity,
         retry: false,
     })
     const chatId = chat?.id
     const queryClient = useQueryClient()
-
-    // Renames the chat once it exists, whenever `name` changes. A dependent
-    // query (not a mutation fired from an effect) for the same reason as
-    // the create-query above.
-    useQuery({
-        queryKey: ['miniChatRename', cacheKey, name],
-        queryFn: () => updateChatTitle(chatId!, name!),
-        enabled: !!chatId && !!name,
-        staleTime: Infinity,
-        retry: false,
-    })
 
     const {
         displayPath, isSending, isRegenerating, pendingReplyForId, streamingText,
@@ -96,22 +82,29 @@ export default function MiniChat({mediaId, instanceKey, name, getContext}: Props
         <div className="flex flex-col h-105 border rounded-lg bg-background p-3">
             <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    {t('miniChatTitle')}
+                    {t('chat:miniChatTitle')}
                 </span>
                 {chatId && (
                     <Link
                         to={`/chat/${chatId}`}
                         className="text-xs text-primary hover:underline flex items-center gap-1"
                     >
-                        {t('openFullChat')}
+                        {t('chat:openFullChat')}
                         <ExternalLink size={12}/>
                     </Link>
                 )}
             </div>
 
-            {!chatId ? (
+            {isCreateError ? (
+                <div className="flex-1 flex flex-col items-center justify-center gap-2 text-xs text-muted-foreground">
+                    <p>{t('chat:startError')}</p>
+                    <button onClick={() => retryCreate()} className="text-primary hover:underline">
+                        {t('common:buttons.retry')}
+                    </button>
+                </div>
+            ) : !chatId ? (
                 <p className="text-xs text-muted-foreground italic flex-1 flex items-center justify-center">
-                    {t('starting')}
+                    {t('chat:starting')}
                 </p>
             ) : (
                 <ChatMessageList

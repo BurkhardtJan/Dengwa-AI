@@ -39,6 +39,7 @@ async def get_chats(lan: Optional[str] = None, db: Session = Depends(get_db), cu
 @router.post("", response_model=ChatResponse)
 async def create_chat(
         media_id: UUID,
+        title: Optional[str] = None,
         db: Session = Depends(get_db),
         current_user=Depends(get_current_user)
 ):
@@ -48,7 +49,7 @@ async def create_chat(
     new_chat = Chat(
         media_id=media_id,
         user_id=current_user.id,
-        title=f"Chat: {media.title}",
+        title=title or f"Chat: {media.title}",
     )
 
     db.add(new_chat)

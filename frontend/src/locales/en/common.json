@@ -7,7 +7,8 @@
     "add": "Add",
     "back": "← Back",
     "saving": "Saving...",
-    "deleting": "Deleting..."
+    "deleting": "Deleting...",
+    "retry": "Retry"
   },
   "loading": "Loading...",
   "errorLoading": "Error loading data",

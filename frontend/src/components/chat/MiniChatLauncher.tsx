@@ -5,7 +5,7 @@ import MiniChat from '@/components/chat/MiniChat'
 interface Props {
     mediaId: string
     instanceKey?: string
-    name?: string
+    title?: string
     getContext?: () => string
 }
 
@@ -15,14 +15,14 @@ interface Props {
  * itself when clicked. Purely a positioning/open-state wrapper — all chat
  * behavior lives in MiniChat itself.
  */
-export default function MiniChatLauncher({mediaId, instanceKey, name, getContext}: Props) {
+export default function MiniChatLauncher({mediaId, instanceKey, title, getContext}: Props) {
     const [open, setOpen] = useState(false)
 
     return (
         <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
             {open && (
                 <div className="w-80">
-                    <MiniChat mediaId={mediaId} instanceKey={instanceKey} name={name} getContext={getContext}/>
+                    <MiniChat mediaId={mediaId} instanceKey={instanceKey} title={title} getContext={getContext}/>
                 </div>
             )}
             <button

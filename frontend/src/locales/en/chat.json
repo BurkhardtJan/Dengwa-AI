@@ -28,6 +28,7 @@
   "thinking": "Thinking…",
   "miniChatTitle": "Chat",
   "openFullChat": "Full Chat view",
+  "startError": "Couldn't start the chat",
   "settings": {
     "title": "Model Settings",
     "provider": "Provider",

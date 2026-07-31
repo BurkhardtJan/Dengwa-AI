@@ -28,6 +28,7 @@
   "thinking": "Denkt nach…",
   "miniChatTitle": "Chat",
   "openFullChat": "Zur Chatansicht",
+  "startError": "Chat konnte nicht gestartet werden",
   "settings": {
     "title": "Modell-Einstellungen",
     "provider": "Anbieter",
