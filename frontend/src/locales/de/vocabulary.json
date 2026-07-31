@@ -20,5 +20,6 @@
   "deleteButton": "Vokabel Löschen",
   "deleting": "Löscht...",
   "openChat": "Mini-Chat öffnen",
-  "closeChat": "Mini-Chat schließen"
+  "closeChat": "Mini-Chat schließen",
+  "notEnoughForMemory": "Zu wenig Vokabeln mit Übersetzung für dieses Spiel."
 }

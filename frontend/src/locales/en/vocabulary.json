@@ -20,5 +20,6 @@
   "deleteButton": "Delete vocabulary",
   "deleting": "Deleting...",
   "openChat": "Open mini chat",
-  "closeChat": "Close mini chat"
+  "closeChat": "Close mini chat",
+  "notEnoughForMemory": "Not enough vocabulary with translations for this game."
 }

@@ -6,6 +6,7 @@ import media from '../locales/en/media.json';
 import chat from '../locales/en/chat.json';
 import auth from '../locales/en/auth.json';
 import landing from '../locales/en/landing.json';
+import game from '../locales/en/game.json'
 
 declare module 'i18next' {
     interface CustomTypeOptions {
@@ -17,6 +18,7 @@ declare module 'i18next' {
             review: typeof review;
             media: typeof media;
             chat: typeof chat;
+            game: typeof game;
             auth: typeof auth;
             landing: typeof landing;
         };
