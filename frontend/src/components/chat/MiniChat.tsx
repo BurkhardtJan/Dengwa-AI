@@ -1,10 +1,10 @@
-import {useEffect} from 'react'
+import {useEffect, useRef} from 'react'
 import {Link} from 'react-router-dom'
 import {ExternalLink} from 'lucide-react'
 import {useQuery, useQueryClient} from '@tanstack/react-query'
 import {isAxiosError} from 'axios'
 import {useTranslation} from 'react-i18next'
-import {createChat} from '@/services/chat.service.ts'
+import {createChat, updateChatTitle} from '@/services/chat.service.ts'
 import {useChatTree} from '@/hooks/useChatTree'
 import ChatMessageList from '@/components/chat/ChatMessageList'
 import ChatMessageInput from '@/components/chat/ChatMessageInput'
@@ -21,6 +21,11 @@ interface Props {
      */
     instanceKey?: string
     /**
+     * Optional title to rename the chat to (via PUT /chats/{id}) once it
+     * exists, e.g. "Vokabel: casa". Re-runs whenever this value changes.
+     */
+    name?: string
+    /**
      * Builds the context text injected as a hidden "context" node before
      * each message, e.g. the current vocab card or game state. Called
      * fresh on every send so it always reflects the current state.
@@ -28,7 +33,7 @@ interface Props {
     getContext?: () => string
 }
 
-export default function MiniChat({mediaId, instanceKey, getContext}: Props) {
+export default function MiniChat({mediaId, instanceKey, name, getContext}: Props) {
     const {t} = useTranslation('chat')
     const cacheKey = instanceKey ?? mediaId
 
@@ -49,6 +54,17 @@ export default function MiniChat({mediaId, instanceKey, getContext}: Props) {
     const chatId = chat?.id
     const queryClient = useQueryClient()
 
+    // Renames the chat once it exists, whenever `name` changes. A dependent
+    // query (not a mutation fired from an effect) for the same reason as
+    // the create-query above.
+    useQuery({
+        queryKey: ['miniChatRename', cacheKey, name],
+        queryFn: () => updateChatTitle(chatId!, name!),
+        enabled: !!chatId && !!name,
+        staleTime: Infinity,
+        retry: false,
+    })
+
     const {
         displayPath, isSending, isRegenerating, pendingReplyForId, streamingText,
         switchSibling, getSiblingInfo, getSiblingMessages, selectBranch,
@@ -64,9 +80,12 @@ export default function MiniChat({mediaId, instanceKey, getContext}: Props) {
         }
     }, [chatId, historyError, cacheKey, queryClient])
 
+    const lastContextRef = useRef<string | null>(null)
+
     const handleSend = (message: string) => {
         const context = getContext?.()
-        if (context) {
+        if (context && context !== lastContextRef.current) {
+            lastContextRef.current = context
             sendNewWithContext(message, context)
         } else {
             sendNew(message)

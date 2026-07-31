@@ -3,8 +3,7 @@ import {useParams, useNavigate} from 'react-router-dom'
 import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query'
 import {fetchVocabulary, deleteVocabulary, updateVocabulary} from '../services/vocabulary.service'
 import {useTranslation} from 'react-i18next'
-import {MessageCircle} from 'lucide-react'
-import MiniChat from '@/components/chat/MiniChat'
+import MiniChatLauncher from '@/components/chat/MiniChatLauncher'
 
 export default function VocabularyDetailPage() {
     const {id} = useParams<{ id: string }>()
@@ -12,7 +11,6 @@ export default function VocabularyDetailPage() {
     const queryClient = useQueryClient()
 
     const [editing, setEditing] = useState(false)
-    const [showChat, setShowChat] = useState(false)
     const [word, setWord] = useState('')
     const [translation, setTranslation] = useState('')
     const [contextSentence, setContextSentence] = useState('')
@@ -147,28 +145,27 @@ export default function VocabularyDetailPage() {
                         >
                             {t('common:buttons.edit')}
                         </button>
-                        <button
-                            onClick={() => setShowChat(v => !v)}
-                            className="px-4 py-2 border rounded-lg text-sm font-medium hover:bg-muted transition-colors flex items-center gap-1.5"
-                        >
-                            <MessageCircle size={14}/>
-                            {showChat ? t('vocabulary:closeChat') : t('vocabulary:openChat')}
-                        </button>
                     </div>
-
-                    {showChat && data && (
-                        <MiniChat
-                            mediaId={data.learning_id}
-                            instanceKey={data.id}
-                            getContext={() => {
-                                const parts = [`Vokabel: "${data.word}"`]
-                                if (data.translation) parts.push(`Übersetzung: "${data.translation}"`)
-                                if (data.context_sentence) parts.push(`Beispielsatz: "${data.context_sentence}"`)
-                                return parts.join(', ')
-                            }}
-                        />
-                    )}
                 </div>
+            )}
+
+            {data && (
+                <MiniChatLauncher
+                    mediaId={data.learning_id}
+                    instanceKey={data.id}
+                    name={`${t('vocabulary:foreignWord')}: ${data.word}`}
+                    getContext={() => {
+                        const parts = [`${t('vocabulary:foreignWord')}: "${data.word}"`]
+                        if (data.translation) {
+                            parts.push(`${t('vocabulary:translationField')}: "${data.translation}"`)
+                        }
+                        if (data.context_sentence) {
+                            parts.push(`${t('vocabulary:contextField')}: "${data.context_sentence}"`)
+                        }
+                        return parts.join(', ')
+                    }}
+
+                />
             )}
         </div>
     )
