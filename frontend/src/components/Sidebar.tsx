@@ -20,6 +20,7 @@ const NAV_ITEMS = [
     {to: '/dashboard', labelKey: 'nav.dashboard'},
     {to: '/vocabulary', labelKey: 'nav.vocabulary'},
     {to: '/review', labelKey: 'nav.review'},
+    {to: '/games', labelKey: 'nav.games'},
     {to: '/media', labelKey: 'nav.media'},
     {to: '/chat', labelKey: 'nav.chats'},
 ]

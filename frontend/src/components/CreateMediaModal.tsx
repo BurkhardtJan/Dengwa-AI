@@ -29,20 +29,33 @@ function CreateMediaModal({onClose}: Props) {
         }
     })
 
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const selected = e.target.files?.[0] ?? null
+        setFile(selected)
+        if (selected) {
+            const lastDot = selected.name.lastIndexOf('.')
+            setTitle(lastDot > 0 ? selected.name.slice(0, lastDot) : selected.name)
+        } else {
+            setTitle('')
+        }
+    }
+
     return (
         <Modal onClose={onClose}>
             <h2 className="text-lg font-bold mb-4">{t('media:newMedia')}</h2>
             <input
-                value={title}
-                onChange={e => setTitle(e.target.value)}
-                placeholder={t('media:titlePlaceholder')}
-                className="border rounded-lg px-3 py-2 w-full mb-4"
-            />
-            <input
                 type="file"
-                onChange={e => setFile(e.target.files?.[0] ?? null)}
+                onChange={handleFileChange}
                 className="border rounded-lg px-3 py-2 w-full mb-4"
             />
+            {file && (
+                <input
+                    value={title}
+                    onChange={e => setTitle(e.target.value)}
+                    placeholder={t('media:titlePlaceholder')}
+                    className="border rounded-lg px-3 py-2 w-full mb-4"
+                />
+            )}
             <button
                 onClick={() => createMutation.mutate()}
                 disabled={!file || createMutation.isPending}
