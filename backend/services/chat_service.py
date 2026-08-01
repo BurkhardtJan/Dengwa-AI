@@ -94,40 +94,6 @@ def generate_assistant_reply(
     )
 
 
-from llm.client import call_llm, prepare_chat
-
-
-def generate_assistant_reply(
-        db: Session,
-        chat: Chat,
-        user_message: ChatHistory,
-        provider: str | None,
-        model: str | None,
-        embedding_model: str | None,
-) -> ChatHistory:
-    """
-    Common logic to generate the assistant reply.
-    """
-    resolved_provider, resolved_model = resolve_chat_config(provider, model)
-    resolved_embedding = resolve_embedding_key(embedding_model)
-
-    messages = build_message_history(db, user_message.parent_id, user_message.message)
-    rag_context = retrieve_context(db, chat.media_id, user_message.message, embedding_key=resolved_embedding)
-    system_prompt = build_system_prompt_language_chat(chat, rag_context)
-
-    ai_response = call_llm(
-        messages=messages,
-        system_prompt=system_prompt,
-        provider=resolved_provider,
-        model=resolved_model,
-    )
-
-    return save_chat_message(
-        db, chat.id, "assistant", ai_response, user_message.id,
-        provider=resolved_provider, model=resolved_model, embedding_model=resolved_embedding,
-    )
-
-
 def stream_assistant_reply(
         db: Session,
         chat: Chat,
