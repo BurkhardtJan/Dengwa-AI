@@ -19,7 +19,7 @@ function CreateMediaModal({onClose}: Props) {
     const queryClient = useQueryClient()
 
     const createMutation = useMutation({
-        mutationFn: () => uploadMedia(selectedLan!, title, file!),
+        mutationFn: () => uploadMedia(selectedLan!, file!, title),
         onSuccess: (newMedia) => {
             queryClient.invalidateQueries({queryKey: ['media']})
             setTitle('')
@@ -45,7 +45,7 @@ function CreateMediaModal({onClose}: Props) {
             />
             <button
                 onClick={() => createMutation.mutate()}
-                disabled={!title || !file || createMutation.isPending}
+                disabled={!file || createMutation.isPending}
                 className="bg-primary text-primary-foreground px-4 py-2 rounded-lg disabled:opacity-50"
             >
                 {createMutation.isPending ? t('media:uploading') : t('common:buttons.save')}

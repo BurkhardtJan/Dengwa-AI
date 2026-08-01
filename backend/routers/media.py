@@ -1,4 +1,5 @@
 import os
+import uuid
 from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 from typing import List, Optional
@@ -12,7 +13,7 @@ from schemas import (
     VocabularyExtraction
 )
 from services.media_service import get_media_or_404, create_media_record, save_uploaded_file, \
-    extract_and_save_vocabulary, generate_media_metadata, embed_media_safe
+    extract_and_save_vocabulary, generate_media_metadata, embed_media_safe, get_media_disk_path
 from services.language_service import get_learning_or_404, get_or_create_learning
 
 router = APIRouter(prefix="/media", tags=["Media"])
@@ -45,14 +46,19 @@ async def get_media(lan: Optional[str] = None, db: Session = Depends(get_db), cu
 @router.post("", response_model=MediaResponse)
 async def post_media(
         background_tasks: BackgroundTasks,
-        lan: str, title: str = Form(...), file: UploadFile = File(...),
+        lan: str, file: UploadFile = File(...), title: Optional[str] = Form(None),
         db: Session = Depends(get_db),
         current_user=Depends(get_current_user)
 ):
-    """Upload a Medium"""
+    """Upload a Medium. If title is omitted, it defaults to the original filename (without extension)."""
     learning = get_or_create_learning(db, lan, current_user.id)
-    file_path = save_uploaded_file(file, current_user.id, lan)
-    media = create_media_record(db, title, file, file_path, learning.id)
+    media_id = uuid.uuid4()
+    file_path = save_uploaded_file(file, media_id, current_user.id, lan)
+
+    if not title or not title.strip():
+        title = os.path.splitext(file.filename or str(media_id))[0]
+
+    media = create_media_record(db, media_id, title, file, file_path, learning.id)
 
     background_tasks.add_task(generate_media_metadata, db, media.id)
     background_tasks.add_task(embed_media_safe, db, media)
@@ -85,14 +91,18 @@ async def get_media_file(media_id: UUID, db: Session = Depends(get_db), current_
     """Stream the raw file for a medium."""
     media = get_media_or_404(db, media_id, current_user.id)
 
-    if not media.file_path or not os.path.exists(media.file_path):
+    if not media.file_extension:
         raise HTTPException(status_code=404, detail="Datei nicht gefunden")
 
-    filename = os.path.basename(media.file_path)
+    disk_path = get_media_disk_path(media)
+    if not os.path.exists(disk_path):
+        raise HTTPException(status_code=404, detail="Datei nicht gefunden")
+
+    filename = f"{media.title}{media.file_extension}"
     content_type = media.content_type or "application/octet-stream"
 
     return FileResponse(
-        path=media.file_path,
+        path=disk_path,
         media_type=content_type,
         filename=filename,
     )

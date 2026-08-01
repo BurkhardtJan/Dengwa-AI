@@ -20,9 +20,11 @@ export async function fetchMediaFile(mediaId: string): Promise<string> {
     return URL.createObjectURL(response.data)
 }
 
-export async function uploadMedia(lan: string, title: string, file: File): Promise<Media> {
+export async function uploadMedia(lan: string, file: File, title?: string): Promise<Media> {
     const formData = new FormData()
-    formData.append('title', title)
+    if (title && title.trim()) {
+        formData.append('title', title)
+    }
     formData.append('file', file)
     const response = await api.post('/media', formData, {
         params: {lan},

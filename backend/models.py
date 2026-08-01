@@ -47,7 +47,8 @@ class Media(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     title = Column(String, nullable=False)
     content_type = Column(String, nullable=False)  # srt, txt, pdf
-    file_path = Column(String)
+    file_extension = Column(String)
+    original_filename = Column(String)
     extracted_content = Column(Text)
     summary = Column(Text, nullable=True)
     topics = Column(ARRAY(String), nullable=True)
