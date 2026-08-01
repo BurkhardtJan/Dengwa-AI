@@ -44,9 +44,9 @@ def create_test_user_with_language(language: str = "Spanish") -> tuple:
     """Register user, add language, return (token, language_name)."""
     token = get_token(unique_username())
     requests.post(f"{BASE_URL}/languages",
-        headers=auth_headers(token),
-        json={"learning_language": language}
-    )
+                  headers=auth_headers(token),
+                  json={"learning_language": language}
+                  )
     return token, language
 
 
@@ -132,9 +132,9 @@ def test_create_language_succeeds():
     """Creating a language returns the language object."""
     token = get_token(unique_username())
     response = requests.post(f"{BASE_URL}/languages",
-        headers=auth_headers(token),
-        json={"learning_language": "Spanish", "proficiency_level": "A1"}
-    )
+                             headers=auth_headers(token),
+                             json={"learning_language": "Spanish", "proficiency_level": "A1"}
+                             )
     assert response.status_code == 200
     data = response.json()
     assert data["learning_language"] == "Spanish"
@@ -145,9 +145,9 @@ def test_get_languages_returns_list():
     """GET /languages returns a list."""
     token = get_token(unique_username())
     requests.post(f"{BASE_URL}/languages",
-        headers=auth_headers(token),
-        json={"learning_language": "French"}
-    )
+                  headers=auth_headers(token),
+                  json={"learning_language": "French"}
+                  )
     response = requests.get(f"{BASE_URL}/languages", headers=auth_headers(token))
     assert response.status_code == 200
     assert isinstance(response.json(), list)
@@ -165,9 +165,9 @@ def test_languages_are_user_isolated():
     token_a = get_token(unique_username())
     token_b = get_token(unique_username())
     requests.post(f"{BASE_URL}/languages",
-        headers=auth_headers(token_a),
-        json={"learning_language": "Japanese"}
-    )
+                  headers=auth_headers(token_a),
+                  json={"learning_language": "Japanese"}
+                  )
     response = requests.get(f"{BASE_URL}/languages", headers=auth_headers(token_b))
     assert response.status_code == 200
     languages = [l["learning_language"] for l in response.json()]
@@ -178,9 +178,9 @@ def test_delete_language_succeeds():
     """Deleting an existing language returns 200."""
     token = get_token(unique_username())
     create = requests.post(f"{BASE_URL}/languages",
-        headers=auth_headers(token),
-        json={"learning_language": "Italian"}
-    )
+                           headers=auth_headers(token),
+                           json={"learning_language": "Italian"}
+                           )
     lang = create.json()["learning_language"]
     response = requests.delete(f"{BASE_URL}/languages/{lang}", headers=auth_headers(token))
     assert response.status_code == 200
@@ -194,13 +194,13 @@ def test_create_vocabulary_succeeds():
     """Creating a vocabulary entry returns the word."""
     token = get_token(unique_username())
     requests.post(f"{BASE_URL}/languages",
-        headers=auth_headers(token),
-        json={"learning_language": "Spanish"}
-    )
+                  headers=auth_headers(token),
+                  json={"learning_language": "Spanish"}
+                  )
     response = requests.post(f"{BASE_URL}/vocabularies?lan=Spanish",
-        headers=auth_headers(token),
-        json={"word": "hola", "translation": "hello"}
-    )
+                             headers=auth_headers(token),
+                             json={"word": "hola", "translation": "hello"}
+                             )
     assert response.status_code == 200
     assert response.json()["word"] == "hola"
 
@@ -209,13 +209,13 @@ def test_get_vocabularies_returns_list():
     """GET /vocabularies returns a list."""
     token = get_token(unique_username())
     requests.post(f"{BASE_URL}/languages",
-        headers=auth_headers(token),
-        json={"learning_language": "Spanish"}
-    )
+                  headers=auth_headers(token),
+                  json={"learning_language": "Spanish"}
+                  )
     requests.post(f"{BASE_URL}/vocabularies?lan=Spanish",
-        headers=auth_headers(token),
-        json={"word": "gracias"}
-    )
+                  headers=auth_headers(token),
+                  json={"word": "gracias"}
+                  )
     response = requests.get(f"{BASE_URL}/vocabularies", headers=auth_headers(token))
     assert response.status_code == 200
     assert isinstance(response.json(), list)
@@ -225,18 +225,18 @@ def test_update_vocabulary_succeeds():
     """Updating a vocabulary entry returns updated data."""
     token = get_token(unique_username())
     requests.post(f"{BASE_URL}/languages",
-        headers=auth_headers(token),
-        json={"learning_language": "Spanish"}
-    )
+                  headers=auth_headers(token),
+                  json={"learning_language": "Spanish"}
+                  )
     create = requests.post(f"{BASE_URL}/vocabularies?lan=Spanish",
-        headers=auth_headers(token),
-        json={"word": "adios"}
-    )
+                           headers=auth_headers(token),
+                           json={"word": "adios"}
+                           )
     vocab_id = create.json()["id"]
     response = requests.put(f"{BASE_URL}/vocabularies/{vocab_id}",
-        headers=auth_headers(token),
-        json={"translation": "goodbye"}
-    )
+                            headers=auth_headers(token),
+                            json={"translation": "goodbye"}
+                            )
     assert response.status_code == 200
     assert response.json()["translation"] == "goodbye"
 
@@ -245,13 +245,13 @@ def test_delete_vocabulary_succeeds():
     """Deleting a vocabulary entry returns 200."""
     token = get_token(unique_username())
     requests.post(f"{BASE_URL}/languages",
-        headers=auth_headers(token),
-        json={"learning_language": "Spanish"}
-    )
+                  headers=auth_headers(token),
+                  json={"learning_language": "Spanish"}
+                  )
     create = requests.post(f"{BASE_URL}/vocabularies?lan=Spanish",
-        headers=auth_headers(token),
-        json={"word": "por favor"}
-    )
+                           headers=auth_headers(token),
+                           json={"word": "por favor"}
+                           )
     vocab_id = create.json()["id"]
     response = requests.delete(f"{BASE_URL}/vocabularies/{vocab_id}", headers=auth_headers(token))
     assert response.status_code == 200
@@ -390,3 +390,71 @@ def test_create_chat_invalid_media_fails():
     fake_id = uuid.uuid4()
     response = requests.post(f"{BASE_URL}/chats?media_id={fake_id}", headers=auth_headers(token))
     assert response.status_code == 404
+
+
+def test_create_chat_with_custom_title():
+    """Creating a chat with a title query param uses it instead of the default."""
+    token, language = create_test_user_with_language()
+    upload = upload_test_media(token, language)
+    media_id = upload.json()["id"]
+    response = requests.post(
+        f"{BASE_URL}/chats?media_id={media_id}&title=CustomTitle",
+        headers=auth_headers(token)
+    )
+    assert response.status_code == 200
+    assert response.json()["title"] == "CustomTitle"
+
+
+def test_rename_chat_succeeds():
+    """PUT /chats/{id} updates the chat's title."""
+    token, language = create_test_user_with_language()
+    upload = upload_test_media(token, language)
+    media_id = upload.json()["id"]
+    chat = requests.post(f"{BASE_URL}/chats?media_id={media_id}", headers=auth_headers(token))
+    chat_id = chat.json()["id"]
+    response = requests.put(
+        f"{BASE_URL}/chats/{chat_id}",
+        headers=auth_headers(token),
+        json={"title": "Renamed Chat"}
+    )
+    assert response.status_code == 200
+    assert response.json()["title"] == "Renamed Chat"
+
+
+def test_rename_chat_wrong_user_fails():
+    """PUT /chats/{id} from another user returns 404."""
+    token_a, language = create_test_user_with_language()
+    token_b = get_token(unique_username())
+    upload = upload_test_media(token_a, language)
+    media_id = upload.json()["id"]
+    chat = requests.post(f"{BASE_URL}/chats?media_id={media_id}", headers=auth_headers(token_a))
+    chat_id = chat.json()["id"]
+    response = requests.put(
+        f"{BASE_URL}/chats/{chat_id}",
+        headers=auth_headers(token_b),
+        json={"title": "Hijacked"}
+    )
+    assert response.status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# Media: language dummy medium
+# ---------------------------------------------------------------------------
+
+def test_dummy_medium_excluded_from_media_list():
+    """GET /media only returns real media, not the language's implicit dummy."""
+    token, language = create_test_user_with_language()
+    upload_test_media(token, language, title="Real Media")
+    response = requests.get(f"{BASE_URL}/media?lan={language}", headers=auth_headers(token))
+    assert response.status_code == 200
+    titles = [m["title"] for m in response.json()]
+    assert titles == ["Real Media"]
+
+
+def test_delete_dummy_medium_fails():
+    """Deleting the language's dummy medium (id == learning_id) is rejected."""
+    token, language = create_test_user_with_language()
+    languages = requests.get(f"{BASE_URL}/languages", headers=auth_headers(token))
+    learning_id = languages.json()[0]["id"]
+    response = requests.delete(f"{BASE_URL}/media/{learning_id}", headers=auth_headers(token))
+    assert response.status_code == 400
