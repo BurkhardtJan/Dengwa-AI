@@ -19,7 +19,8 @@
     "review": "Review",
     "media": "Media",
     "chats": "Chats",
-    "games": "Games"
+    "games": "Games",
+    "settings": "Settings"
   },
   "targetLanguage": "Learning language",
   "selectLanguage": "Select language...",

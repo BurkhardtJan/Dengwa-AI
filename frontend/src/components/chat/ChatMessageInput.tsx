@@ -1,5 +1,7 @@
-import {useState, useRef} from 'react'
+import {useEffect, useRef, useState} from 'react'
 import {useTranslation} from 'react-i18next'
+import {Mic, Square} from 'lucide-react'
+import {useSpeechToText} from '@/hooks/useSpeechToText'
 
 interface Props {
     isSending: boolean
@@ -7,18 +9,32 @@ interface Props {
 }
 
 export default function ChatMessageInput({isSending, onSend}: Props) {
-    const {t} = useTranslation('chat')
+    const {t, i18n} = useTranslation('chat')
     const [value, setValue] = useState('')
     const textareaRef = useRef<HTMLTextAreaElement>(null)
+    const {start, stop, isListening, transcript, isSupported: isSttSupported} = useSpeechToText()
 
-    const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setValue(e.target.value)
+    const resizeTextarea = () => {
         const el = textareaRef.current
         if (el) {
             el.style.height = 'auto'
             el.style.height = `${el.scrollHeight}px`
         }
     }
+
+    const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setValue(e.target.value)
+        resizeTextarea()
+    }
+
+    // Dictated text arrives outside the textarea's own onChange, so the
+    // auto-resize has to be triggered here too.
+    useEffect(() => {
+        if (transcript) {
+            setValue(transcript)
+            resizeTextarea()
+        }
+    }, [transcript])
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
@@ -36,6 +52,14 @@ export default function ChatMessageInput({isSending, onSend}: Props) {
         }
     }
 
+    const toggleListening = () => {
+        if (isListening) {
+            stop()
+        } else {
+            start(i18n.language)
+        }
+    }
+
     return (
         <form onSubmit={handleSubmit} className="flex gap-2">
             <textarea
@@ -48,6 +72,21 @@ export default function ChatMessageInput({isSending, onSend}: Props) {
                 rows={1}
                 className="flex-1 border rounded-lg px-4 py-2 bg-background text-sm focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-60 resize-none max-h-40 overflow-y-auto"
             />
+            {isSttSupported && (
+                <button
+                    type="button"
+                    onClick={toggleListening}
+                    disabled={isSending}
+                    title={t(isListening ? 'stopListening' : 'startListening')}
+                    className={`px-3 py-2 rounded-lg text-sm border self-end transition-colors disabled:opacity-50 ${
+                        isListening
+                            ? 'bg-destructive text-destructive-foreground border-destructive'
+                            : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                >
+                    {isListening ? <Square size={16}/> : <Mic size={16}/>}
+                </button>
+            )}
             <button
                 type="submit"
                 disabled={!value.trim() || isSending}

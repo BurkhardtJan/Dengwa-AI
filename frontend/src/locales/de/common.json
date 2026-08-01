@@ -19,7 +19,8 @@
     "review": "Wiederholen",
     "media": "Medien",
     "chats": "Chats",
-    "games": "Spiele"
+    "games": "Spiele",
+    "settings": "Einstellungen"
   },
   "targetLanguage": "Lernsprache",
   "selectLanguage": "Sprache wählen...",

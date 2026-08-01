@@ -1,8 +1,10 @@
 import {useState} from 'react'
 import {useTranslation} from 'react-i18next'
-import {ChevronLeft, ChevronRight, Pencil, RotateCw} from 'lucide-react'
+import {ChevronLeft, ChevronRight, Pencil, RotateCw, Volume2, VolumeX} from 'lucide-react'
 import type {components} from '@/types/api'
 import MarkdownContent from '@/components/chat/MarkdownContent'
+import {useTextToSpeech} from '@/hooks/useTextToSpeech'
+import {stripMarkdownForSpeech} from '@/lib/speech/stripMarkdownForSpeech'
 
 type ChatMessage = components['schemas']['ChatMessageResponse']
 
@@ -24,6 +26,7 @@ export default function ChatMessageBubble({
     const {t, i18n} = useTranslation(['chat', 'common'])
     const [isEditing, setIsEditing] = useState(false)
     const [editText, setEditText] = useState(message.message)
+    const {speak, stop, isSpeaking, isSupported: isTtsSupported} = useTextToSpeech()
 
     const isAi = message.role === 'assistant' || message.role === 'ai'
     const isContext = message.role === 'context'
@@ -112,6 +115,15 @@ export default function ChatMessageBubble({
                             title={t('regenerate')}
                         >
                             <RotateCw size={13} className={isRegenerating ? 'animate-spin' : ''}/>
+                        </button>
+                    )}
+                    {isAi && isTtsSupported && (
+                        <button
+                            onClick={() => isSpeaking ? stop() : speak(stripMarkdownForSpeech(message.message), i18n.language)}
+                            className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground p-1"
+                            title={t(isSpeaking ? 'stopSpeaking' : 'readAloud')}
+                        >
+                            {isSpeaking ? <VolumeX size={13}/> : <Volume2 size={13}/>}
                         </button>
                     )}
                 </div>

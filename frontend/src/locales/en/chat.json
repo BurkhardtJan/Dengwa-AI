@@ -29,6 +29,10 @@
   "miniChatTitle": "Chat",
   "openFullChat": "Full Chat view",
   "startError": "Couldn't start the chat",
+  "readAloud": "Read reply aloud",
+  "stopSpeaking": "Stop reading",
+  "startListening": "Dictate",
+  "stopListening": "Stop recording",
   "settings": {
     "title": "Model Settings",
     "provider": "Provider",

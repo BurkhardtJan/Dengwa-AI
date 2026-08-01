@@ -1,0 +1,19 @@
+{
+  "title": "Settings",
+  "notAvailable": "Not available in this browser",
+  "engines": {
+    "browser": "Browser-native",
+    "webgpu": "Local (WebGPU)",
+    "server": "Server"
+  },
+  "tts": {
+    "title": "Text-to-speech (TTS)",
+    "description": "How replies are read aloud.",
+    "browserHint": "Uses your browser/OS built-in speech synthesis. Voice quality and language coverage depend heavily on your system."
+  },
+  "stt": {
+    "title": "Speech-to-text (STT)",
+    "description": "How spoken input is recognized.",
+    "browserPrivacyHint": "Note: in Chrome/Chromium, the audio recording is sent to Google's servers for recognition. Choose \"Local (WebGPU)\" or \"Server\" once available for local/private processing."
+  }
+}

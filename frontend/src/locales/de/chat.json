@@ -29,6 +29,10 @@
   "miniChatTitle": "Chat",
   "openFullChat": "Zur Chatansicht",
   "startError": "Chat konnte nicht gestartet werden",
+  "readAloud": "Antwort vorlesen",
+  "stopSpeaking": "Vorlesen stoppen",
+  "startListening": "Diktieren",
+  "stopListening": "Aufnahme stoppen",
   "settings": {
     "title": "Modell-Einstellungen",
     "provider": "Anbieter",

@@ -11,6 +11,7 @@ import enChat from './locales/en/chat.json';
 import enAuth from './locales/en/auth.json';
 import enLanding from './locales/en/landing.json';
 import enGame from './locales/en/game.json'
+import enSettings from './locales/en/settings.json'
 
 import deCommon from './locales/de/common.json';
 import deDashboard from './locales/de/dashboard.json';
@@ -20,7 +21,8 @@ import deMedia from './locales/de/media.json';
 import deChat from './locales/de/chat.json';
 import deAuth from './locales/de/auth.json';
 import deLanding from './locales/de/landing.json';
-import deGame from  './locales/de/game.json'
+import deGame from './locales/de/game.json'
+import deSettings from './locales/de/settings.json'
 
 i18n
     .use(LanguageDetector)
@@ -36,7 +38,8 @@ i18n
                 chat: enChat,
                 auth: enAuth,
                 landing: enLanding,
-                game: enGame
+                game: enGame,
+                settings: enSettings
             },
             de: {
                 common: deCommon,
@@ -47,7 +50,8 @@ i18n
                 chat: deChat,
                 auth: deAuth,
                 landing: deLanding,
-                game: deGame
+                game: deGame,
+                settings: deSettings
             },
         },
         defaultNS: 'common',

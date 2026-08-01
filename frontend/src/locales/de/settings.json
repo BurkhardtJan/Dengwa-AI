@@ -1,0 +1,19 @@
+{
+  "title": "Einstellungen",
+  "notAvailable": "In diesem Browser nicht verfügbar",
+  "engines": {
+    "browser": "Browser-nativ",
+    "webgpu": "Lokal (WebGPU)",
+    "server": "Server"
+  },
+  "tts": {
+    "title": "Sprachausgabe (TTS)",
+    "description": "Wie Antworten vorgelesen werden sollen.",
+    "browserHint": "Nutzt die Sprachausgabe deines Browsers/Betriebssystems. Stimmqualität und Sprachabdeckung hängen stark von deinem System ab."
+  },
+  "stt": {
+    "title": "Spracheingabe (STT)",
+    "description": "Wie gesprochener Text erkannt werden soll.",
+    "browserPrivacyHint": "Hinweis: In Chrome/Chromium wird die Audioaufnahme zur Erkennung an Google-Server gesendet. Für lokale/private Verarbeitung sobald verfügbar \"Lokal (WebGPU)\" oder \"Server\" wählen."
+  }
+}

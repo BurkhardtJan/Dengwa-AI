@@ -7,6 +7,7 @@ import chat from '../locales/en/chat.json';
 import auth from '../locales/en/auth.json';
 import landing from '../locales/en/landing.json';
 import game from '../locales/en/game.json'
+import settings from '../locales/en/settings.json'
 
 declare module 'i18next' {
     interface CustomTypeOptions {
@@ -21,6 +22,7 @@ declare module 'i18next' {
             game: typeof game;
             auth: typeof auth;
             landing: typeof landing;
+            settings: typeof settings;
         };
     }
 }

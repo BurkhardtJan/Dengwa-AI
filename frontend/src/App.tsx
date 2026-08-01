@@ -13,6 +13,7 @@ import MediaPage from './pages/MediaPage';
 import MediaDetailPage from './pages/MediaDetailPage.tsx';
 import GamesPage from "@/pages/GamesPage.tsx";
 import MemoryGamePage from "@/pages/games/MemoryGamePage.tsx";
+import SettingsPage from "@/pages/SettingsPage.tsx";
 import Layout from './components/Layout'
 
 function App() {
@@ -32,9 +33,8 @@ function App() {
                     <Route path="/media" element={<MediaPage/>}/>
                     <Route path="/media/:id" element={<MediaDetailPage/>}/>
                     <Route path="/games" element={<GamesPage/>}/>
-                    <Route path="/games/memory" element={<MemoryGamePage />} />
-
-
+                    <Route path="/games/memory" element={<MemoryGamePage/>}/>
+                    <Route path="/settings" element={<SettingsPage/>}/>
                 </Route>
                 <Route path="*" element={<Navigate to="/landing"/>}/>
             </Routes>

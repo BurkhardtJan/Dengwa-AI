@@ -4,7 +4,7 @@ from uuid import UUID
 from models import Chat, ChatHistory
 from llm.providers import resolve_chat_config, resolve_embedding_key
 from llm.prompts import build_system_prompt_language_chat, build_chat_title_prompt
-from llm.client import call_llm
+from llm.client import call_llm, prepare_chat
 from llm.rag_service import retrieve_context
 
 
