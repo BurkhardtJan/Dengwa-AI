@@ -4,6 +4,9 @@
   },
   "memory": {
     "title": "Memory",
-    "description": "A Memory game"
+    "description": "A Memory game",
+    "moves": "Moves: {{count}}",
+    "restart": "Restart",
+    "solved": "Solved in {{count}} moves 🎉"
   }
 }

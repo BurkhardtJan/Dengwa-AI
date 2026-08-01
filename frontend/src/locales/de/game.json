@@ -4,6 +4,9 @@
   },
   "memory": {
     "title": "Memory",
-    "description": "Ein Memory Spiel"
+    "description": "Ein Memory Spiel",
+    "moves": "Züge: {{count}}",
+    "restart": "Neu starten",
+    "solved": "Gelöst in {{count}} Zügen 🎉"
   }
 }

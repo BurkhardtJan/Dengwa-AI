@@ -1,4 +1,5 @@
 import {useEffect} from "react";
+import {useTranslation} from "react-i18next";
 import {useMemoryGame} from "./hooks/useMemoryGame";
 import {MemoryCard} from "./components/MemoryCard";
 import type {MemoryPair} from "./types";
@@ -9,6 +10,7 @@ interface MemoryGameProps {
 }
 
 export function MemoryGame({pairs, onComplete}: MemoryGameProps) {
+    const {t} = useTranslation("game");
     const {cards, isComplete, moves, flipCard, reset} = useMemoryGame(pairs);
 
     // Calling a parent callback (not our own setState) inside an effect
@@ -22,9 +24,9 @@ export function MemoryGame({pairs, onComplete}: MemoryGameProps) {
     return (
         <div className="flex flex-col gap-4">
             <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Moves: {moves}</span>
+                <span className="text-sm text-muted-foreground">{t("memory.moves", {count: moves})}</span>
                 <button type="button" onClick={reset} className="text-sm underline">
-                    Restart
+                    {t("memory.restart")}
                 </button>
             </div>
 
@@ -41,7 +43,7 @@ export function MemoryGame({pairs, onComplete}: MemoryGameProps) {
             </div>
 
             {isComplete && (
-                <p className="text-center text-sm font-medium">Solved in {moves} moves 🎉</p>
+                <p className="text-center text-sm font-medium">{t("memory.solved", {count: moves})}</p>
             )}
         </div>
     );
