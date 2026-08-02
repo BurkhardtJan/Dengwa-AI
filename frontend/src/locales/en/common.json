@@ -25,6 +25,15 @@
   "targetLanguage": "Learning language",
   "selectLanguage": "Select language...",
   "addLanguage": "+ Add language",
+  "languagePicker": {
+    "allLanguages": "All languages…",
+    "selected": "Selected",
+    "title": "Choose a language",
+    "searchPlaceholder": "Search languages…",
+    "noMatches": "No matches",
+    "freeTextLabel": "Not listed? Enter free text",
+    "freeTextPlaceholder": "e.g. Swiss German"
+  },
   "medium": "Medium",
   "allMedia": "All media",
   "addMedium": "+ Add medium",

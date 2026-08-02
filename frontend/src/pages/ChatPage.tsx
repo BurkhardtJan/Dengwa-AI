@@ -7,6 +7,7 @@ import {fetchMedia} from '@/services/media.service.ts'
 import {useLanguage} from '@/context/TargetLanguageContext.tsx'
 import {useMedium} from '@/context/MediumContext'
 import type {components} from '../types/api'
+import {getLanguageDisplayName} from '@/lib/languages'
 import {useTranslation} from 'react-i18next'
 
 type Chat = components['schemas']['ChatResponse']
@@ -17,8 +18,7 @@ function ChatPage() {
     const queryClient = useQueryClient()
     const {selectedLan} = useLanguage()
     const {mediumId, medium} = useMedium()
-    const {t} = useTranslation(['chat', 'common'])
-
+    const {t, i18n} = useTranslation(['chat', 'common'])
     const [showForm, setShowForm] = useState(false)
     const [selectedMediaId, setSelectedMediaId] = useState('')
 
@@ -82,7 +82,7 @@ function ChatPage() {
                         {mediumId
                             ? t('noChatsForMedium', {medium: medium?.title})
                             : selectedLan
-                                ? t('noChats', {language: selectedLan})
+                                ? t('noChats', {language: getLanguageDisplayName(selectedLan, i18n.language)})
                                 : t('common:noLanguageSelected')}
                     </p>
                 ) : (
@@ -107,8 +107,7 @@ function ChatPage() {
                 <Modal onClose={() => setShowForm(false)}>
                     <h2 className="text-lg font-bold mb-4">{t('newChat')}</h2>
                     <p className="text-sm text-muted-foreground mb-4">
-                        {t('selectMediaLabel', {language: selectedLan})}
-                    </p>
+                        {t('selectMediaLabel', {language: selectedLan ? getLanguageDisplayName(selectedLan, i18n.language) : selectedLan})}                    </p>
                     <select
                         value={selectedMediaId}
                         onChange={e => setSelectedMediaId(e.target.value)}

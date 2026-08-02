@@ -4,6 +4,7 @@ import {useQuery} from '@tanstack/react-query'
 import {fetchMedia} from "@/services/media.service.ts"
 import type {components} from '../types/api'
 import {useLanguage} from "@/context/TargetLanguageContext.tsx"
+import {getLanguageDisplayName} from '@/lib/languages'
 import {useTranslation} from 'react-i18next'
 import CreateMediaModal from '@/components/CreateMediaModal'
 
@@ -12,7 +13,7 @@ type Media = components['schemas']['MediaResponse']
 function MediaPage() {
     const navigate = useNavigate()
     const {selectedLan} = useLanguage()
-    const {t} = useTranslation(['media', 'common'])
+    const {t, i18n} = useTranslation(['media', 'common'])
     const [showForm, setShowForm] = useState(false)
 
     const {data, isLoading, isError} = useQuery({
@@ -41,7 +42,7 @@ function MediaPage() {
                 {(data ?? []).length === 0 ? (
                     <p className="text-muted-foreground text-sm italic">
                         {selectedLan
-                            ? t('noMedia', {language: selectedLan})
+                            ? t('noMedia', {language: getLanguageDisplayName(selectedLan, i18n.language)})
                             : t('common:noLanguageSelected')}
                     </p>
                 ) : (

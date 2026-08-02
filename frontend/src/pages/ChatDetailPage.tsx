@@ -102,8 +102,10 @@ export default function ChatDetailPage() {
                 onSelectBranch={selectBranch}
                 onEditSubmit={(_id, newText, originalParentId) => sendEdit(newText, originalParentId)}
                 onRegenerate={regenerate}
+                learningLanguage={chatMeta?.learning_language ?? ''}
             />
-            <ChatMessageInput isSending={isSending} onSend={sendNew}/>
+            <ChatMessageInput isSending={isSending} onSend={sendNew}
+                              learningLanguage={chatMeta?.learning_language ?? ''}/>
         </div>
     )
 }

@@ -2,14 +2,17 @@ import {useEffect, useRef, useState} from 'react'
 import {useTranslation} from 'react-i18next'
 import {Mic, Square} from 'lucide-react'
 import {useSpeechToText} from '@/hooks/useSpeechToText'
+import {toBcp47} from '@/lib/speech/languageCodes'
 
 interface Props {
     isSending: boolean
     onSend: (message: string) => void
+    /** The chat's target learning language (Dengwa's free-text value, e.g. "Spanisch") — used for dictation, not the UI locale. */
+    learningLanguage: string
 }
 
-export default function ChatMessageInput({isSending, onSend}: Props) {
-    const {t, i18n} = useTranslation('chat')
+export default function ChatMessageInput({isSending, onSend, learningLanguage}: Props) {
+    const {t} = useTranslation('chat')
     const [value, setValue] = useState('')
     const textareaRef = useRef<HTMLTextAreaElement>(null)
     const {start, stop, isListening, transcript, isSupported: isSttSupported} = useSpeechToText()
@@ -46,7 +49,7 @@ export default function ChatMessageInput({isSending, onSend}: Props) {
     }
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
+        if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
             e.preventDefault()
             handleSubmit(e)
         }
@@ -56,7 +59,7 @@ export default function ChatMessageInput({isSending, onSend}: Props) {
         if (isListening) {
             stop()
         } else {
-            start(i18n.language)
+            start(toBcp47(learningLanguage))
         }
     }
 

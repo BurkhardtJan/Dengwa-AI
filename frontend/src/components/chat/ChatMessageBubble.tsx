@@ -5,6 +5,7 @@ import type {components} from '@/types/api'
 import MarkdownContent from '@/components/chat/MarkdownContent'
 import {useTextToSpeech} from '@/hooks/useTextToSpeech'
 import {stripMarkdownForSpeech} from '@/lib/speech/stripMarkdownForSpeech'
+import {toBcp47} from '@/lib/speech/languageCodes'
 
 type ChatMessage = components['schemas']['ChatMessageResponse']
 
@@ -17,11 +18,13 @@ interface Props {
     onSwitchSibling: (direction: 'prev' | 'next') => void
     onEditSubmit: (newText: string) => void
     onRegenerate: () => void
+    /** The chat's target learning language (Dengwa's free-text value, e.g. "Spanisch") — used for read-aloud, not the UI locale. */
+    learningLanguage: string
 }
 
 export default function ChatMessageBubble({
                                               message, siblingIndex, siblingCount, isSending, isRegenerating,
-                                              onSwitchSibling, onEditSubmit, onRegenerate
+                                              onSwitchSibling, onEditSubmit, onRegenerate, learningLanguage
                                           }: Props) {
     const {t, i18n} = useTranslation(['chat', 'common'])
     const [isEditing, setIsEditing] = useState(false)
@@ -119,7 +122,7 @@ export default function ChatMessageBubble({
                     )}
                     {isAi && isTtsSupported && (
                         <button
-                            onClick={() => isSpeaking ? stop() : speak(stripMarkdownForSpeech(message.message), i18n.language)}
+                            onClick={() => isSpeaking ? stop() : speak(stripMarkdownForSpeech(message.message), toBcp47(learningLanguage))}
                             className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground p-1"
                             title={t(isSpeaking ? 'stopSpeaking' : 'readAloud')}
                         >

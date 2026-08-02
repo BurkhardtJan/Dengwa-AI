@@ -6,6 +6,7 @@ import {fetchVocabularies, createVocabulary} from '../services/vocabulary.servic
 import type {components} from '../types/api'
 import {useLanguage} from "@/context/TargetLanguageContext.tsx";
 import {useMedium} from '@/context/MediumContext'
+import {getLanguageDisplayName} from '@/lib/languages'
 import {useTranslation} from 'react-i18next'
 
 type Vocabulary = components['schemas']['VocabularyResponse']
@@ -21,7 +22,7 @@ function VocabularyPage() {
     const [showForm, setShowForm] = useState(false)
     const [newContextSentence, setNewContextSentence] = useState('')
 
-    const {t} = useTranslation(['common', 'vocabulary'])
+    const {t, i18n} = useTranslation(['common', 'vocabulary'])
 
     const {data, isLoading, isError} = useQuery({
         queryKey: ['vocabularies', selectedLan, mediumId],
@@ -63,7 +64,7 @@ function VocabularyPage() {
                             {mediumId
                                 ? t('vocabulary:noVocabularyForMedium', {medium: medium?.title})
                                 : selectedLan
-                                    ? t('vocabulary:noVocabulary', {language: selectedLan})
+                                    ? t('vocabulary:noVocabulary', {language: getLanguageDisplayName(selectedLan, i18n.language)})
                                     : t('common:noLanguageSelected')}
                         </p>
                     ) :

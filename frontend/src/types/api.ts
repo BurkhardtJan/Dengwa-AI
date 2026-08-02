@@ -143,7 +143,7 @@ export interface paths {
         put?: never;
         /**
          * Post Media
-         * @description Upload a Medium
+         * @description Upload a Medium. If title is omitted, it defaults to the original filename (without extension).
          */
         post: operations["post_media_media_post"];
         delete?: never;
@@ -568,10 +568,10 @@ export interface components {
         };
         /** Body_post_media_media_post */
         Body_post_media_media_post: {
-            /** Title */
-            title: string;
             /** File */
             file: string;
+            /** Title */
+            title?: string | null;
         };
         /** ChatMessageRequest */
         ChatMessageRequest: {
@@ -636,6 +636,8 @@ export interface components {
             title?: string | null;
             /** Media Title */
             media_title: string;
+            /** Learning Language */
+            learning_language: string;
         };
         /** ChatTitleUpdate */
         ChatTitleUpdate: {
@@ -1338,6 +1340,7 @@ export interface operations {
         parameters: {
             query: {
                 media_id: string;
+                title?: string | null;
             };
             header?: never;
             path?: never;

@@ -156,6 +156,10 @@ class Chat(Base):
     def learning_id(self):
         return self.media.learning_id
 
+    @property
+    def learning_language(self) -> str:
+        return self.media.language_learning.learning_language
+
 
 class ChatHistory(Base):
     __tablename__ = "chat_histories"

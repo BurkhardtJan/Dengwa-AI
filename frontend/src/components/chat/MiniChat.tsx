@@ -120,9 +120,11 @@ export default function MiniChat({mediaId, instanceKey, title, getContext}: Prop
                     onSelectBranch={selectBranch}
                     onEditSubmit={(_id, newText, originalParentId) => sendEdit(newText, originalParentId)}
                     onRegenerate={regenerate}
+                    learningLanguage={chat?.learning_language ?? ''}
                 />
             )}
-            <ChatMessageInput isSending={isSending || !chatId} onSend={handleSend}/>
+            <ChatMessageInput isSending={isSending || !chatId} onSend={handleSend}
+                              learningLanguage={chat?.learning_language ?? ''}/>
         </div>
     )
 }

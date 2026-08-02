@@ -25,6 +25,15 @@
   "targetLanguage": "Lernsprache",
   "selectLanguage": "Sprache wählen...",
   "addLanguage": "+ Sprache hinzufügen",
+  "languagePicker": {
+    "allLanguages": "Alle Sprachen…",
+    "selected": "Ausgewählt",
+    "title": "Sprache auswählen",
+    "searchPlaceholder": "Sprache suchen…",
+    "noMatches": "Keine Treffer",
+    "freeTextLabel": "Sprache nicht dabei? Freitext eingeben",
+    "freeTextPlaceholder": "z.B. Schweizerdeutsch"
+  },
   "medium": "Medium",
   "allMedia": "Alle Medien",
   "addMedium": "+ Medium hinzufügen",

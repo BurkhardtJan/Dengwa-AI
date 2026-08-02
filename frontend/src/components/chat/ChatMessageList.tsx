@@ -22,6 +22,8 @@ interface Props {
     onSelectBranch: (messageId: string) => void
     onEditSubmit: (messageId: string, newText: string, originalParentId: string | null | undefined) => void
     onRegenerate: (userMessageId: string) => void
+    /** The chat's target learning language — forwarded to each bubble for read-aloud. */
+    learningLanguage: string
 }
 
 function StreamingBubble({text}: { text: string }) {
@@ -50,7 +52,8 @@ export default function ChatMessageList({
                                             onSwitchSibling,
                                             onSelectBranch,
                                             onEditSubmit,
-                                            onRegenerate
+                                            onRegenerate,
+                                            learningLanguage
                                         }: Props) {
     const {t} = useTranslation('chat')
     const endRef = useRef<HTMLDivElement>(null)
@@ -116,6 +119,7 @@ export default function ChatMessageList({
                                 onSwitchSibling={(direction) => onSwitchSibling(msg.id, direction)}
                                 onEditSubmit={(newText) => onEditSubmit(msg.id, newText, msg.parent_id)}
                                 onRegenerate={() => isAi && msg.parent_id && onRegenerate(msg.parent_id)}
+                                learningLanguage={learningLanguage}
                             />
                             {showRegenLoading && (
                                 streamingText ? <StreamingBubble text={streamingText}/> : <LoadingBubble/>

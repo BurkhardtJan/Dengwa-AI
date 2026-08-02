@@ -9,6 +9,7 @@ import CreateLanguageModal from '@/components/CreateLanguageModal'
 import CreateMediaModal from '@/components/CreateMediaModal'
 import {LanguageSwitcher} from './LanguageSwitcher'
 import {authStorage} from '@/lib/authStorage'
+import {getLanguageDisplayName} from '@/lib/languages'
 import {useTranslation} from 'react-i18next'
 
 type Props = {
@@ -27,7 +28,7 @@ const NAV_ITEMS = [
 
 function Sidebar({isOpen, onNavigate}: Props) {
     const navigate = useNavigate()
-    const {t} = useTranslation()
+    const {t, i18n} = useTranslation()
     const {selectedLan, setSelectedLan} = useLanguage()
     const {mediumId, setMediumId} = useMedium()
     const [showCreateLanguage, setShowCreateLanguage] = useState(false)
@@ -90,7 +91,7 @@ function Sidebar({isOpen, onNavigate}: Props) {
                         <option value="" disabled>{t('selectLanguage')}.</option>
                         {languages?.map(lan => (
                             <option key={lan.id} value={lan.learning_language}>
-                                {lan.learning_language}
+                                {getLanguageDisplayName(lan.learning_language, i18n.language)}
                             </option>
                         ))}
                         <option value="__add__" className="text-primary">
