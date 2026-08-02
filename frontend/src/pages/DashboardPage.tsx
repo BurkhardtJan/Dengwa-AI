@@ -67,7 +67,8 @@ function DashboardPage() {
                     <h1 className="text-3xl font-bold">{t('common:nav.dashboard')}</h1>
                     <p className="text-muted-foreground mt-1">{t('dashboard:welcome', {name: data.username})}</p>
                     <p>{t('dashboard:nativeLanguage')}: <span
-                        className="font-medium text-foreground">{data.native_language}</span></p>
+                        className="font-medium text-foreground">{getLanguageDisplayName(data.native_language, i18n.language)}</span>
+                    </p>
 
                 </div>
                 <button
@@ -119,86 +120,87 @@ function DashboardPage() {
                     setSelectedLan(null);
                     setEditing(false)
                 }}>
-                    <h2 className="text-lg font-bold mb-4">{getLanguageDisplayName(selectedLan.learning_language, i18n.language)}</h2>                    {editing ? (
-                    <div className="flex flex-col gap-3">
-                        <label
-                            className="text-xs font-medium text-muted-foreground -mb-1">{t('dashboard:levelPlaceholder')}</label>
-                        <input
-                            value={proficiencyLevel}
-                            onChange={e => setProficiencyLevel(e.target.value)}
-                            placeholder="Level"
-                            className="border rounded-lg px-3 py-2 bg-background text-sm"
-                        />
-                        <label
-                            className="text-xs font-medium text-muted-foreground -mb-1">{t('dashboard:motivationLabel')}</label>
-                        <input
-                            value={userMotivation}
-                            onChange={e => setUserMotivation(e.target.value)}
-                            placeholder="Motivation"
-                            className="border rounded-lg px-3 py-2 bg-background text-sm"
-                        />
-                        <div className="flex gap-2 justify-end mt-2">
-                            <button
-                                onClick={() => setEditing(false)}
-                                className="border px-4 py-2 rounded-lg text-sm hover:bg-muted"
-                            >
-                                {t('buttons.cancel')}
-                            </button>
-                            <button
-                                onClick={() => updateMutation.mutate()}
-                                className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium"
-                            >
-                                {t('buttons.save')}
-                            </button>
+                    <h2 className="text-lg font-bold mb-4">{getLanguageDisplayName(selectedLan.learning_language, i18n.language)}</h2>
+                    {editing ? (
+                        <div className="flex flex-col gap-3">
+                            <label
+                                className="text-xs font-medium text-muted-foreground -mb-1">{t('dashboard:levelPlaceholder')}</label>
+                            <input
+                                value={proficiencyLevel}
+                                onChange={e => setProficiencyLevel(e.target.value)}
+                                placeholder="Level"
+                                className="border rounded-lg px-3 py-2 bg-background text-sm"
+                            />
+                            <label
+                                className="text-xs font-medium text-muted-foreground -mb-1">{t('dashboard:motivationLabel')}</label>
+                            <input
+                                value={userMotivation}
+                                onChange={e => setUserMotivation(e.target.value)}
+                                placeholder="Motivation"
+                                className="border rounded-lg px-3 py-2 bg-background text-sm"
+                            />
+                            <div className="flex gap-2 justify-end mt-2">
+                                <button
+                                    onClick={() => setEditing(false)}
+                                    className="border px-4 py-2 rounded-lg text-sm hover:bg-muted"
+                                >
+                                    {t('buttons.cancel')}
+                                </button>
+                                <button
+                                    onClick={() => updateMutation.mutate()}
+                                    className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium"
+                                >
+                                    {t('buttons.save')}
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                ) : (
-                    <>
-                        <div className="space-y-3 mb-6">
-                            <p className="text-sm">
+                    ) : (
+                        <>
+                            <div className="space-y-3 mb-6">
+                                <p className="text-sm">
                                     <span
                                         className="text-muted-foreground block text-xs">{t('dashboard:currentLevel')}:</span>
-                                <span className="font-medium text-base">{selectedLan.proficiency_level}</span>
-                            </p>
-                            {selectedLan.user_motivation && (
-                                <p className="text-sm">
+                                    <span className="font-medium text-base">{selectedLan.proficiency_level}</span>
+                                </p>
+                                {selectedLan.user_motivation && (
+                                    <p className="text-sm">
                                         <span
                                             className="text-muted-foreground block text-xs">{t('dashboard:motivation')}:</span>
-                                    <span className="italic">"{selectedLan.user_motivation}"</span>
-                                </p>
-                            )}
-                        </div>
+                                        <span className="italic">"{selectedLan.user_motivation}"</span>
+                                    </p>
+                                )}
+                            </div>
 
-                        <div className="flex gap-2 justify-end border-t pt-4">
-                            <button
-                                onClick={() => {
-                                    if (confirm(t('dashboard:deleteConfirm'))) {
-                                        deleteMutation.mutate(selectedLan.learning_language)
-                                    }
-                                }}
-                                className="text-destructive border border-destructive/30 px-4 py-2 rounded-lg text-sm hover:bg-destructive/5 transition-colors mr-auto"
-                            >
-                                {t('dashboard:delete')}
-                            </button>
-                            <button
-                                onClick={() => setEditing(true)}
-                                className="border px-4 py-2 rounded-lg text-sm hover:bg-muted"
-                            >
-                                {t('dashboard:edit')}
-                            </button>
-                            <button
-                                onClick={() => {
-                                    setGlobalLan(selectedLan.learning_language)
-                                    setSelectedLan(null)
-                                    setMediumId(null)
-                                }}
-                                className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium"
-                            >
-                                {t('dashboard:activate')}
-                            </button>
-                        </div>
-                    </>
-                )}
+                            <div className="flex gap-2 justify-end border-t pt-4">
+                                <button
+                                    onClick={() => {
+                                        if (confirm(t('dashboard:deleteConfirm'))) {
+                                            deleteMutation.mutate(selectedLan.learning_language)
+                                        }
+                                    }}
+                                    className="text-destructive border border-destructive/30 px-4 py-2 rounded-lg text-sm hover:bg-destructive/5 transition-colors mr-auto"
+                                >
+                                    {t('dashboard:delete')}
+                                </button>
+                                <button
+                                    onClick={() => setEditing(true)}
+                                    className="border px-4 py-2 rounded-lg text-sm hover:bg-muted"
+                                >
+                                    {t('dashboard:edit')}
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setGlobalLan(selectedLan.learning_language)
+                                        setSelectedLan(null)
+                                        setMediumId(null)
+                                    }}
+                                    className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium"
+                                >
+                                    {t('dashboard:activate')}
+                                </button>
+                            </div>
+                        </>
+                    )}
                 </Modal>
             )}
 

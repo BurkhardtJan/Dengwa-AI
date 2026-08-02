@@ -182,6 +182,7 @@ pnpm dev
 - [x] Spaced Repetition System (SRS)
 - [x] PWA
 - [x] Added Message Streaming
+- [ ] Added Games
 
 ### Backend
 
@@ -197,7 +198,8 @@ pnpm dev
 
 ### Frontend
 
-- [ ] Add Games
+- [ ] Add more Games
+- [ ] TTS for all components
 - [ ] Try WebLLM
 - [ ] Big uploads in background
 - [ ] Progress visualization

@@ -9,7 +9,7 @@
 
 /** Quick-pick shortlist shown by default. Extend freely — this is a starting point, not a hard limit. */
 export const CURATED_LANGUAGE_CODES = [
-    'en', 'de', 'es', 'fr', 'it', 'pt', 'nl', 'sv', 'da', 'fi',
+    'de', 'en', 'es', 'fr', 'it', 'pt', 'nl', 'sv', 'da', 'fi',
     'pl', 'cs', 'ro', 'hu', 'el', 'ru', 'uk', 'tr',
     'ar', 'he', 'hi',
     'ja', 'zh', 'ko', 'th', 'vi', 'id',
