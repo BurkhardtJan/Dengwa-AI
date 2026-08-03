@@ -3,6 +3,7 @@
   "addButton": "+ New chat",
   "noChats": "No chats for {{language}} yet. Click \"+ New chat\".",
   "noChatsForMedium": "No chats for \"{{medium}}\" yet.",
+  "freeConversation": "Free conversation",
   "newChat": "Start new AI chat",
   "selectMediaLabel": "Choose a media from your library ({{language}}) as context for the conversation:",
   "selectMediaPlaceholder": "-- Please select media --",
