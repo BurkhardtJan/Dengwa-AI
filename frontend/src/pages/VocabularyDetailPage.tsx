@@ -4,6 +4,7 @@ import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query'
 import {fetchVocabulary, deleteVocabulary, updateVocabulary} from '../services/vocabulary.service'
 import {useTranslation} from 'react-i18next'
 import MiniChatLauncher from '@/components/chat/MiniChatLauncher'
+import SpeakButton from '@/components/SpeakButton'
 
 export default function VocabularyDetailPage() {
     const {id} = useParams<{ id: string }>()
@@ -57,7 +58,10 @@ export default function VocabularyDetailPage() {
                     >
                         {t('vocabulary:backToVocabulary')}
                     </button>
-                    <h1 className="text-3xl font-bold">{data?.word}</h1>
+                    <div className="flex items-center gap-2">
+                        <h1 className="text-3xl font-bold">{data?.word}</h1>
+                        {data && <SpeakButton text={data.word} lang={data.language} size={18}/>}
+                    </div>
                 </div>
 
                 <button
@@ -128,7 +132,10 @@ export default function VocabularyDetailPage() {
                             <p className="text-sm">
                                 <span
                                     className="text-muted-foreground block text-xs">{t('vocabulary:contextField')}</span>
-                                <span className="italic">"{data.context_sentence}"</span>
+                                <span className="flex items-center gap-1">
+                                    <span className="italic">"{data.context_sentence}"</span>
+                                    <SpeakButton text={data.context_sentence} lang={data.language}/>
+                                </span>
                             </p>
                         )}
                     </div>

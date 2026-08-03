@@ -6,6 +6,7 @@ import {useMedium} from '@/context/MediumContext'
 import {fetchLanguages} from '@/services/language.service'
 import {fetchNextReviewCard, fetchReviewCounts, submitReview} from '@/services/review.service.ts'
 import type {ReviewEase} from '@/services/review.service.ts'
+import SpeakButton from '@/components/SpeakButton'
 
 const GRADES: { ease: ReviewEase; labelKey: string; className: string }[] = [
     {ease: 1, labelKey: 'review:again', className: 'bg-destructive text-destructive-foreground hover:opacity-90'},
@@ -83,13 +84,19 @@ function ReviewPage() {
                 <div className="border rounded-lg p-10 text-center min-h-64 flex flex-col justify-center gap-4">
                     <span
                         className="text-xs uppercase tracking-wide text-muted-foreground">{t(`review:queue.${card.queue}`)}</span>
-                    <p className="text-2xl font-bold">{card.word}</p>
+                    <div className="flex items-center justify-center gap-1">
+                        <p className="text-2xl font-bold">{card.word}</p>
+                        <SpeakButton text={card.word} lang={card.language} size={18}/>
+                    </div>
 
                     {revealed ? (
                         <div className="mt-2 space-y-2">
                             <p className="text-lg text-muted-foreground">{card.translation}</p>
                             {card.context_sentence && (
-                                <p className="text-sm italic text-muted-foreground">{card.context_sentence}</p>
+                                <p className="text-sm italic text-muted-foreground flex items-center justify-center gap-1">
+                                    <span>{card.context_sentence}</span>
+                                    <SpeakButton text={card.context_sentence} lang={card.language}/>
+                                </p>
                             )}
                         </div>
                     ) : (

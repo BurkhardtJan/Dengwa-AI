@@ -17,7 +17,7 @@ def _to_review_card_out(card: VocabularyCard) -> ReviewCardOut:
         word=card.vocabulary.word,
         translation=card.vocabulary.translation,
         context_sentence=card.vocabulary.context_sentence,
-        language=card.vocabulary.language,
+        language=card.vocabulary.resolved_language,
         template=card.template,
         queue=card.queue,
         due=card.due,

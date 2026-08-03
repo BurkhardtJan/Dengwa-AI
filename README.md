@@ -182,14 +182,16 @@ pnpm dev
 - [x] Spaced Repetition System (SRS)
 - [x] PWA
 - [x] Added Message Streaming
-- [ ] Added Games
+- [x] TTS & STT
+- [x] Added Games
+- [x] TTS for all components
 
 ### Backend
 
-- [ ] LiteLLM as LLM wrapper
 - [ ] Add default Vocab starter set (HSK, JLPT, ...)
 - [ ] Other Media Parsing
 - [ ] Add Multiple Choice & Free text entry to SRS
+- [ ] LiteLLM as LLM wrapper
 - [ ] Add LLM API Keys for users
 - [ ] Monitoring Token
 - [ ] Alembic
@@ -199,14 +201,12 @@ pnpm dev
 ### Frontend
 
 - [ ] Add more Games
-- [ ] TTS for all components
 - [ ] Try WebLLM
 - [ ] Big uploads in background
 - [ ] Progress visualization
 - [ ] Error handling
 - [ ] Responsive design
 - [ ] PWA offline features
-- [ ] TTS & STT
 
 ## Architecture
 

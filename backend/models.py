@@ -72,6 +72,12 @@ class Media(Base):
     chunks_gemini_embedding_001_3072 = relationship("MediaChunkGeminiEmbedding001_3072", back_populates="media",
                                                     cascade="all, delete-orphan")
 
+    @property
+    def resolved_language(self) -> str:
+        """The best-known language for this medium: the LLM-detected
+        language if set, otherwise the course's nominal learning language."""
+        return self.detected_language or self.language_learning.learning_language
+
 
 class Vocabulary(Base):
     __tablename__ = "vocabularies"
@@ -87,6 +93,12 @@ class Vocabulary(Base):
     language_learning = relationship("LanguageLearning", back_populates="vocabularies")
     media_vocabularies = relationship("MediaVocabulary", back_populates="vocabulary", cascade="all, delete-orphan")
     cards = relationship("VocabularyCard", back_populates="vocabulary", cascade="all, delete-orphan")
+
+    @property
+    def resolved_language(self) -> str:
+        """The best-known language for this word: the LLM-detected/assigned
+        language if set, otherwise the course's nominal learning language."""
+        return self.language or self.language_learning.learning_language
 
 
 class VocabularyCard(Base):

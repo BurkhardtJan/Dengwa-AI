@@ -7,6 +7,7 @@ import type {components} from '../types/api'
 import {useLanguage} from "@/context/TargetLanguageContext.tsx";
 import {useMedium} from '@/context/MediumContext'
 import {getLanguageDisplayName} from '@/lib/languages'
+import SpeakButton from '@/components/SpeakButton'
 import {useTranslation} from 'react-i18next'
 
 type Vocabulary = components['schemas']['VocabularyResponse']
@@ -74,7 +75,10 @@ function VocabularyPage() {
                             className="border rounded-lg p-4 cursor-pointer hover:bg-muted"
                             onClick={() => navigate(`/vocabulary/${vocab.id}`)}
                         >
-                            <p className="font-medium">{vocab.word}</p>
+                            <div className="flex items-center gap-1">
+                                <p className="font-medium">{vocab.word}</p>
+                                <SpeakButton text={vocab.word} lang={vocab.language}/>
+                            </div>
                             <p className="text-muted-foreground">{vocab.translation}</p>
                             <p className="text-muted-foreground">{vocab.context_sentence}</p>
                         </div>

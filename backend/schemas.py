@@ -48,7 +48,7 @@ class MediaResponse(BaseModel):
     topics: Optional[List[str]] = None
     difficulty_estimate: Optional[str] = None
     genre: Optional[str] = None
-    detected_language: Optional[str] = None
+    language: str = Field(validation_alias="resolved_language")
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -72,7 +72,7 @@ class VocabularyResponse(BaseModel):
     word: str
     translation: Optional[str] = None
     context_sentence: Optional[str] = None
-    language: Optional[str] = None
+    language: str = Field(validation_alias="resolved_language")
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
@@ -164,7 +164,7 @@ class ReviewCardOut(BaseModel):
     word: str
     translation: str | None
     context_sentence: str | None
-    language: str | None
+    language: str
     template: str | None
     queue: str
     due: datetime

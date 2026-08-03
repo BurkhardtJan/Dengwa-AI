@@ -5,6 +5,7 @@ import {useState, useEffect} from 'react'
 import {MediaViewer} from '../components/MediaViewer'
 import {useTranslation} from 'react-i18next'
 import {useMedium} from '@/context/MediumContext'
+import SpeakButton from '@/components/SpeakButton'
 
 export default function MediaDetailPage() {
     const {id} = useParams<{ id: string }>()
@@ -71,7 +72,10 @@ export default function MediaDetailPage() {
             {(data?.summary || data?.topics || data?.genre || data?.difficulty_estimate) && (
                 <div className="mb-8 p-4 border rounded-lg bg-muted/20">
                     {data?.summary && (
-                        <p className="text-sm mb-3">{data.summary}</p>
+                        <p className="text-sm mb-3 flex items-start gap-1">
+                            <span>{data.summary}</span>
+                            <SpeakButton text={data.summary} lang={data.language}/>
+                        </p>
                     )}
                     <div className="flex flex-wrap gap-2 text-xs">
                         {data?.genre && (

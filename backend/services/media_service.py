@@ -251,6 +251,17 @@ def save_uploaded_file(file: UploadFile, media_id: UUID, user_id: UUID, lan: str
     return file_path
 
 
+def sanitize_content_type(content_type: str | None) -> str:
+    """Strips control characters (e.g. CR/LF) from a client-supplied MIME
+    type before it's persisted. This value gets echoed back verbatim as
+    the Content-Type response header on download, so it must never carry
+    anything that could split/inject headers. No whitelist — the set of
+    accepted content types changes independently of this."""
+    if not content_type:
+        return "application/octet-stream"
+    return "".join(ch for ch in content_type if ch.isprintable()).strip()[:255] or "application/octet-stream"
+
+
 def create_media_record(db: Session, media_id: UUID, title: str, file: UploadFile, file_path: str,
                         learning_id: int) -> Media:
     """Creates and persists a Media DB record. Only the extension (not the
@@ -259,7 +270,7 @@ def create_media_record(db: Session, media_id: UUID, title: str, file: UploadFil
     media = Media(
         id=media_id,
         title=title,
-        content_type=file.content_type,
+        content_type=sanitize_content_type(file.content_type),
         file_extension=os.path.splitext(file_path)[1],
         original_filename=file.filename,
         extracted_content=extract_content(file.content_type, file_path),
@@ -309,5 +320,5 @@ def generate_media_metadata(db: Session, media_id: UUID, provider: str | None = 
     media.topics = result.topics
     media.difficulty_estimate = result.difficulty_estimate
     media.genre = result.genre
-    media.detected_language = result.detected_language
+    media.language = result.detected_language
     db.commit()

@@ -1,4 +1,6 @@
 {
+  "speakStart": "Vorlesen",
+  "speakStop": "Vorlesen stoppen",
   "buttons": {
     "save": "Speichern",
     "cancel": "Abbrechen",

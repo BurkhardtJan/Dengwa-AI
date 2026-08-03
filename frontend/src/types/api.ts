@@ -719,8 +719,8 @@ export interface components {
             difficulty_estimate?: string | null;
             /** Genre */
             genre?: string | null;
-            /** Detected Language */
-            detected_language?: string | null;
+            /** Language */
+            language: string;
         };
         /**
          * ProviderModelsResponse
@@ -754,7 +754,7 @@ export interface components {
             /** Context Sentence */
             context_sentence: string | null;
             /** Language */
-            language: string | null;
+            language: string;
             /** Template */
             template: string | null;
             /** Queue */
@@ -831,7 +831,7 @@ export interface components {
             /** Context Sentence */
             context_sentence?: string | null;
             /** Language */
-            language?: string | null;
+            language: string;
             /**
              * Created At
              * Format: date-time

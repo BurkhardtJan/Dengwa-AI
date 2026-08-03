@@ -1,4 +1,6 @@
 {
+  "speakStart": "Read aloud",
+  "speakStop": "Stop reading",
   "buttons": {
     "save": "Save",
     "cancel": "Cancel",
