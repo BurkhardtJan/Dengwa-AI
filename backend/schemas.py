@@ -129,34 +129,6 @@ class ChatMessageResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class ExtractedVocabularyItem(BaseModel):
-    word: str = Field(
-        description="Das fremdsprachige Wort in Originalschrift (z.B. Kanji/Kana bei Japanisch) und optionaler Romaji-Lautschrift in Klammern."
-    )
-    translation: str = Field(
-        description="Die präzise deutsche Übersetzung des Wortes, passend zum Kontext des Textes."
-    )
-    context_sentence: str = Field(
-        description="Der exakte Satz aus dem bereitgestellten Text, in dem das Wort vorkommt, um den Kontext zu wahren."
-    )
-
-
-class VocabularyExtraction(BaseModel):
-    vocabularies: List[ExtractedVocabularyItem] = Field(
-        description="Eine Liste aller aus dem Text extrahierten Schlüsselvokabeln."
-    )
-
-
-class ProviderModelsResponse(BaseModel):
-    """Provider -> Liste of available models."""
-    providers: dict[str, list[str]]
-
-
-class EmbeddingModelsResponse(BaseModel):
-    """List of curated Embedding-Provider-Keys."""
-    models: list[str]
-
-
 class ReviewCardOut(BaseModel):
     """Card + its vocabulary data flattened, so the frontend doesn't need a follow-up lookup."""
     id: UUID
@@ -175,6 +147,36 @@ class ReviewCardOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class ProviderModelsResponse(BaseModel):
+    """Provider -> Liste of available models."""
+    providers: dict[str, list[str]]
+
+
+class EmbeddingModelsResponse(BaseModel):
+    """List of curated Embedding-Provider-Keys."""
+    models: list[str]
+
+
+#######################################################
+
+class ExtractedVocabularyItem(BaseModel):
+    word: str = Field(
+        description="Das fremdsprachige Wort in Originalschrift (z.B. Kanji/Kana bei Japanisch) und optionaler Romaji-Lautschrift in Klammern."
+    )
+    translation: str = Field(
+        description="Die präzise deutsche Übersetzung des Wortes, passend zum Kontext des Textes."
+    )
+    context_sentence: str = Field(
+        description="Der exakte Satz aus dem bereitgestellten Text, in dem das Wort vorkommt, um den Kontext zu wahren."
+    )
+
+
+class VocabularyExtraction(BaseModel):
+    vocabularies: List[ExtractedVocabularyItem] = Field(
+        description="Eine Liste aller aus dem Text extrahierten Schlüsselvokabeln."
+    )
 
 
 class MediaMetadataExtraction(BaseModel):
