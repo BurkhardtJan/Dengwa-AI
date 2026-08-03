@@ -74,6 +74,7 @@ export default function ChatDetailPage() {
                 chatId={id!}
                 title={chatMeta?.title}
                 mediaTitle={chatMeta?.media_title}
+                isFreeConversation={!!chatMeta && chatMeta.media_id === chatMeta.learning_id}
                 isDeleting={deleteMutation.isPending}
                 isRenaming={renameMutation.isPending}
                 onDelete={() => deleteMutation.mutate()}
@@ -104,8 +105,7 @@ export default function ChatDetailPage() {
                 onRegenerate={regenerate}
                 learningLanguage={chatMeta?.learning_language ?? ''}
             />
-            <ChatMessageInput isSending={isSending} onSend={sendNew}
-                              learningLanguage={chatMeta?.learning_language ?? ''}/>
+            <ChatMessageInput isSending={isSending} onSend={sendNew} learningLanguage={chatMeta?.learning_language ?? ''}/>
         </div>
     )
 }

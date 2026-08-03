@@ -34,7 +34,7 @@ function ChatPage() {
     const currentLearning = languages?.find(l => l.learning_language === selectedLan)
 
     const createChatMutation = useMutation({
-        mutationFn: (mediaId: string) => createChat(mediaId),
+        mutationFn: ({mediaId, title}: { mediaId: string; title?: string }) => createChat(mediaId, title),
         onSuccess: (newChat) => {
             queryClient.invalidateQueries({queryKey: ['chat']})
             navigate(`/chat/${newChat.id}`)
@@ -48,11 +48,13 @@ function ChatPage() {
 
     function handleAddChat() {
         if (mediumId) {
-            createChatMutation.mutate(mediumId)
+            createChatMutation.mutate({mediaId: mediumId})
         } else if (currentLearning) {
             // No medium selected/filtered → free-form conversation practice,
             // backed by the per-language dummy medium (id === learning_id).
-            createChatMutation.mutate(currentLearning.id)
+            // Sending the title up front avoids a "Chat: es" flash before
+            // the background auto-title job would otherwise overwrite it.
+            createChatMutation.mutate({mediaId: currentLearning.id, title: t('freeConversation')})
         }
     }
 

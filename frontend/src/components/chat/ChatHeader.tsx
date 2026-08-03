@@ -7,19 +7,28 @@ interface Props {
     chatId: string
     title: string | null | undefined
     mediaTitle: string | undefined
+    isFreeConversation: boolean
     isDeleting: boolean
     isRenaming: boolean
     onDelete: () => void
     onRename: (newTitle: string) => void
 }
 
-export default function ChatHeader({title, mediaTitle, isDeleting, isRenaming, onDelete, onRename}: Props) {
+export default function ChatHeader({
+                                       title,
+                                       mediaTitle,
+                                       isFreeConversation,
+                                       isDeleting,
+                                       isRenaming,
+                                       onDelete,
+                                       onRename
+                                   }: Props) {
     const navigate = useNavigate()
     const {t} = useTranslation(['chat', 'common'])
     const [isEditingTitle, setIsEditingTitle] = useState(false)
     const [titleDraft, setTitleDraft] = useState('')
 
-    const displayTitle = title ?? (mediaTitle ? `${t('title')}: ${mediaTitle}` : t('conversation'))
+    const displayTitle = title ?? (isFreeConversation ? t('freeConversation') : mediaTitle ? `${t('title')}: ${mediaTitle}` : t('conversation'))
 
     const handleTitleSubmit = () => {
         const trimmed = titleDraft.trim()
@@ -82,7 +91,9 @@ export default function ChatHeader({title, mediaTitle, isDeleting, isRenaming, o
                     </h1>
                 )}
 
-                {mediaTitle && (
+                {isFreeConversation ? (
+                    <p className="text-sm text-muted-foreground mt-1">{t('freeConversation')}</p>
+                ) : mediaTitle && (
                     <p className="text-sm text-muted-foreground mt-1">
                         {t('medium')}: <span className="font-medium">{mediaTitle}</span>
                     </p>
