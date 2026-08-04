@@ -39,7 +39,7 @@ async function getPipeline(modelId: string): Promise<TtsPipeline> {
         cached = import('@huggingface/transformers').then(({pipeline}) =>
             pipeline('text-to-speech', modelId, {
                 device: 'wasm',
-                dtype: 'q8',
+                dtype: 'fp32',
                 progress_callback: (event: ProgressEvent) => {
                     workerScope.postMessage({type: 'progress', modelId, event})
                 },
