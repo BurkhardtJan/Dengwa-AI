@@ -1,5 +1,6 @@
 import type {SttEngine, SttEngineId, TtsEngine, TtsEngineId} from './types'
 import {browserTts} from './engines/browserTts'
+import {wasmTts} from "@/lib/speech/engines/wasmTts.ts";
 import {browserStt} from './engines/browserStt'
 
 function notImplementedTts(id: TtsEngineId): TtsEngine {
@@ -24,7 +25,7 @@ function notImplementedStt(id: SttEngineId): SttEngine {
 
 const ttsEngines: Record<TtsEngineId, TtsEngine> = {
     browser: browserTts,
-    webgpu: notImplementedTts('webgpu'),
+    webgpu: wasmTts,
     server: notImplementedTts('server'),
 }
 

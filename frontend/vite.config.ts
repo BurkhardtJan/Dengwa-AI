@@ -38,4 +38,18 @@ export default defineConfig({
             '@': path.resolve(__dirname, './src'),
         },
     },
+    server: {
+        headers: {
+            // Same reasoning as nginx.conf - enables SharedArrayBuffer so
+            // onnxruntime-web (WASM TTS engine) can run multi-threaded.
+            'Cross-Origin-Opener-Policy': 'same-origin',
+            'Cross-Origin-Embedder-Policy': 'require-corp',
+        },
+    },
+    preview: {
+        headers: {
+            'Cross-Origin-Opener-Policy': 'same-origin',
+            'Cross-Origin-Embedder-Policy': 'require-corp',
+        },
+    },
 })
