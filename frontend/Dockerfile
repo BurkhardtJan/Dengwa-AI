@@ -3,7 +3,7 @@ FROM node:22-slim AS builder
 ENV COREPACK_ENABLE=1
 RUN corepack enable pnpm
 WORKDIR /app
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile
 COPY . .
 RUN pnpm build
