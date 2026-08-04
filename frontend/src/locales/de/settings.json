@@ -3,17 +3,19 @@
   "notAvailable": "In diesem Browser nicht verfügbar",
   "engines": {
     "browser": "Browser-nativ",
-    "webgpu": "Lokal (WebGPU)",
+    "webgpu": "Lokal (WASM)",
+    "piper": "Lokal (Piper, hohe Qualität)",
     "server": "Server"
   },
   "tts": {
     "title": "Sprachausgabe (TTS)",
     "description": "Wie Antworten vorgelesen werden sollen.",
-    "browserHint": "Nutzt die Sprachausgabe deines Browsers/Betriebssystems. Stimmqualität und Sprachabdeckung hängen stark von deinem System ab."
+    "browserHint": "Nutzt die Sprachausgabe deines Browsers/Betriebssystems. Stimmqualität und Sprachabdeckung hängen stark von deinem System ab.",
+    "webgpuHint": "Läuft komplett lokal im Browser, ohne Server. Erster Aufruf pro Sprache lädt ein Modell herunter und kann mehrere Sekunden dauern; danach ist es schneller. Klingt bei ganzen Sätzen aktuell noch holpriger als die anderen Optionen, und nicht jede Sprache ist verfügbar."
   },
   "stt": {
     "title": "Spracheingabe (STT)",
     "description": "Wie gesprochener Text erkannt werden soll.",
-    "browserPrivacyHint": "Hinweis: In Chrome/Chromium wird die Audioaufnahme zur Erkennung an Google-Server gesendet. Für lokale/private Verarbeitung sobald verfügbar \"Lokal (WebGPU)\" oder \"Server\" wählen."
+    "browserPrivacyHint": "Hinweis: In Chrome/Chromium wird die Audioaufnahme zur Erkennung an Google-Server gesendet. Für lokale/private Verarbeitung sobald verfügbar \"Lokal (WASM)\" oder \"Server\" wählen."
   }
 }

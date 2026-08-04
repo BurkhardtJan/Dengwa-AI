@@ -3,17 +3,19 @@
   "notAvailable": "Not available in this browser",
   "engines": {
     "browser": "Browser-native",
-    "webgpu": "Local (WebGPU)",
+    "webgpu": "Local (WASM)",
+    "piper": "Local (Piper, high quality)",
     "server": "Server"
   },
   "tts": {
     "title": "Text-to-speech (TTS)",
     "description": "How replies are read aloud.",
-    "browserHint": "Uses your browser/OS built-in speech synthesis. Voice quality and language coverage depend heavily on your system."
+    "browserHint": "Uses your browser/OS built-in speech synthesis. Voice quality and language coverage depend heavily on your system.",
+    "webgpuHint": "Runs fully on-device, no server involved. First use per language downloads a model and can take several seconds; faster afterwards. Full sentences still sound rougher than the other options, and not every language is available."
   },
   "stt": {
     "title": "Speech-to-text (STT)",
     "description": "How spoken input is recognized.",
-    "browserPrivacyHint": "Note: in Chrome/Chromium, the audio recording is sent to Google's servers for recognition. Choose \"Local (WebGPU)\" or \"Server\" once available for local/private processing."
+    "browserPrivacyHint": "Note: in Chrome/Chromium, the audio recording is sent to Google's servers for recognition. Choose \"Local (WASM)\" or \"Server\" once available for local/private processing."
   }
 }

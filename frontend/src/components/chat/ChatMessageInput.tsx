@@ -16,6 +16,13 @@ export default function ChatMessageInput({isSending, onSend, learningLanguage}: 
     const [value, setValue] = useState('')
     const textareaRef = useRef<HTMLTextAreaElement>(null)
     const {start, stop, isListening, transcript, isSupported: isSttSupported} = useSpeechToText()
+    // Guards against a trailing recognition result landing in the input
+    // after we've already sent and cleared it - recognition.stop() doesn't
+    // cut off instantly, it can still deliver one more final result a beat
+    // later. Without this, that stray result (or, worse, the mic picking
+    // up the assistant's spoken-aloud reply if it's still listening)
+    // silently retypes text into the box post-send.
+    const suppressTranscriptRef = useRef(false)
 
     const resizeTextarea = () => {
         const el = textareaRef.current
@@ -33,7 +40,7 @@ export default function ChatMessageInput({isSending, onSend, learningLanguage}: 
     // Dictated text arrives outside the textarea's own onChange, so the
     // auto-resize has to be triggered here too.
     useEffect(() => {
-        if (transcript) {
+        if (transcript && !suppressTranscriptRef.current) {
             setValue(transcript)
             resizeTextarea()
         }
@@ -42,6 +49,11 @@ export default function ChatMessageInput({isSending, onSend, learningLanguage}: 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
         if (!value.trim() || isSending) return
+        // Always stop dictation on send, regardless of the isListening
+        // state - safe no-op if nothing's running, and doesn't depend on
+        // isListening being perfectly in sync with the engine.
+        suppressTranscriptRef.current = true
+        stop()
         onSend(value.trim())
         setValue('')
         const el = textareaRef.current
@@ -59,6 +71,7 @@ export default function ChatMessageInput({isSending, onSend, learningLanguage}: 
         if (isListening) {
             stop()
         } else {
+            suppressTranscriptRef.current = false
             start(toBcp47(learningLanguage))
         }
     }

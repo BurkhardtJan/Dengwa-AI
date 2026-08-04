@@ -22,7 +22,7 @@ export const browserStt: SttEngine = {
         return getSpeechRecognitionConstructor() !== undefined
     },
 
-    start({lang, onResult, onError}: SttStartOptions) {
+    start({lang, onResult, onError, onEnd}: SttStartOptions) {
         const RecognitionCtor = getSpeechRecognitionConstructor()
         if (!RecognitionCtor) {
             onError?.('SpeechRecognition is not supported in this browser.')
@@ -42,6 +42,14 @@ export const browserStt: SttEngine = {
         }
         recognition.onerror = (event) => {
             onError?.(event.error)
+        }
+        recognition.onend = () => {
+            // The authoritative "mic is actually off now" signal - fires on
+            // our own stop()/abort() as well as engine-internal reasons
+            // (e.g. a silence timeout), unlike a final onresult, which
+            // does NOT mean listening stopped in continuous mode.
+            if (activeRecognition === recognition) activeRecognition = null
+            onEnd?.()
         }
 
         activeRecognition = recognition

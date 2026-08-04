@@ -62,6 +62,9 @@ export default function SettingsPage() {
                 {ttsEngine === 'browser' && (
                     <p className="text-[11px] text-muted-foreground italic">{t('tts.browserHint')}</p>
                 )}
+                {ttsEngine === 'webgpu' && (
+                    <p className="text-[11px] text-muted-foreground italic">{t('tts.webgpuHint')}</p>
+                )}
             </section>
 
             <section className="flex flex-col gap-2">
