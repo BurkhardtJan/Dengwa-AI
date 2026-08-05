@@ -1,7 +1,6 @@
 import {Loader2, Volume2, VolumeX} from 'lucide-react'
 import {useTranslation} from 'react-i18next'
 import {useTextToSpeech} from '@/hooks/useTextToSpeech'
-import {stripMarkdownForSpeech} from '@/lib/speech/stripMarkdownForSpeech'
 import {toBcp47} from '@/lib/speech/languageCodes'
 
 interface Props {
@@ -22,7 +21,7 @@ export default function SpeakButton({text, lang, size = 14, className = ''}: Pro
             type="button"
             onClick={(e) => {
                 e.stopPropagation()
-                isSpeaking ? stop() : speak(stripMarkdownForSpeech(text), toBcp47(lang))
+                isSpeaking ? stop() : speak(text, toBcp47(lang)) // markdown stripping happens per-sentence inside the speaker now
             }}
             className={`text-muted-foreground hover:text-foreground transition-colors p-1 ${className}`}
             title={status ? status.label : t(isSpeaking ? 'speakStop' : 'speakStart')}

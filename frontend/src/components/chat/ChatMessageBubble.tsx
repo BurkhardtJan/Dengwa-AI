@@ -4,7 +4,6 @@ import {ChevronLeft, ChevronRight, Pencil, RotateCw, Volume2, VolumeX} from 'luc
 import type {components} from '@/types/api'
 import MarkdownContent from '@/components/chat/MarkdownContent'
 import {useTextToSpeech} from '@/hooks/useTextToSpeech'
-import {stripMarkdownForSpeech} from '@/lib/speech/stripMarkdownForSpeech'
 import {toBcp47} from '@/lib/speech/languageCodes'
 
 type ChatMessage = components['schemas']['ChatMessageResponse']
@@ -122,7 +121,7 @@ export default function ChatMessageBubble({
                     )}
                     {isAi && isTtsSupported && (
                         <button
-                            onClick={() => isSpeaking ? stop() : speak(stripMarkdownForSpeech(message.message), toBcp47(learningLanguage))}
+                            onClick={() => isSpeaking ? stop() : speak(message.message, toBcp47(learningLanguage))}
                             className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground p-1"
                             title={t(isSpeaking ? 'stopSpeaking' : 'readAloud')}
                         >
