@@ -43,7 +43,14 @@ function EngineSwitch<T extends string>({
 
 export default function SettingsPage() {
     const {t} = useTranslation('settings')
-    const {ttsEngine, setTtsEngine, sttEngine, setSttEngine} = useSpeechSettings()
+    const {
+        ttsEngine,
+        setTtsEngine,
+        sttEngine,
+        setSttEngine,
+        speakWhileStreaming,
+        setSpeakWhileStreaming
+    } = useSpeechSettings()
 
     return (
         <div className="max-w-xl mx-auto p-6 flex flex-col gap-8">
@@ -65,6 +72,16 @@ export default function SettingsPage() {
                 {ttsEngine === 'webgpu' && (
                     <p className="text-[11px] text-muted-foreground italic">{t('tts.webgpuHint')}</p>
                 )}
+
+                <label className="flex items-center gap-2 mt-1 text-xs cursor-pointer">
+                    <input
+                        type="checkbox"
+                        checked={speakWhileStreaming}
+                        onChange={(e) => setSpeakWhileStreaming(e.target.checked)}
+                        className="accent-primary"
+                    />
+                    {t('tts.speakWhileStreaming')}
+                </label>
             </section>
 
             <section className="flex flex-col gap-2">

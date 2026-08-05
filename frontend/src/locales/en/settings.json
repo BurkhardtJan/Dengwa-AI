@@ -11,7 +11,8 @@
     "title": "Text-to-speech (TTS)",
     "description": "How replies are read aloud.",
     "browserHint": "Uses your browser/OS built-in speech synthesis. Voice quality and language coverage depend heavily on your system.",
-    "webgpuHint": "Runs fully on-device, no server involved. First use per language downloads a model and can take several seconds; faster afterwards. Full sentences still sound rougher than the other options, and not every language is available."
+    "webgpuHint": "Runs fully on-device, no server involved. First use per language downloads a model and can take several seconds; faster afterwards. Full sentences still sound rougher than the other options, and not every language is available.",
+    "speakWhileStreaming": "Speak the reply sentence-by-sentence as it streams in, instead of only after it finishes"
   },
   "stt": {
     "title": "Speech-to-text (STT)",

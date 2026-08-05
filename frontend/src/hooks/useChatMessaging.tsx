@@ -1,6 +1,10 @@
-import {useState} from 'react'
+import {useEffect, useRef, useState} from 'react'
 import {useQueryClient} from '@tanstack/react-query'
 import {streamMessage, streamResponse, createResponse, writeMessage} from '@/services/chat.service.ts'
+import {useSpeechSettings} from '@/context/SpeechSettingsContext'
+import {getTtsEngine} from '@/lib/speech/registry'
+import {createStreamingSpeaker} from '@/lib/speech/streamingSpeaker'
+import {toBcp47} from '@/lib/speech/languageCodes'
 import type {components} from '@/types/api'
 
 type ChatMessage = components['schemas']['ChatMessageResponse']
@@ -17,14 +21,23 @@ export type ViewMode = 'switch' | 'sbs'
 const EMPTY_CHOICE: ModelChoice = {provider: null, model: null, embeddingModel: null}
 const VIEW_MODE_KEY = 'dengwa-chat-view-mode'
 
-export function useChatMessaging(chatId: string | undefined, onNewLeaf: (id: string) => void) {
+export function useChatMessaging(chatId: string | undefined, onNewLeaf: (id: string) => void, learningLanguage: string) {
     const queryClient = useQueryClient()
+    const {ttsEngine, speakWhileStreaming} = useSpeechSettings()
     const [configs, setConfigs] = useState<ModelChoice[]>([EMPTY_CHOICE])
     const [pendingUserText, setPendingUserText] = useState<string | null>(null)
     const [pendingReplyForId, setPendingReplyForId] = useState<string | null>(null)
     const [streamingText, setStreamingText] = useState<string | null>(null)
     const [isSending, setIsSending] = useState(false)
     const [isRegenerating, setIsRegenerating] = useState(false)
+    // Tracks the currently-playing/-queued streaming speaker so a new
+    // message can cut off leftover audio from a previous one, instead of
+    // both playing on top of each other.
+    const activeSpeakerRef = useRef<ReturnType<typeof createStreamingSpeaker> | null>(null)
+
+    // Stop any queued/playing speech if the chat unmounts mid-stream
+    // (navigating away) - otherwise it just keeps talking in the background.
+    useEffect(() => () => activeSpeakerRef.current?.stop(), [])
 
     const [viewMode, setViewModeState] = useState<ViewMode>(() => {
         const stored = localStorage.getItem(VIEW_MODE_KEY)
@@ -35,9 +48,20 @@ export function useChatMessaging(chatId: string | undefined, onNewLeaf: (id: str
         localStorage.setItem(VIEW_MODE_KEY, mode)
     }
 
+    function startStreamingSpeaker() {
+        activeSpeakerRef.current?.stop() // cut off anything left over from a previous message
+        if (!speakWhileStreaming || !learningLanguage) return null
+        const engine = getTtsEngine(ttsEngine)
+        if (!engine.isSupported()) return null
+        const speaker = createStreamingSpeaker(engine, toBcp47(learningLanguage))
+        activeSpeakerRef.current = speaker
+        return speaker
+    }
+
     async function send(message: string, parentId: string | null) {
         const [primary, ...extra] = configs.length > 0 ? configs : [EMPTY_CHOICE]
         let persistedUserMessage: ChatMessage | null = null
+        const speaker = startStreamingSpeaker()
 
         setIsSending(true)
         setPendingUserText(message)
@@ -52,6 +76,7 @@ export function useChatMessaging(chatId: string | undefined, onNewLeaf: (id: str
                     persistedUserMessage = event.message
                 } else if (event.type === 'chunk') {
                     setStreamingText(prev => (prev ?? '') + event.content)
+                    speaker?.push(event.content)
                 } else if (event.type === 'done') {
                     onNewLeaf(event.message.id)
                 } else if (event.type === 'title') {
@@ -61,6 +86,7 @@ export function useChatMessaging(chatId: string | undefined, onNewLeaf: (id: str
                     void queryClient.invalidateQueries({queryKey: ['chat']})
                 }
             }
+            speaker?.flush() // speaks whatever's left without trailing punctuation - keeps playing in the background after this function returns
 
             // Compare-view extras stay request/response for now — kein Streaming dort
             if (extra.length > 0 && persistedUserMessage) {
@@ -84,6 +110,7 @@ export function useChatMessaging(chatId: string | undefined, onNewLeaf: (id: str
 
     async function regenerate(userMessageId: string) {
         const primary = configs[0] ?? EMPTY_CHOICE
+        const speaker = startStreamingSpeaker()
 
         setIsRegenerating(true)
         setPendingReplyForId(userMessageId)
@@ -96,10 +123,12 @@ export function useChatMessaging(chatId: string | undefined, onNewLeaf: (id: str
             )) {
                 if (event.type === 'chunk') {
                     setStreamingText(prev => (prev ?? '') + event.content)
+                    speaker?.push(event.content)
                 } else if (event.type === 'done') {
                     onNewLeaf(event.message.id)
                 }
             }
+            speaker?.flush()
         } finally {
             await queryClient.invalidateQueries({queryKey: ['chatHistory', chatId]})
             setIsRegenerating(false)

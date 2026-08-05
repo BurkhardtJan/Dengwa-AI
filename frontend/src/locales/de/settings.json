@@ -11,7 +11,8 @@
     "title": "Sprachausgabe (TTS)",
     "description": "Wie Antworten vorgelesen werden sollen.",
     "browserHint": "Nutzt die Sprachausgabe deines Browsers/Betriebssystems. Stimmqualität und Sprachabdeckung hängen stark von deinem System ab.",
-    "webgpuHint": "Läuft komplett lokal im Browser, ohne Server. Erster Aufruf pro Sprache lädt ein Modell herunter und kann mehrere Sekunden dauern; danach ist es schneller. Klingt bei ganzen Sätzen aktuell noch holpriger als die anderen Optionen, und nicht jede Sprache ist verfügbar."
+    "webgpuHint": "Läuft komplett lokal im Browser, ohne Server. Erster Aufruf pro Sprache lädt ein Modell herunter und kann mehrere Sekunden dauern; danach ist es schneller. Klingt bei ganzen Sätzen aktuell noch holpriger als die anderen Optionen, und nicht jede Sprache ist verfügbar.",
+    "speakWhileStreaming": "Antwort satzweise vorlesen, während sie geschrieben wird (statt erst am Ende)"
   },
   "stt": {
     "title": "Spracheingabe (STT)",

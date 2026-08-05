@@ -55,7 +55,7 @@ export default function MiniChat({mediaId, instanceKey, title, getContext}: Prop
         displayPath, isSending, isRegenerating, pendingReplyForId, streamingText,
         switchSibling, getSiblingInfo, getSiblingMessages, selectBranch,
         sendNew, sendNewWithContext, sendEdit, regenerate, viewMode, error: historyError
-    } = useChatTree(chatId)
+    } = useChatTree(chatId, chat?.learning_language ?? '')
 
     // The cached chat can outlive the actual chat on the server (e.g. a
     // dev DB reset). If loading its history 404s, drop the stale cache

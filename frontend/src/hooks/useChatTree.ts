@@ -10,7 +10,7 @@ export type {ModelChoice, ViewMode} from './useChatMessaging'
 
 type ChatMessage = components['schemas']['ChatMessageResponse']
 
-export function useChatTree(chatId: string | undefined) {
+export function useChatTree(chatId: string | undefined, learningLanguage: string) {
     const {data: history, isLoading, isError, error} = useQuery({
         queryKey: ['chatHistory', chatId],
         queryFn: () => fetchChatHistory(chatId!),
@@ -18,7 +18,7 @@ export function useChatTree(chatId: string | undefined) {
     })
 
     const branches = useChatBranches(history)
-    const messaging = useChatMessaging(chatId, branches.setActiveLeafId)
+    const messaging = useChatMessaging(chatId, branches.setActiveLeafId, learningLanguage)
 
     const displayPath = useMemo<ChatMessage[]>(() => {
         if (!messaging.pendingUserText) return branches.activePath

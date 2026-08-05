@@ -16,13 +16,6 @@ export default function ChatDetailPage() {
     const queryClient = useQueryClient()
     const {t} = useTranslation('chat')
 
-    const {
-        displayPath, isLoading, isError, isSending, isRegenerating, pendingReplyForId, streamingText,
-        switchSibling, getSiblingInfo, getSiblingMessages, selectBranch,
-        sendNew, sendEdit, regenerate,
-        configs, addConfig, removeConfig, updateConfig, viewMode, setViewMode
-    } = useChatTree(id)
-
     const {data: chatMeta} = useQuery({
         queryKey: ['chatMeta', id],
         queryFn: async () => {
@@ -36,6 +29,13 @@ export default function ChatDetailPage() {
         },
         enabled: !!id
     })
+
+    const {
+        displayPath, isLoading, isError, isSending, isRegenerating, pendingReplyForId, streamingText,
+        switchSibling, getSiblingInfo, getSiblingMessages, selectBranch,
+        sendNew, sendEdit, regenerate,
+        configs, addConfig, removeConfig, updateConfig, viewMode, setViewMode
+    } = useChatTree(id, chatMeta?.learning_language ?? '')
 
 
     const deleteMutation = useMutation({
@@ -105,7 +105,8 @@ export default function ChatDetailPage() {
                 onRegenerate={regenerate}
                 learningLanguage={chatMeta?.learning_language ?? ''}
             />
-            <ChatMessageInput isSending={isSending} onSend={sendNew} learningLanguage={chatMeta?.learning_language ?? ''}/>
+            <ChatMessageInput isSending={isSending} onSend={sendNew}
+                              learningLanguage={chatMeta?.learning_language ?? ''}/>
         </div>
     )
 }
