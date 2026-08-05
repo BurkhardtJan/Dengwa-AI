@@ -34,6 +34,7 @@ export function useChatMessaging(chatId: string | undefined, onNewLeaf: (id: str
     // message can cut off leftover audio from a previous one, instead of
     // both playing on top of each other.
     const activeSpeakerRef = useRef<ReturnType<typeof createStreamingSpeaker> | null>(null)
+    const [isSpeakingStream, setIsSpeakingStream] = useState(false)
 
     // Stop any queued/playing speech if the chat unmounts mid-stream
     // (navigating away) - otherwise it just keeps talking in the background.
@@ -53,9 +54,13 @@ export function useChatMessaging(chatId: string | undefined, onNewLeaf: (id: str
         if (!speakWhileStreaming || !learningLanguage) return null
         const engine = getTtsEngine(ttsEngine)
         if (!engine.isSupported()) return null
-        const speaker = createStreamingSpeaker(engine, toBcp47(learningLanguage))
+        const speaker = createStreamingSpeaker(engine, toBcp47(learningLanguage), setIsSpeakingStream)
         activeSpeakerRef.current = speaker
         return speaker
+    }
+
+    function stopSpeaking() {
+        activeSpeakerRef.current?.stop()
     }
 
     async function send(message: string, parentId: string | null) {
@@ -147,5 +152,6 @@ export function useChatMessaging(chatId: string | undefined, onNewLeaf: (id: str
         isSending, isRegenerating, pendingUserText, pendingReplyForId, streamingText,
         configs, addConfig, removeConfig, updateConfig,
         viewMode, setViewMode,
+        isSpeakingStream, stopSpeaking,
     }
 }

@@ -9,12 +9,13 @@ import ChatMessageList from '@/components/chat/ChatMessageList'
 import ChatMessageInput from '@/components/chat/ChatMessageInput'
 import {useTranslation} from 'react-i18next'
 import {useMedium} from '@/context/MediumContext'
+import {VolumeX} from 'lucide-react'
 
 export default function ChatDetailPage() {
     const {id} = useParams<{ id: string }>()
     const navigate = useNavigate()
     const queryClient = useQueryClient()
-    const {t} = useTranslation('chat')
+    const {t} = useTranslation(['chat', 'common'])
 
     const {data: chatMeta} = useQuery({
         queryKey: ['chatMeta', id],
@@ -34,7 +35,8 @@ export default function ChatDetailPage() {
         displayPath, isLoading, isError, isSending, isRegenerating, pendingReplyForId, streamingText,
         switchSibling, getSiblingInfo, getSiblingMessages, selectBranch,
         sendNew, sendEdit, regenerate,
-        configs, addConfig, removeConfig, updateConfig, viewMode, setViewMode
+        configs, addConfig, removeConfig, updateConfig, viewMode, setViewMode,
+        isSpeakingStream, stopSpeaking,
     } = useChatTree(id, chatMeta?.learning_language ?? '')
 
 
@@ -105,8 +107,17 @@ export default function ChatDetailPage() {
                 onRegenerate={regenerate}
                 learningLanguage={chatMeta?.learning_language ?? ''}
             />
-            <ChatMessageInput isSending={isSending} onSend={sendNew}
-                              learningLanguage={chatMeta?.learning_language ?? ''}/>
+            {isSpeakingStream && (
+                <button
+                    type="button"
+                    onClick={stopSpeaking}
+                    className="self-center mb-2 flex items-center gap-1.5 text-xs px-3 py-1 rounded-full border bg-background text-muted-foreground hover:text-foreground transition-colors"
+                >
+                    <VolumeX size={13}/>
+                    {t('speakStop', {ns: 'common'})}
+                </button>
+            )}
+            <ChatMessageInput isSending={isSending} onSend={sendNew} learningLanguage={chatMeta?.learning_language ?? ''}/>
         </div>
     )
 }

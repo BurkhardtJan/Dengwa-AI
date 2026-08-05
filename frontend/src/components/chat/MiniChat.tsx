@@ -1,6 +1,6 @@
 import {useEffect, useRef} from 'react'
 import {Link} from 'react-router-dom'
-import {ExternalLink} from 'lucide-react'
+import {ExternalLink, VolumeX} from 'lucide-react'
 import {useQuery, useQueryClient} from '@tanstack/react-query'
 import {isAxiosError} from 'axios'
 import {useTranslation} from 'react-i18next'
@@ -54,7 +54,8 @@ export default function MiniChat({mediaId, instanceKey, title, getContext}: Prop
     const {
         displayPath, isSending, isRegenerating, pendingReplyForId, streamingText,
         switchSibling, getSiblingInfo, getSiblingMessages, selectBranch,
-        sendNew, sendNewWithContext, sendEdit, regenerate, viewMode, error: historyError
+        sendNew, sendNewWithContext, sendEdit, regenerate, viewMode, error: historyError,
+        isSpeakingStream, stopSpeaking,
     } = useChatTree(chatId, chat?.learning_language ?? '')
 
     // The cached chat can outlive the actual chat on the server (e.g. a
@@ -122,6 +123,16 @@ export default function MiniChat({mediaId, instanceKey, title, getContext}: Prop
                     onRegenerate={regenerate}
                     learningLanguage={chat?.learning_language ?? ''}
                 />
+            )}
+            {isSpeakingStream && (
+                <button
+                    type="button"
+                    onClick={stopSpeaking}
+                    className="self-center mb-1 flex items-center gap-1.5 text-[11px] px-2.5 py-0.5 rounded-full border bg-background text-muted-foreground hover:text-foreground transition-colors"
+                >
+                    <VolumeX size={11}/>
+                    {t('common:speakStop')}
+                </button>
             )}
             <ChatMessageInput isSending={isSending || !chatId} onSend={handleSend}
                               learningLanguage={chat?.learning_language ?? ''}/>

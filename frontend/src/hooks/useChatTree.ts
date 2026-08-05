@@ -81,5 +81,7 @@ export function useChatTree(chatId: string | undefined, learningLanguage: string
         updateConfig: messaging.updateConfig,
         viewMode: messaging.viewMode,
         setViewMode: messaging.setViewMode,
+        isSpeakingStream: messaging.isSpeakingStream,
+        stopSpeaking: messaging.stopSpeaking,
     }
 }
