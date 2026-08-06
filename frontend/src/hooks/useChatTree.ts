@@ -67,6 +67,7 @@ export function useChatTree(chatId: string | undefined, learningLanguage: string
         isRegenerating: messaging.isRegenerating,
         pendingReplyForId: messaging.pendingReplyForId,
         streamingText: messaging.streamingText,
+        compareStreamingTexts: messaging.compareStreamingTexts,
         switchSibling: branches.switchSibling,
         getSiblingInfo: branches.getSiblingInfo,
         getSiblingMessages: branches.getSiblingMessages,
@@ -81,6 +82,8 @@ export function useChatTree(chatId: string | undefined, learningLanguage: string
         updateConfig: messaging.updateConfig,
         viewMode: messaging.viewMode,
         setViewMode: messaging.setViewMode,
+        showMetadata: messaging.showMetadata,
+        setShowMetadata: messaging.setShowMetadata,
         isSpeakingStream: messaging.isSpeakingStream,
         stopSpeaking: messaging.stopSpeaking,
     }

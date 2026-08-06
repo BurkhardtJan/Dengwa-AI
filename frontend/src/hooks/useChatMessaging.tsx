@@ -1,13 +1,12 @@
 import {useEffect, useRef, useState} from 'react'
 import {useQueryClient} from '@tanstack/react-query'
-import {streamMessage, streamResponse, createResponse, writeMessage} from '@/services/chat.service.ts'
+import {streamMessage, streamResponse, writeMessage} from '@/services/chat.service.ts'
 import {useSpeechSettings} from '@/context/SpeechSettingsContext'
 import {getTtsEngine} from '@/lib/speech/registry'
 import {createStreamingSpeaker} from '@/lib/speech/streamingSpeaker'
 import {toBcp47} from '@/lib/speech/languageCodes'
 import type {components} from '@/types/api'
 
-type ChatMessage = components['schemas']['ChatMessageResponse']
 type Chat = components['schemas']['ChatResponse']
 
 export interface ModelChoice {
@@ -26,6 +25,7 @@ const EMPTY_CHOICE: ModelChoice = {
     provider: null, model: null, embeddingModel: null, temperature: undefined, maxTokens: null
 }
 const VIEW_MODE_KEY = 'dengwa-chat-view-mode'
+const SHOW_METADATA_KEY = 'dengwa-chat-show-metadata'
 
 export function useChatMessaging(chatId: string | undefined, onNewLeaf: (id: string) => void, learningLanguage: string) {
     const queryClient = useQueryClient()
@@ -34,6 +34,9 @@ export function useChatMessaging(chatId: string | undefined, onNewLeaf: (id: str
     const [pendingUserText, setPendingUserText] = useState<string | null>(null)
     const [pendingReplyForId, setPendingReplyForId] = useState<string | null>(null)
     const [streamingText, setStreamingText] = useState<string | null>(null)
+    // Per-slot streaming text while a compare send (2+ configs) is in flight.
+    // Index 0 = primary, same order as `configs`. Null outside a compare send.
+    const [compareStreamingTexts, setCompareStreamingTexts] = useState<(string | null)[] | null>(null)
     const [isSending, setIsSending] = useState(false)
     const [isRegenerating, setIsRegenerating] = useState(false)
     // Tracks the currently-playing/-queued streaming speaker so a new
@@ -55,6 +58,15 @@ export function useChatMessaging(chatId: string | undefined, onNewLeaf: (id: str
         localStorage.setItem(VIEW_MODE_KEY, mode)
     }
 
+    // MVP-only debug toggle - shows token counts + estimated cost under each
+    // AI reply. Off by default; end users won't care, but it's handy while
+    // comparing models. Persisted the same way as viewMode.
+    const [showMetadata, setShowMetadataState] = useState<boolean>(() => localStorage.getItem(SHOW_METADATA_KEY) === 'true')
+    const setShowMetadata = (value: boolean) => {
+        setShowMetadataState(value)
+        localStorage.setItem(SHOW_METADATA_KEY, String(value))
+    }
+
     function startStreamingSpeaker() {
         activeSpeakerRef.current?.stop() // cut off anything left over from a previous message
         if (!speakWhileStreaming || !learningLanguage) return null
@@ -70,23 +82,42 @@ export function useChatMessaging(chatId: string | undefined, onNewLeaf: (id: str
     }
 
     async function send(message: string, parentId: string | null) {
-        const [primary, ...extra] = configs.length > 0 ? configs : [EMPTY_CHOICE]
-        let persistedUserMessage: ChatMessage | null = null
-        const speaker = startStreamingSpeaker()
+        const activeConfigs = configs.length > 0 ? configs : [EMPTY_CHOICE]
+        const [primary, ...extra] = activeConfigs
+        const isCompare = extra.length > 0
+        const speaker = startStreamingSpeaker() // only the primary reply is read aloud
 
         setIsSending(true)
         setPendingUserText(message)
         setStreamingText('')
+        setCompareStreamingTexts(isCompare ? activeConfigs.map(() => '') : null)
 
-        try {
+        // Extras need the persisted user-message id before they can start
+        // their own /messages/{id}/stream call - the primary stream creates
+        // that message and emits it as its first SSE event. This resolves
+        // as soon as that event arrives, so extras start almost immediately
+        // alongside the primary instead of waiting for it to finish.
+        let resolveUserMessageId: (id: string) => void = () => {
+        }
+        const userMessageIdPromise = new Promise<string>(resolve => {
+            resolveUserMessageId = resolve
+        })
+
+        async function runPrimary() {
             for await (const event of streamMessage(
                 chatId!, message, parentId,
                 primary.provider, primary.model, primary.embeddingModel, primary.temperature, primary.maxTokens
             )) {
                 if (event.type === 'user_message') {
-                    persistedUserMessage = event.message
+                    resolveUserMessageId(event.message.id)
                 } else if (event.type === 'chunk') {
                     setStreamingText(prev => (prev ?? '') + event.content)
+                    setCompareStreamingTexts(prev => {
+                        if (!prev) return prev
+                        const next = [...prev]
+                        next[0] = (next[0] ?? '') + event.content
+                        return next
+                    })
                     speaker?.push(event.content)
                 } else if (event.type === 'done') {
                     onNewLeaf(event.message.id)
@@ -98,21 +129,36 @@ export function useChatMessaging(chatId: string | undefined, onNewLeaf: (id: str
                 }
             }
             speaker?.flush() // speaks whatever's left without trailing punctuation - keeps playing in the background after this function returns
+        }
 
-            // Compare-view extras stay request/response for now — kein Streaming dort
-            if (extra.length > 0 && persistedUserMessage) {
-                const userMessageId = persistedUserMessage.id
-                await Promise.all(
-                    extra.map(cfg => createResponse(
-                        chatId!, userMessageId, cfg.provider, cfg.model, cfg.embeddingModel, cfg.temperature, cfg.maxTokens
-                    ))
-                )
+        // Extra compare slots stream too now, so the user sees all columns
+        // filling in side by side instead of the extras just popping in
+        // once done. They become additional siblings the user can switch
+        // to/compare - only the primary's reply becomes the new active leaf.
+        async function runExtra(cfg: ModelChoice, slotIndex: number) {
+            const userMessageId = await userMessageIdPromise
+            for await (const event of streamResponse(
+                chatId!, userMessageId, cfg.provider, cfg.model, cfg.embeddingModel, cfg.temperature, cfg.maxTokens
+            )) {
+                if (event.type === 'chunk') {
+                    setCompareStreamingTexts(prev => {
+                        if (!prev) return prev
+                        const next = [...prev]
+                        next[slotIndex] = (next[slotIndex] ?? '') + event.content
+                        return next
+                    })
+                }
             }
+        }
+
+        try {
+            await Promise.all([runPrimary(), ...extra.map((cfg, i) => runExtra(cfg, i + 1))])
         } finally {
             await queryClient.invalidateQueries({queryKey: ['chatHistory', chatId]})
             setIsSending(false)
             setPendingUserText(null)
             setStreamingText(null)
+            setCompareStreamingTexts(null)
         }
     }
 
@@ -157,9 +203,10 @@ export function useChatMessaging(chatId: string | undefined, onNewLeaf: (id: str
 
     return {
         send, sendWithContext, regenerate,
-        isSending, isRegenerating, pendingUserText, pendingReplyForId, streamingText,
+        isSending, isRegenerating, pendingUserText, pendingReplyForId, streamingText, compareStreamingTexts,
         configs, addConfig, removeConfig, updateConfig,
         viewMode, setViewMode,
+        showMetadata, setShowMetadata,
         isSpeakingStream, stopSpeaking,
     }
 }

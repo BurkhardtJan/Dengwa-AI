@@ -7,9 +7,10 @@ interface Props {
     siblings: ChatMessage[]
     activeId: string
     onSelect: (messageId: string) => void
+    showMetadata: boolean
 }
 
-export default function CompareView({siblings, activeId, onSelect}: Props) {
+export default function CompareView({siblings, activeId, onSelect, showMetadata}: Props) {
     const {t, i18n} = useTranslation('chat')
 
     return (
@@ -20,6 +21,8 @@ export default function CompareView({siblings, activeId, onSelect}: Props) {
             <div className="grid gap-2" style={{gridTemplateColumns: `repeat(${siblings.length}, minmax(0, 1fr))`}}>
                 {siblings.map(msg => {
                     const isActive = msg.id === activeId
+                    const totalTokens = (msg.input_tokens ?? 0) + (msg.output_tokens ?? 0)
+                    const hasMetadata = msg.input_tokens != null || msg.output_tokens != null
                     return (
                         <button
                             key={msg.id}
@@ -29,7 +32,8 @@ export default function CompareView({siblings, activeId, onSelect}: Props) {
                             }`}
                         >
                             <div className="flex items-center justify-between gap-1">
-                                <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider truncate">
+                                <span
+                                    className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider truncate">
                                     {msg.model ?? msg.provider ?? t('defaultModel')}
                                 </span>
                                 {isActive && (
@@ -45,6 +49,12 @@ export default function CompareView({siblings, activeId, onSelect}: Props) {
                                     minute: '2-digit'
                                 })}
                             </span>
+                            {showMetadata && hasMetadata && (
+                                <span className="text-[10px] text-muted-foreground">
+                                    {totalTokens} {t('tokens')}
+                                    {msg.estimated_cost_usd != null && ` (~$${msg.estimated_cost_usd.toFixed(4)})`}
+                                </span>
+                            )}
                         </button>
                     )
                 })}

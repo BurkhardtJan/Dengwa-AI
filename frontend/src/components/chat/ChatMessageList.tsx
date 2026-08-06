@@ -2,10 +2,11 @@ import {Fragment, useEffect, useRef} from 'react'
 import {useTranslation} from 'react-i18next'
 import ChatMessageBubble from './ChatMessageBubble'
 import CompareView from './CompareView'
+import PendingCompareView from './PendingCompareView'
 import LoadingBubble from './LoadingBubble'
 import {PENDING_USER_MESSAGE_ID} from '@/utils/tree.utils'
 import type {components} from '@/types/api'
-import type {ViewMode} from '@/hooks/useChatTree'
+import type {ModelChoice, ViewMode} from '@/hooks/useChatTree'
 
 type ChatMessage = components['schemas']['ChatMessageResponse']
 
@@ -15,7 +16,10 @@ interface Props {
     isRegenerating: boolean
     pendingReplyForId: string | null
     streamingText: string | null
+    compareStreamingTexts: (string | null)[] | null
     viewMode: ViewMode
+    configs: ModelChoice[]
+    showMetadata: boolean
     getSiblingInfo: (messageId: string) => { index: number; count: number }
     getSiblingMessages: (messageId: string) => ChatMessage[]
     onSwitchSibling: (messageId: string, direction: 'prev' | 'next') => void
@@ -46,7 +50,10 @@ export default function ChatMessageList({
                                             isRegenerating,
                                             pendingReplyForId,
                                             streamingText,
+                                            compareStreamingTexts,
                                             viewMode,
+                                            configs,
+                                            showMetadata,
                                             getSiblingInfo,
                                             getSiblingMessages,
                                             onSwitchSibling,
@@ -84,7 +91,9 @@ export default function ChatMessageList({
                                     </div>
                                 </div>
                                 {isSending && (
-                                    streamingText ? <StreamingBubble text={streamingText}/> : <LoadingBubble/>
+                                    compareStreamingTexts && configs.length > 1 && viewMode === 'sbs'
+                                        ? <PendingCompareView configs={configs} streamingTexts={compareStreamingTexts}/>
+                                        : (streamingText ? <StreamingBubble text={streamingText}/> : <LoadingBubble/>)
                                 )}
                             </Fragment>
                         )
@@ -100,6 +109,7 @@ export default function ChatMessageList({
                                     siblings={siblings}
                                     activeId={msg.id}
                                     onSelect={onSelectBranch}
+                                    showMetadata={showMetadata}
                                 />
                                 {showRegenLoading && (
                                     streamingText ? <StreamingBubble text={streamingText}/> : <LoadingBubble/>
@@ -120,6 +130,7 @@ export default function ChatMessageList({
                                 onEditSubmit={(newText) => onEditSubmit(msg.id, newText, msg.parent_id)}
                                 onRegenerate={() => isAi && msg.parent_id && onRegenerate(msg.parent_id)}
                                 learningLanguage={learningLanguage}
+                                showMetadata={showMetadata}
                             />
                             {showRegenLoading && (
                                 streamingText ? <StreamingBubble text={streamingText}/> : <LoadingBubble/>

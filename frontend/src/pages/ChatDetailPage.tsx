@@ -33,9 +33,11 @@ export default function ChatDetailPage() {
 
     const {
         displayPath, isLoading, isError, isSending, isRegenerating, pendingReplyForId, streamingText,
+        compareStreamingTexts,
         switchSibling, getSiblingInfo, getSiblingMessages, selectBranch,
         sendNew, sendEdit, regenerate,
         configs, addConfig, removeConfig, updateConfig, viewMode, setViewMode,
+        showMetadata, setShowMetadata,
         isSpeakingStream, stopSpeaking,
     } = useChatTree(id, chatMeta?.learning_language ?? '')
 
@@ -90,6 +92,8 @@ export default function ChatDetailPage() {
                     onUpdateConfig={updateConfig}
                     viewMode={viewMode}
                     onViewModeChange={setViewMode}
+                    showMetadata={showMetadata}
+                    onShowMetadataChange={setShowMetadata}
                 />
             </div>
             <ChatMessageList
@@ -98,7 +102,10 @@ export default function ChatDetailPage() {
                 isRegenerating={isRegenerating}
                 pendingReplyForId={pendingReplyForId}
                 streamingText={streamingText}
+                compareStreamingTexts={compareStreamingTexts}
                 viewMode={viewMode}
+                configs={configs}
+                showMetadata={showMetadata}
                 getSiblingInfo={getSiblingInfo}
                 getSiblingMessages={getSiblingMessages}
                 onSwitchSibling={switchSibling}
@@ -117,7 +124,8 @@ export default function ChatDetailPage() {
                     {t('speakStop', {ns: 'common'})}
                 </button>
             )}
-            <ChatMessageInput isSending={isSending} onSend={sendNew} learningLanguage={chatMeta?.learning_language ?? ''}/>
+            <ChatMessageInput isSending={isSending} onSend={sendNew}
+                              learningLanguage={chatMeta?.learning_language ?? ''}/>
         </div>
     )
 }

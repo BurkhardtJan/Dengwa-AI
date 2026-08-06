@@ -11,11 +11,20 @@ interface Props {
     onUpdateConfig: (index: number, choice: ModelChoice) => void
     viewMode: ViewMode
     onViewModeChange: (mode: ViewMode) => void
+    showMetadata: boolean
+    onShowMetadataChange: (value: boolean) => void
 }
 
 export default function ChatSettings({
-    configs, onAddConfig, onRemoveConfig, onUpdateConfig, viewMode, onViewModeChange
-}: Props) {
+                                         configs,
+                                         onAddConfig,
+                                         onRemoveConfig,
+                                         onUpdateConfig,
+                                         viewMode,
+                                         onViewModeChange,
+                                         showMetadata,
+                                         onShowMetadataChange
+                                     }: Props) {
     const {t} = useTranslation('chat')
     const [isOpen, setIsOpen] = useState(false)
 
@@ -39,7 +48,8 @@ export default function ChatSettings({
 
             {isOpen && (
                 <div className="px-3 pb-3 flex flex-col gap-3">
-                    <div className="grid gap-2" style={{gridTemplateColumns: `repeat(${Math.min(configs.length, 3)}, 1fr)`}}>
+                    <div className="grid gap-2"
+                         style={{gridTemplateColumns: `repeat(${Math.min(configs.length, 3)}, 1fr)`}}>
                         {configs.map((cfg, i) => (
                             <ModelConfigFields
                                 key={i}
@@ -91,6 +101,18 @@ export default function ChatSettings({
                             </button>
                         </div>
                     </div>
+
+                    <label className="flex items-center gap-2 pt-2 border-t cursor-pointer">
+                        <input
+                            type="checkbox"
+                            checked={showMetadata}
+                            onChange={(e) => onShowMetadataChange(e.target.checked)}
+                            className="accent-primary"
+                        />
+                        <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                            {t('settings.showMetadata')}
+                        </span>
+                    </label>
                 </div>
             )}
         </div>

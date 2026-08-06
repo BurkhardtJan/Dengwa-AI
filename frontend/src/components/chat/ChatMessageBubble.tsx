@@ -19,11 +19,21 @@ interface Props {
     onRegenerate: () => void
     /** The chat's target learning language (Dengwa's free-text value, e.g. "Spanisch") — used for read-aloud, not the UI locale. */
     learningLanguage: string
+    /** MVP-only: shows token count + estimated cost under AI replies. */
+    showMetadata: boolean
 }
 
 export default function ChatMessageBubble({
-                                              message, siblingIndex, siblingCount, isSending, isRegenerating,
-                                              onSwitchSibling, onEditSubmit, onRegenerate, learningLanguage
+                                              message,
+                                              siblingIndex,
+                                              siblingCount,
+                                              isSending,
+                                              isRegenerating,
+                                              onSwitchSibling,
+                                              onEditSubmit,
+                                              onRegenerate,
+                                              learningLanguage,
+                                              showMetadata
                                           }: Props) {
     const {t, i18n} = useTranslation(['chat', 'common'])
     const [isEditing, setIsEditing] = useState(false)
@@ -56,12 +66,6 @@ export default function ChatMessageBubble({
                 {isAi && (message.model || message.provider) && (
                     <span className="ml-1.5 normal-case tracking-normal opacity-70">
                         · {message.model ?? message.provider}
-                    </span>
-                )}
-                {isAi && (message.input_tokens != null || message.output_tokens != null) && (
-                    <span className="ml-1.5 normal-case tracking-normal opacity-70">
-                        · {(message.input_tokens ?? 0) + (message.output_tokens ?? 0)} {t('tokens')}
-                        {message.estimated_cost_usd != null && ` (~$${message.estimated_cost_usd.toFixed(4)})`}
                     </span>
                 )}
             </span>
@@ -166,6 +170,12 @@ export default function ChatMessageBubble({
                     })}
                 </span>
             </div>
+            {showMetadata && isAi && (message.input_tokens != null || message.output_tokens != null) && (
+                <span className="text-[10px] text-muted-foreground px-1 mt-0.5">
+                    {(message.input_tokens ?? 0) + (message.output_tokens ?? 0)} {t('tokens')}
+                    {message.estimated_cost_usd != null && ` (~$${message.estimated_cost_usd.toFixed(4)})`}
+                </span>
+            )}
         </div>
     )
 }

@@ -52,9 +52,9 @@ export default function MiniChat({mediaId, instanceKey, title, getContext}: Prop
     const queryClient = useQueryClient()
 
     const {
-        displayPath, isSending, isRegenerating, pendingReplyForId, streamingText,
+        displayPath, isSending, isRegenerating, pendingReplyForId, streamingText, compareStreamingTexts,
         switchSibling, getSiblingInfo, getSiblingMessages, selectBranch,
-        sendNew, sendNewWithContext, sendEdit, regenerate, viewMode, error: historyError,
+        sendNew, sendNewWithContext, sendEdit, regenerate, configs, viewMode, showMetadata, error: historyError,
         isSpeakingStream, stopSpeaking,
     } = useChatTree(chatId, chat?.learning_language ?? '')
 
@@ -114,7 +114,10 @@ export default function MiniChat({mediaId, instanceKey, title, getContext}: Prop
                     isRegenerating={isRegenerating}
                     pendingReplyForId={pendingReplyForId}
                     streamingText={streamingText}
+                    compareStreamingTexts={compareStreamingTexts}
                     viewMode={viewMode}
+                    configs={configs}
+                    showMetadata={showMetadata}
                     getSiblingInfo={getSiblingInfo}
                     getSiblingMessages={getSiblingMessages}
                     onSwitchSibling={switchSibling}
