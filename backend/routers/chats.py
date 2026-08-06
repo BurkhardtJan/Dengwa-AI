@@ -96,6 +96,8 @@ async def post_chat_message(
         provider: str | None = None,
         model: str | None = None,
         embedding_model: str | None = None,
+        temperature: float | None = None,
+        max_tokens: int | None = None,
         db: Session = Depends(get_db),
         current_user=Depends(get_current_user)
 ):
@@ -107,7 +109,7 @@ async def post_chat_message(
         background_tasks.add_task(generate_chat_title, db, chat.id, request.message)
 
     assistant_message = generate_assistant_reply(
-        db, chat, user_message, provider, model, embedding_model
+        db, chat, user_message, provider, model, embedding_model, temperature, max_tokens
     )
 
     return [user_message, assistant_message]
@@ -120,6 +122,8 @@ async def post_chat_message_stream(
         provider: str | None = None,
         model: str | None = None,
         embedding_model: str | None = None,
+        temperature: float | None = None,
+        max_tokens: int | None = None,
         db: Session = Depends(get_db),
         current_user=Depends(get_current_user)
 ):
@@ -132,7 +136,9 @@ async def post_chat_message_stream(
             "type": "user_message",
             "message": ChatMessageResponse.model_validate(user_message).model_dump(mode="json"),
         })
-        for kind, payload in stream_assistant_reply(db, chat, user_message, provider, model, embedding_model):
+        for kind, payload in stream_assistant_reply(
+                db, chat, user_message, provider, model, embedding_model, temperature, max_tokens
+        ):
             if kind == "chunk":
                 yield sse({"type": "chunk", "content": payload})
             else:
@@ -155,6 +161,8 @@ async def create_response(
         provider: str | None = None,
         model: str | None = None,
         embedding_model: str | None = None,
+        temperature: float | None = None,
+        max_tokens: int | None = None,
         db: Session = Depends(get_db),
         current_user=Depends(get_current_user)
 ):
@@ -168,7 +176,7 @@ async def create_response(
         raise HTTPException(status_code=404, detail="User message not found")
 
     assistant_message = generate_assistant_reply(
-        db, chat, user_message, provider, model, embedding_model
+        db, chat, user_message, provider, model, embedding_model, temperature, max_tokens
     )
 
     return [assistant_message]
@@ -181,6 +189,8 @@ async def create_response_stream(
         provider: str | None = None,
         model: str | None = None,
         embedding_model: str | None = None,
+        temperature: float | None = None,
+        max_tokens: int | None = None,
         db: Session = Depends(get_db),
         current_user=Depends(get_current_user)
 ):
@@ -192,7 +202,9 @@ async def create_response_stream(
         raise HTTPException(status_code=404, detail="User message not found")
 
     def event_stream():
-        for kind, payload in stream_assistant_reply(db, chat, user_message, provider, model, embedding_model):
+        for kind, payload in stream_assistant_reply(
+                db, chat, user_message, provider, model, embedding_model, temperature, max_tokens
+        ):
             if kind == "chunk":
                 yield sse({"type": "chunk", "content": payload})
             else:

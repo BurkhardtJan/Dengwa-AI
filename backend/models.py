@@ -185,6 +185,10 @@ class ChatHistory(Base):
     provider = Column(Text, nullable=True)
     model = Column(Text, nullable=True)
     embedding_model = Column(Text, nullable=True)
+    temperature = Column(Float, nullable=True)
+    max_tokens = Column(Integer, nullable=True)
+    input_tokens = Column(Integer, nullable=True)
+    output_tokens = Column(Integer, nullable=True)
 
     chat = relationship("Chat", back_populates="chat_histories")
     parent = relationship(

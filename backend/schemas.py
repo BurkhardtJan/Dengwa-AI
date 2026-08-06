@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict, computed_field
 from typing import Optional, List
 from datetime import datetime
 from uuid import UUID
@@ -125,8 +125,19 @@ class ChatMessageResponse(BaseModel):
     provider: Optional[str] = None
     model: Optional[str] = None
     embedding_model: Optional[str] = None
+    temperature: Optional[float] = None
+    max_tokens: Optional[int] = None
+    input_tokens: Optional[int] = None
+    output_tokens: Optional[int] = None
 
     model_config = ConfigDict(from_attributes=True)
+
+    @computed_field
+    @property
+    def estimated_cost_usd(self) -> Optional[float]:
+        """Rough cost estimate in USD, None if provider/model has no price entry."""
+        from llm.providers import estimate_cost
+        return estimate_cost(self.provider, self.model, self.input_tokens, self.output_tokens)
 
 
 class ReviewCardOut(BaseModel):

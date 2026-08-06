@@ -609,6 +609,19 @@ export interface components {
             model?: string | null;
             /** Embedding Model */
             embedding_model?: string | null;
+            /** Temperature */
+            temperature?: number | null;
+            /** Max Tokens */
+            max_tokens?: number | null;
+            /** Input Tokens */
+            input_tokens?: number | null;
+            /** Output Tokens */
+            output_tokens?: number | null;
+            /**
+             * Estimated Cost Usd
+             * @description Rough cost estimate in USD, None if provider/model has no price entry.
+             */
+            readonly estimated_cost_usd: number | null;
         };
         /** ChatResponse */
         ChatResponse: {
@@ -1440,6 +1453,8 @@ export interface operations {
                 provider?: string | null;
                 model?: string | null;
                 embedding_model?: string | null;
+                temperature?: number | null;
+                max_tokens?: number | null;
             };
             header?: never;
             path: {
@@ -1510,6 +1525,8 @@ export interface operations {
                 provider?: string | null;
                 model?: string | null;
                 embedding_model?: string | null;
+                temperature?: number | null;
+                max_tokens?: number | null;
             };
             header?: never;
             path: {
@@ -1549,6 +1566,8 @@ export interface operations {
                 provider?: string | null;
                 model?: string | null;
                 embedding_model?: string | null;
+                temperature?: number | null;
+                max_tokens?: number | null;
             };
             header?: never;
             path: {
@@ -1585,6 +1604,8 @@ export interface operations {
                 provider?: string | null;
                 model?: string | null;
                 embedding_model?: string | null;
+                temperature?: number | null;
+                max_tokens?: number | null;
             };
             header?: never;
             path: {

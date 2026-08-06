@@ -58,6 +58,12 @@ export default function ChatMessageBubble({
                         · {message.model ?? message.provider}
                     </span>
                 )}
+                {isAi && (message.input_tokens != null || message.output_tokens != null) && (
+                    <span className="ml-1.5 normal-case tracking-normal opacity-70">
+                        · {(message.input_tokens ?? 0) + (message.output_tokens ?? 0)} {t('tokens')}
+                        {message.estimated_cost_usd != null && ` (~$${message.estimated_cost_usd.toFixed(4)})`}
+                    </span>
+                )}
             </span>
 
             {isEditing ? (

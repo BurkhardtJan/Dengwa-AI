@@ -25,6 +25,10 @@ def save_chat_message(
         provider: str | None = None,
         model: str | None = None,
         embedding_model: str | None = None,
+        temperature: float | None = None,
+        max_tokens: int | None = None,
+        input_tokens: int | None = None,
+        output_tokens: int | None = None,
 ) -> ChatHistory:
     """
     Writes a single message to the chat history.
@@ -37,6 +41,10 @@ def save_chat_message(
         provider=provider,
         model=model,
         embedding_model=embedding_model,
+        temperature=temperature,
+        max_tokens=max_tokens,
+        input_tokens=input_tokens,
+        output_tokens=output_tokens,
     )
     db.add(entry)
     db.commit()
@@ -70,6 +78,8 @@ def generate_assistant_reply(
         provider: str | None,
         model: str | None,
         embedding_model: str | None,
+        temperature: float | None = None,
+        max_tokens: int | None = None,
 ) -> ChatHistory:
     """
     Common logic to generate the assistant reply.
@@ -81,16 +91,21 @@ def generate_assistant_reply(
     rag_context = retrieve_context(db, chat.media_id, user_message.message, embedding_key=resolved_embedding)
     system_prompt = build_system_prompt_language_chat(chat, rag_context)
 
-    ai_response = call_llm(
-        messages=messages,
-        system_prompt=system_prompt,
-        provider=resolved_provider,
-        model=resolved_model,
+    # Use prepare_chat + invoke directly (instead of call_llm) so we get the
+    # raw AIMessage back with .usage_metadata for token tracking - call_llm()
+    # only returns the plain text content.
+    lc_model, lc_messages = prepare_chat(
+        messages=messages, system_prompt=system_prompt, provider=resolved_provider, model=resolved_model,
+        temperature=temperature if temperature is not None else 1.0, max_tokens=max_tokens,
     )
+    response = lc_model.invoke(lc_messages)
+    usage = getattr(response, "usage_metadata", None) or {}
 
     return save_chat_message(
-        db, chat.id, "assistant", ai_response, user_message.id,
+        db, chat.id, "assistant", response.content, user_message.id,
         provider=resolved_provider, model=resolved_model, embedding_model=resolved_embedding,
+        temperature=temperature, max_tokens=max_tokens,
+        input_tokens=usage.get("input_tokens"), output_tokens=usage.get("output_tokens"),
     )
 
 
@@ -101,6 +116,8 @@ def stream_assistant_reply(
         provider: str | None,
         model: str | None,
         embedding_model: str | None,
+        temperature: float | None = None,
+        max_tokens: int | None = None,
 ):
     """
     Generator yielding ("chunk", str) per token, then ("done", ChatHistory).
@@ -113,18 +130,28 @@ def stream_assistant_reply(
     system_prompt = build_system_prompt_language_chat(chat, rag_context)
 
     lc_model, lc_messages = prepare_chat(
-        messages=messages, system_prompt=system_prompt, provider=resolved_provider, model=resolved_model, streaming=True
+        messages=messages, system_prompt=system_prompt, provider=resolved_provider, model=resolved_model,
+        temperature=temperature if temperature is not None else 1.0, max_tokens=max_tokens, streaming=True,
     )
 
     full_text = ""
+    # Accumulate chunks with "+" instead of just concatenating .content: LangChain's
+    # AIMessageChunk.__add__ also merges usage_metadata, so the final accumulated
+    # chunk carries the total token usage (if the provider reports it while streaming).
+    accumulated = None
     for chunk in lc_model.stream(lc_messages):
         if chunk.content:
             full_text += chunk.content
             yield "chunk", chunk.content
+        accumulated = chunk if accumulated is None else accumulated + chunk
+
+    usage = getattr(accumulated, "usage_metadata", None) or {}
 
     assistant_message = save_chat_message(
         db, chat.id, "assistant", full_text, user_message.id,
         provider=resolved_provider, model=resolved_model, embedding_model=resolved_embedding,
+        temperature=temperature, max_tokens=max_tokens,
+        input_tokens=usage.get("input_tokens"), output_tokens=usage.get("output_tokens"),
     )
     yield "done", assistant_message
 

@@ -21,6 +21,32 @@ CHAT_MODELS = {
     "ollama": "dolphin-llama3:latest",
 }
 
+CHAT_PRICING: dict[tuple[str, str], dict[str, float]] = {
+    ("openai", "gpt-4o-mini"): {"input": 0.15, "output": 0.60},
+    ("groq", "llama-3.3-70b-versatile"): {"input": 0.59, "output": 0.79},
+    ("gemini", "gemini-2.5-flash-lite"): {"input": 0.10, "output": 0.40},
+}
+
+
+def estimate_cost(
+        provider: str | None,
+        model: str | None,
+        input_tokens: int | None,
+        output_tokens: int | None,
+) -> float | None:
+    """
+    Rough USD cost estimate from CHAT_PRICING. Returns None if the
+    provider/model isn't in the table (e.g. Ollama, or a model picked via
+    live model-discovery that we don't have prices for) or token counts
+    are missing.
+    """
+    if not provider or not model or input_tokens is None or output_tokens is None:
+        return None
+    prices = CHAT_PRICING.get((provider, model))
+    if not prices:
+        return None
+    return (input_tokens * prices["input"] + output_tokens * prices["output"]) / 1_000_000
+
 
 def get_chat_model(
         provider: str | None = None,

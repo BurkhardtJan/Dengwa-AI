@@ -26,13 +26,17 @@ export async function sendMessage(
     parentId?: string | null,
     provider?: string | null,
     model?: string | null,
-    embeddingModel?: string | null
+    embeddingModel?: string | null,
+    temperature?: number | null,
+    maxTokens?: number | null
 ): Promise<ChatMessage[]> {
     const response = await api.post(`/chats/${chatId}`, {message, parent_id: parentId ?? null}, {
         params: {
             provider: provider ?? undefined,
             model: model ?? undefined,
-            embedding_model: embeddingModel ?? undefined
+            embedding_model: embeddingModel ?? undefined,
+            temperature: temperature ?? undefined,
+            max_tokens: maxTokens ?? undefined
         }
     })
     return response.data
@@ -43,13 +47,17 @@ export async function createResponse(
     userMessageId: string,
     provider?: string | null,
     model?: string | null,
-    embeddingModel?: string | null
+    embeddingModel?: string | null,
+    temperature?: number | null,
+    maxTokens?: number | null
 ): Promise<ChatMessage[]> {
     const response = await api.post(`/chats/${chatId}/messages/${userMessageId}`, null, {
         params: {
             provider: provider ?? undefined,
             model: model ?? undefined,
-            embedding_model: embeddingModel ?? undefined
+            embedding_model: embeddingModel ?? undefined,
+            temperature: temperature ?? undefined,
+            max_tokens: maxTokens ?? undefined
         }
     })
     return response.data
@@ -94,11 +102,15 @@ export async function* streamMessage(
     provider?: string | null,
     model?: string | null,
     embeddingModel?: string | null,
+    temperature?: number | null,
+    maxTokens?: number | null,
 ): AsyncGenerator<StreamEvent> {
     const params = new URLSearchParams()
     if (provider) params.set('provider', provider)
     if (model) params.set('model', model)
     if (embeddingModel) params.set('embedding_model', embeddingModel)
+    if (temperature != null) params.set('temperature', String(temperature))
+    if (maxTokens != null) params.set('max_tokens', String(maxTokens))
 
     const response = await fetch(`${API_BASE_URL}/chats/${chatId}/stream?${params}`, {
         method: 'POST',
@@ -118,11 +130,15 @@ export async function* streamResponse(
     provider?: string | null,
     model?: string | null,
     embeddingModel?: string | null,
+    temperature?: number | null,
+    maxTokens?: number | null,
 ): AsyncGenerator<StreamEvent> {
     const params = new URLSearchParams()
     if (provider) params.set('provider', provider)
     if (model) params.set('model', model)
     if (embeddingModel) params.set('embedding_model', embeddingModel)
+    if (temperature != null) params.set('temperature', String(temperature))
+    if (maxTokens != null) params.set('max_tokens', String(maxTokens))
 
     const response = await fetch(`${API_BASE_URL}/chats/${chatId}/messages/${userMessageId}/stream?${params}`, {
         method: 'POST',

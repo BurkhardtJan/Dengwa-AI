@@ -14,11 +14,17 @@ export interface ModelChoice {
     provider: string | null
     model: string | null
     embeddingModel: string | null
+    /** undefined -> backend default (1.0) */
+    temperature?: number
+    /** null/undefined -> no limit set */
+    maxTokens?: number | null
 }
 
 export type ViewMode = 'switch' | 'sbs'
 
-const EMPTY_CHOICE: ModelChoice = {provider: null, model: null, embeddingModel: null}
+const EMPTY_CHOICE: ModelChoice = {
+    provider: null, model: null, embeddingModel: null, temperature: undefined, maxTokens: null
+}
 const VIEW_MODE_KEY = 'dengwa-chat-view-mode'
 
 export function useChatMessaging(chatId: string | undefined, onNewLeaf: (id: string) => void, learningLanguage: string) {
@@ -75,7 +81,7 @@ export function useChatMessaging(chatId: string | undefined, onNewLeaf: (id: str
         try {
             for await (const event of streamMessage(
                 chatId!, message, parentId,
-                primary.provider, primary.model, primary.embeddingModel
+                primary.provider, primary.model, primary.embeddingModel, primary.temperature, primary.maxTokens
             )) {
                 if (event.type === 'user_message') {
                     persistedUserMessage = event.message
@@ -97,7 +103,9 @@ export function useChatMessaging(chatId: string | undefined, onNewLeaf: (id: str
             if (extra.length > 0 && persistedUserMessage) {
                 const userMessageId = persistedUserMessage.id
                 await Promise.all(
-                    extra.map(cfg => createResponse(chatId!, userMessageId, cfg.provider, cfg.model, cfg.embeddingModel))
+                    extra.map(cfg => createResponse(
+                        chatId!, userMessageId, cfg.provider, cfg.model, cfg.embeddingModel, cfg.temperature, cfg.maxTokens
+                    ))
                 )
             }
         } finally {
@@ -124,7 +132,7 @@ export function useChatMessaging(chatId: string | undefined, onNewLeaf: (id: str
         try {
             for await (const event of streamResponse(
                 chatId!, userMessageId,
-                primary.provider, primary.model, primary.embeddingModel
+                primary.provider, primary.model, primary.embeddingModel, primary.temperature, primary.maxTokens
             )) {
                 if (event.type === 'chunk') {
                     setStreamingText(prev => (prev ?? '') + event.content)

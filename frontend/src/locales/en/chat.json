@@ -34,7 +34,11 @@
   "stopSpeaking": "Stop reading",
   "startListening": "Dictate",
   "stopListening": "Stop recording",
+  "tokens": "tokens",
   "settings": {
+    "temperature": "Temperature",
+    "maxTokens": "Max tokens",
+    "maxTokensPlaceholder": "unlimited",
     "title": "Model Settings",
     "provider": "Provider",
     "providerPlaceholder": "e.g. openai, groq, ollama",
