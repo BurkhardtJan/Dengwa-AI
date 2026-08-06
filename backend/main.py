@@ -4,6 +4,9 @@ import uvicorn
 from database import Base, engine
 from routers import system, users, languages, media, chats, vocabularies, llm_models, reviews
 from sqlalchemy import text
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from rate_limit import limiter
 
 with engine.connect() as conn:
     conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
@@ -11,6 +14,9 @@ with engine.connect() as conn:
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.add_middleware(
     CORSMiddleware,

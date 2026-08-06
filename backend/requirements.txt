@@ -28,3 +28,4 @@ ebooklib
 beautifulsoup4
 odfpy
 python-docx
+slowapi

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
@@ -6,12 +6,14 @@ from schemas import UserRegister
 from database import get_db
 from models import User
 from services.user_service import create_access_token, verify_password, hash_password, get_current_user
+from rate_limit import limiter
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
 
 @router.post("/register")
-async def register(data: UserRegister, db: Session = Depends(get_db)):
+@limiter.limit("5/minute")
+async def register(request: Request, data: UserRegister, db: Session = Depends(get_db)):
     """Register a new user"""
     user = (db.query(User).filter(User.username == data.username)).first()
     if user:
@@ -28,7 +30,8 @@ async def register(data: UserRegister, db: Session = Depends(get_db)):
 
 
 @router.post("/login")
-def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+@limiter.limit("5/minute")
+def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     """Login, returns Token"""
     user = db.query(User).filter(User.username == form_data.username).first()
     if not user or not verify_password(form_data.password, user.hashed_password):
