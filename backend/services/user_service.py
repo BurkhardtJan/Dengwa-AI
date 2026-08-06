@@ -15,6 +15,11 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 load_dotenv()
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
+if not SECRET_KEY or len(SECRET_KEY) < 32:
+    raise RuntimeError(
+        "SECRET_KEY is missing or too short (must be at least 32 characters). "
+        "Set it in backend/.env, e.g. via: python -c \"import secrets; print(secrets.token_urlsafe(32))\""
+    )
 ALGORITHM = os.environ.get("ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.environ.get("ACCESS_TOKEN_EXPIRE_MINUTES", 30))
 

@@ -20,9 +20,10 @@ jobs:
       - name: Create .env file
         run: |
           cat > backend/.env << EOF
-          SECRET_KEY=testsecretkey1234567890abcdef12
+          SECRET_KEY=testsecretkey1234567890abcdef12345
           ALGORITHM=HS256
           ACCESS_TOKEN_EXPIRE_MINUTES=30
+          DISABLE_RATE_LIMIT=true
           EOF
 
       - name: Start services
