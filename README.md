@@ -345,6 +345,10 @@ erDiagram
         TEXT provider
         TEXT model
         TEXT embedding_model
+        FLOAT temperature
+        INT max_tokens
+        INT input_tokens
+        INT output_tokens
         TIMESTAMP timestamp
     }
 

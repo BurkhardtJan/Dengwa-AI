@@ -8,6 +8,7 @@ import type {components} from '../types/api'
 import Modal from '../components/Modal'
 import CreateLanguageModal from '@/components/CreateLanguageModal'
 import {getLanguageDisplayName} from '@/lib/languages'
+import {PAGE_WIDTH, PAGE_PADDING} from '@/lib/layout'
 import {useTranslation} from 'react-i18next'
 
 type Languages = components['schemas']['LanguageLearningResponse']
@@ -61,7 +62,7 @@ function DashboardPage() {
     if (isError) return <p className="p-8 text-destructive">{t('common:errorLoading')}</p>
 
     return (
-        <div className="min-h-screen p-8">
+        <div className={`min-h-screen ${PAGE_PADDING} ${PAGE_WIDTH}`}>
             <div className="flex justify-between items-center mb-8">
                 <div>
                     <h1 className="text-3xl font-bold">{t('common:nav.dashboard')}</h1>

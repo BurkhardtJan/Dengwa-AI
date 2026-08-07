@@ -5,6 +5,7 @@ import {useChatDefaults} from '@/context/ChatDefaultsContext'
 import {useChatProviders} from '@/hooks/useModelOptions'
 import ProviderModelSelect from '@/components/chat/ProviderModelSelect'
 import EmbeddingSelect from '@/components/chat/EmbeddingSelect'
+import {PAGE_WIDTH, PAGE_PADDING} from '@/lib/layout'
 import type {SttEngineId, TtsEngineId} from '@/lib/speech/types'
 import {getSttEngine, getTtsEngine} from '@/lib/speech/registry'
 
@@ -62,8 +63,8 @@ export default function SettingsPage() {
     const {data: chatProviders, isLoading: isChatProvidersLoading} = useChatProviders()
 
     return (
-        <div className="max-w-xl mx-auto p-6 flex flex-col gap-8">
-            <h1 className="text-xl font-semibold">{t('title')}</h1>
+        <div className={`${PAGE_PADDING} ${PAGE_WIDTH} flex flex-col gap-8`}>
+            <h1 className="text-3xl font-bold">{t('title')}</h1>
 
             <section className="flex flex-col gap-2">
                 <h2 className="text-sm font-medium">{t('chatDefaults.title')}</h2>

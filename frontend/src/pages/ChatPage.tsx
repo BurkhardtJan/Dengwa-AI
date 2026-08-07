@@ -7,6 +7,7 @@ import {useLanguage} from '@/context/TargetLanguageContext.tsx'
 import {useMedium} from '@/context/MediumContext'
 import type {components} from '../types/api'
 import {getLanguageDisplayName} from '@/lib/languages'
+import {PAGE_WIDTH, PAGE_PADDING} from '@/lib/layout'
 import {useTranslation} from 'react-i18next'
 
 type Chat = components['schemas']['ChatResponse']
@@ -62,7 +63,7 @@ function ChatPage() {
     if (isChatsError) return <p className="p-8 text-destructive">{t('errorLoading')}</p>
 
     return (
-        <div className="min-h-screen p-8">
+        <div className={`min-h-screen ${PAGE_PADDING} ${PAGE_WIDTH}`}>
             <div className="flex justify-between items-center mb-8">
                 <h1 className="text-3xl font-bold">{t('common:nav.chats')}</h1>
                 {selectedLan && (

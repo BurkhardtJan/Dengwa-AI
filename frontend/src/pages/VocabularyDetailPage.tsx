@@ -4,6 +4,7 @@ import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query'
 import {fetchVocabulary, deleteVocabulary, updateVocabulary} from '../services/vocabulary.service'
 import {useTranslation} from 'react-i18next'
 import MiniChatLauncher from '@/components/chat/MiniChatLauncher'
+import {PAGE_WIDTH, PAGE_PADDING} from '@/lib/layout'
 import SpeakButton from '@/components/SpeakButton'
 
 export default function VocabularyDetailPage() {
@@ -49,7 +50,7 @@ export default function VocabularyDetailPage() {
     if (isError) return <p className="p-8 text-destructive">{t('common:errorLoading')}</p>
 
     return (
-        <div className="p-8 max-w-2xl mx-auto">
+        <div className={`${PAGE_PADDING} ${PAGE_WIDTH}`}>
             <div className="flex justify-between items-start mb-6">
                 <div>
                     <button

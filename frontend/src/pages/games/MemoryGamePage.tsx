@@ -6,6 +6,7 @@ import {MemoryGame} from '@/games/memory'
 import type {MemoryPair} from '@/games/memory'
 import {fetchVocabularies} from '@/services/vocabulary.service'
 import {useLanguage} from '@/context/TargetLanguageContext.tsx'
+import {PAGE_WIDTH, PAGE_PADDING} from '@/lib/layout'
 
 const PAIR_COUNT = 6
 const MIN_PAIRS = 4
@@ -36,12 +37,12 @@ export default function MemoryGamePage() {
     }
 
     return (
-        <div className="max-w-xl mx-auto p-6">
+        <div className={`${PAGE_PADDING} ${PAGE_WIDTH}`}>
             <Link to="/games" className="text-sm text-muted-foreground hover:underline">
                 {t('common:buttons.back')}
             </Link>
 
-            <h1 className="text-xl font-semibold my-4">{t('game:memory.title')}</h1>
+            <h1 className="text-3xl font-bold my-4">{t('game:memory.title')}</h1>
 
             {!selectedLan ? (
                 <p className="text-sm text-muted-foreground">{t('common:noLanguageSelected')}</p>

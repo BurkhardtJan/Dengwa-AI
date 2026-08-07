@@ -7,6 +7,7 @@ import {fetchLanguages} from '@/services/language.service'
 import {fetchNextReviewCard, fetchReviewCounts, submitReview} from '@/services/review.service.ts'
 import type {ReviewEase} from '@/services/review.service.ts'
 import SpeakButton from '@/components/SpeakButton'
+import {PAGE_WIDTH, PAGE_PADDING} from '@/lib/layout'
 
 const GRADES: { ease: ReviewEase; labelKey: string; className: string }[] = [
     {ease: 1, labelKey: 'review:again', className: 'bg-destructive text-destructive-foreground hover:opacity-90'},
@@ -60,7 +61,7 @@ function ReviewPage() {
     if (isError) return <p className="p-8 text-destructive">{t('common:errorLoading')}</p>
 
     return (
-        <div className="min-h-screen p-8 max-w-xl mx-auto">
+        <div className={`min-h-screen ${PAGE_PADDING} ${PAGE_WIDTH}`}>
             <div className="flex justify-between items-center mb-8">
                 <h1 className="text-3xl font-bold">{t('review:title')}</h1>
                 {counts && (

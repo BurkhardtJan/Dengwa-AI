@@ -5,6 +5,7 @@ import {useState, useEffect} from 'react'
 import {MediaViewer} from '../components/MediaViewer'
 import {useTranslation} from 'react-i18next'
 import {useMedium} from '@/context/MediumContext'
+import {PAGE_WIDTH, PAGE_PADDING} from '@/lib/layout'
 import SpeakButton from '@/components/SpeakButton'
 
 export default function MediaDetailPage() {
@@ -44,7 +45,7 @@ export default function MediaDetailPage() {
     if (isError) return <p className="p-8 text-destructive">{t('common:errorLoading')}</p>
 
     return (
-        <div className="p-8 max-w-2xl mx-auto">
+        <div className={`${PAGE_PADDING} ${PAGE_WIDTH}`}>
             <div className="flex justify-between items-start mb-6">
                 <div>
                     <button

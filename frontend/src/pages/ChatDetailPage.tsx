@@ -9,6 +9,7 @@ import ChatMessageList from '@/components/chat/ChatMessageList'
 import ChatMessageInput from '@/components/chat/ChatMessageInput'
 import {useTranslation} from 'react-i18next'
 import {useMedium} from '@/context/MediumContext'
+import {PAGE_WIDTH, PAGE_PADDING} from '@/lib/layout'
 import {VolumeX} from 'lucide-react'
 
 export default function ChatDetailPage() {
@@ -73,7 +74,7 @@ export default function ChatDetailPage() {
 
 
     return (
-        <div className="p-8 max-w-2xl mx-auto flex flex-col h-[calc(100vh-2rem)]">
+        <div className={`${PAGE_PADDING} ${PAGE_WIDTH} flex flex-col h-[calc(100vh-2rem)]`}>
             <ChatHeader
                 chatId={id!}
                 title={chatMeta?.title}

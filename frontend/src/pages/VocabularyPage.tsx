@@ -7,6 +7,7 @@ import type {components} from '../types/api'
 import {useLanguage} from "@/context/TargetLanguageContext.tsx";
 import {useMedium} from '@/context/MediumContext'
 import {getLanguageDisplayName} from '@/lib/languages'
+import {PAGE_WIDTH, PAGE_PADDING} from '@/lib/layout'
 import SpeakButton from '@/components/SpeakButton'
 import {useTranslation} from 'react-i18next'
 
@@ -45,7 +46,7 @@ function VocabularyPage() {
     if (isError) return <p className="p-8 text-destructive">{t('common:errorLoading')}</p>
 
     return (
-        <div className="min-h-screen p-8">
+        <div className={`min-h-screen ${PAGE_PADDING} ${PAGE_WIDTH}`}>
             <div className="flex justify-between items-center mb-8">
                 <h1 className="text-3xl font-bold">{t('common:nav.vocabulary')}</h1>
 
