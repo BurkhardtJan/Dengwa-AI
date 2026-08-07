@@ -2,6 +2,7 @@ import {useState} from 'react'
 import {useTranslation} from 'react-i18next'
 import {Settings, ChevronDown, ChevronUp, Plus} from 'lucide-react'
 import ModelConfigFields from './ModelConfigFields'
+import {useSpeechSettings} from '@/context/SpeechSettingsContext'
 import type {ModelChoice, ViewMode} from '@/hooks/useChatTree'
 
 interface Props {
@@ -27,6 +28,7 @@ export default function ChatSettings({
                                      }: Props) {
     const {t} = useTranslation('chat')
     const [isOpen, setIsOpen] = useState(false)
+    const {speakWhileStreaming, setSpeakWhileStreaming} = useSpeechSettings()
 
     return (
         <div className="border rounded-lg bg-muted/10">
@@ -111,6 +113,18 @@ export default function ChatSettings({
                         />
                         <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
                             {t('settings.showMetadata')}
+                        </span>
+                    </label>
+
+                    <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                            type="checkbox"
+                            checked={speakWhileStreaming}
+                            onChange={(e) => setSpeakWhileStreaming(e.target.checked)}
+                            className="accent-primary"
+                        />
+                        <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                            {t('settings.speakWhileStreaming')}
                         </span>
                     </label>
                 </div>

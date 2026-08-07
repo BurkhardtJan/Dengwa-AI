@@ -57,6 +57,7 @@
     "continueFrom": "will continue",
     "default": "Default",
     "chatModel": "Chat model",
-    "showMetadata": "Show Metadata"
+    "showMetadata": "Show Metadata",
+    "speakWhileStreaming": "Read aloud while streaming"
   }
 }

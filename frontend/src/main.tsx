@@ -7,6 +7,7 @@ import App from './App.tsx'
 import {TargetLanguageProvider} from "./context/TargetLanguageContext.tsx";
 import {MediumProvider} from '@/context/MediumContext'
 import {SpeechSettingsProvider} from '@/context/SpeechSettingsContext'
+import {ChatDefaultsProvider} from '@/context/ChatDefaultsContext'
 import './i18n';
 
 registerSW({immediate: true})
@@ -18,7 +19,9 @@ createRoot(document.getElementById('root')!).render(
             <TargetLanguageProvider>
                 <MediumProvider>
                     <SpeechSettingsProvider>
-                        <App/>
+                        <ChatDefaultsProvider>
+                            <App/>
+                        </ChatDefaultsProvider>
                     </SpeechSettingsProvider>
                 </MediumProvider>
             </TargetLanguageProvider>

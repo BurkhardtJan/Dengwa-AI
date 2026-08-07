@@ -2,6 +2,7 @@ import {useEffect, useRef, useState} from 'react'
 import {useQueryClient} from '@tanstack/react-query'
 import {streamMessage, streamResponse, writeMessage} from '@/services/chat.service.ts'
 import {useSpeechSettings} from '@/context/SpeechSettingsContext'
+import {useChatDefaults} from '@/context/ChatDefaultsContext'
 import {getTtsEngine} from '@/lib/speech/registry'
 import {createStreamingSpeaker} from '@/lib/speech/streamingSpeaker'
 import {toBcp47} from '@/lib/speech/languageCodes'
@@ -21,16 +22,20 @@ export interface ModelChoice {
 
 export type ViewMode = 'switch' | 'sbs'
 
-const EMPTY_CHOICE: ModelChoice = {
-    provider: null, model: null, embeddingModel: null, temperature: undefined, maxTokens: null
-}
 const VIEW_MODE_KEY = 'dengwa-chat-view-mode'
 const SHOW_METADATA_KEY = 'dengwa-chat-show-metadata'
 
 export function useChatMessaging(chatId: string | undefined, onNewLeaf: (id: string) => void, learningLanguage: string) {
     const queryClient = useQueryClient()
     const {ttsEngine, speakWhileStreaming} = useSpeechSettings()
-    const [configs, setConfigs] = useState<ModelChoice[]>([EMPTY_CHOICE])
+    const {defaultProvider, defaultModel, defaultEmbeddingModel} = useChatDefaults()
+    const defaultChoice = (): ModelChoice => ({
+        provider: defaultProvider, model: defaultModel, embeddingModel: defaultEmbeddingModel,
+    })
+    // Each chat's compare slots start from the user's configured defaults
+    // (Settings page) instead of always "backend default" - still just the
+    // starting point per config slot, editable per chat like before.
+    const [configs, setConfigs] = useState<ModelChoice[]>([defaultChoice()])
     const [pendingUserText, setPendingUserText] = useState<string | null>(null)
     const [pendingReplyForId, setPendingReplyForId] = useState<string | null>(null)
     const [streamingText, setStreamingText] = useState<string | null>(null)
@@ -82,7 +87,7 @@ export function useChatMessaging(chatId: string | undefined, onNewLeaf: (id: str
     }
 
     async function send(message: string, parentId: string | null) {
-        const activeConfigs = configs.length > 0 ? configs : [EMPTY_CHOICE]
+        const activeConfigs = configs.length > 0 ? configs : [defaultChoice()]
         const [primary, ...extra] = activeConfigs
         const isCompare = extra.length > 0
         const speaker = startStreamingSpeaker() // only the primary reply is read aloud
@@ -168,7 +173,7 @@ export function useChatMessaging(chatId: string | undefined, onNewLeaf: (id: str
     }
 
     async function regenerate(userMessageId: string) {
-        const primary = configs[0] ?? EMPTY_CHOICE
+        const primary = configs[0] ?? defaultChoice()
         const speaker = startStreamingSpeaker()
 
         setIsRegenerating(true)
@@ -196,7 +201,7 @@ export function useChatMessaging(chatId: string | undefined, onNewLeaf: (id: str
         }
     }
 
-    const addConfig = () => setConfigs(prev => [...prev, EMPTY_CHOICE])
+    const addConfig = () => setConfigs(prev => [...prev, defaultChoice()])
     const removeConfig = (index: number) => setConfigs(prev => prev.filter((_, i) => i !== index))
     const updateConfig = (index: number, choice: ModelChoice) =>
         setConfigs(prev => prev.map((c, i) => i === index ? choice : c))

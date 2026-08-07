@@ -1,6 +1,12 @@
 {
   "title": "Einstellungen",
   "notAvailable": "In diesem Browser nicht verfügbar",
+  "chatDefaults": {
+    "title": "Standard-Chatmodell",
+    "description": "Wird für neue Chats und neue Vergleichs-Slots vorausgewählt (in einem Chat weiterhin änderbar).",
+    "model": "Modell",
+    "embeddingModel": "Embedding-Modell"
+  },
   "engines": {
     "browser": "Browser-nativ",
     "webgpu": "Lokal (WASM)",

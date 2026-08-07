@@ -57,6 +57,7 @@
     "continueFrom": "wird fortgesetzt",
     "default": "Standard",
     "chatModel": "Chat-Modell",
-    "showMetadata": "Metadaten anzeigen"
+    "showMetadata": "Metadaten anzeigen",
+    "speakWhileStreaming": "Live vorlesen während der Antwort streamt"
   }
 }

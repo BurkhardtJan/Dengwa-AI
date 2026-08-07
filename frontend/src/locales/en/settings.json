@@ -1,6 +1,12 @@
 {
   "title": "Settings",
   "notAvailable": "Not available in this browser",
+  "chatDefaults": {
+    "title": "Default chat model",
+    "description": "Preselected for new chats and new compare slots (still changeable within a chat).",
+    "model": "Model",
+    "embeddingModel": "Embedding model"
+  },
   "engines": {
     "browser": "Browser-native",
     "webgpu": "Local (WASM)",

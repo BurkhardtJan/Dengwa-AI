@@ -1,6 +1,10 @@
 import {useTranslation} from 'react-i18next'
 import type {TFunction} from 'i18next'
 import {useSpeechSettings} from '@/context/SpeechSettingsContext'
+import {useChatDefaults} from '@/context/ChatDefaultsContext'
+import {useChatProviders} from '@/hooks/useModelOptions'
+import ProviderModelSelect from '@/components/chat/ProviderModelSelect'
+import EmbeddingSelect from '@/components/chat/EmbeddingSelect'
 import type {SttEngineId, TtsEngineId} from '@/lib/speech/types'
 import {getSttEngine, getTtsEngine} from '@/lib/speech/registry'
 
@@ -51,10 +55,35 @@ export default function SettingsPage() {
         speakWhileStreaming,
         setSpeakWhileStreaming
     } = useSpeechSettings()
+    const {
+        defaultProvider, defaultModel, defaultEmbeddingModel,
+        setDefaultProvider, setDefaultModel, setDefaultEmbeddingModel,
+    } = useChatDefaults()
+    const {data: chatProviders, isLoading: isChatProvidersLoading} = useChatProviders()
 
     return (
         <div className="max-w-xl mx-auto p-6 flex flex-col gap-8">
             <h1 className="text-xl font-semibold">{t('title')}</h1>
+
+            <section className="flex flex-col gap-2">
+                <h2 className="text-sm font-medium">{t('chatDefaults.title')}</h2>
+                <p className="text-xs text-muted-foreground">{t('chatDefaults.description')}</p>
+                <div className="flex flex-col gap-1">
+                    <span className="text-[11px] text-muted-foreground">{t('chatDefaults.model')}</span>
+                    <ProviderModelSelect
+                        providers={chatProviders?.providers}
+                        isLoading={isChatProvidersLoading}
+                        provider={defaultProvider}
+                        model={defaultModel}
+                        onProviderChange={setDefaultProvider}
+                        onModelChange={setDefaultModel}
+                    />
+                </div>
+                <div className="flex flex-col gap-1">
+                    <span className="text-[11px] text-muted-foreground">{t('chatDefaults.embeddingModel')}</span>
+                    <EmbeddingSelect value={defaultEmbeddingModel} onChange={setDefaultEmbeddingModel}/>
+                </div>
+            </section>
 
             <section className="flex flex-col gap-2">
                 <h2 className="text-sm font-medium">{t('tts.title')}</h2>
