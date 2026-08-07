@@ -7,6 +7,7 @@ import {useTranslation} from 'react-i18next'
 import {useMedium} from '@/context/MediumContext'
 import {PAGE_WIDTH, PAGE_PADDING} from '@/lib/layout'
 import SpeakButton from '@/components/SpeakButton'
+import MiniChatLauncher from '@/components/chat/MiniChatLauncher'
 
 export default function MediaDetailPage() {
     const {id} = useParams<{ id: string }>()
@@ -117,6 +118,14 @@ export default function MediaDetailPage() {
                     )}
                 </div>
             </div>
+
+            {data && (
+                <MiniChatLauncher
+                    mediaId={id!}
+                    instanceKey={id}
+                    title={data.title}
+                />
+            )}
         </div>
     )
 }

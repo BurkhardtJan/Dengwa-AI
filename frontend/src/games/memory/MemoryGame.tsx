@@ -3,6 +3,8 @@ import {useTranslation} from "react-i18next";
 import {useMemoryGame} from "./hooks/useMemoryGame";
 import {MemoryCard} from "./components/MemoryCard";
 import type {MemoryPair} from "./types";
+import Confetti from "react-confetti"
+
 
 interface MemoryGameProps {
     pairs: MemoryPair[];
@@ -43,7 +45,10 @@ export function MemoryGame({pairs, onComplete}: MemoryGameProps) {
             </div>
 
             {isComplete && (
+                <>
                 <p className="text-center text-sm font-medium">{t("memory.solved", {count: moves})}</p>
+                <Confetti />
+                </>
             )}
         </div>
     );

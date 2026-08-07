@@ -7,6 +7,7 @@ import {fetchLanguages} from '@/services/language.service'
 import {fetchNextReviewCard, fetchReviewCounts, submitReview} from '@/services/review.service.ts'
 import type {ReviewEase} from '@/services/review.service.ts'
 import SpeakButton from '@/components/SpeakButton'
+import MiniChatLauncher from '@/components/chat/MiniChatLauncher'
 import {PAGE_WIDTH, PAGE_PADDING} from '@/lib/layout'
 
 const GRADES: { ease: ReviewEase; labelKey: string; className: string }[] = [
@@ -21,7 +22,7 @@ function ReviewPage() {
     const {mediumId} = useMedium()
     const queryClient = useQueryClient()
     const [revealed, setRevealed] = useState(false)
-    const {t} = useTranslation(['common', 'review'])
+    const {t} = useTranslation(['common', 'review', 'vocabulary'])
 
     const {data: languages} = useQuery({
         queryKey: ['languages'],
@@ -124,6 +125,20 @@ function ReviewPage() {
                         </button>
                     ))}
                 </div>
+            )}
+
+            {card && learningId && (
+                <MiniChatLauncher
+                    mediaId={learningId}
+                    instanceKey={card.id}
+                    title={`${t('vocabulary:foreignWord')}: ${card.word}`}
+                    getContext={() => {
+                        const parts = [`${t('vocabulary:foreignWord')}: "${card.word}"`]
+                        if (card.translation) parts.push(`${t('vocabulary:translationField')}: "${card.translation}"`)
+                        if (card.context_sentence) parts.push(`${t('vocabulary:contextField')}: "${card.context_sentence}"`)
+                        return parts.join(', ')
+                    }}
+                />
             )}
         </div>
     )

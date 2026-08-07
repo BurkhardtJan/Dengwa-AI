@@ -5,7 +5,9 @@ import {useTranslation} from 'react-i18next'
 import {MemoryGame} from '@/games/memory'
 import type {MemoryPair} from '@/games/memory'
 import {fetchVocabularies} from '@/services/vocabulary.service'
+import {fetchLanguages} from '@/services/language.service'
 import {useLanguage} from '@/context/TargetLanguageContext.tsx'
+import MiniChatLauncher from '@/components/chat/MiniChatLauncher'
 import {PAGE_WIDTH, PAGE_PADDING} from '@/lib/layout'
 
 const PAIR_COUNT = 6
@@ -20,6 +22,12 @@ export default function MemoryGamePage() {
         queryFn: () => fetchVocabularies(selectedLan ?? undefined),
         enabled: !!selectedLan,
     })
+
+    const {data: languages} = useQuery({
+        queryKey: ['languages'],
+        queryFn: fetchLanguages,
+    })
+    const learningId = languages?.find(l => l.learning_language === selectedLan)?.id
 
     const pairs = useMemo<MemoryPair[]>(() => {
         if (!vocabularies) return []
@@ -57,6 +65,15 @@ export default function MemoryGamePage() {
                     pairs={pairs}
                     onComplete={handleComplete}
                     key={pairs.map((p) => p.id).join(",")}
+                />
+            )}
+
+            {learningId && pairs.length > 0 && (
+                <MiniChatLauncher
+                    mediaId={learningId}
+                    instanceKey={pairs.map(p => p.id).join(",")}
+                    title={t('game:memory.title')}
+                    getContext={() => `Memory-Wortpaare: ${pairs.map(p => `${p.contentA} = ${p.contentB}`).join(', ')}`}
                 />
             )}
         </div>
