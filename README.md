@@ -47,11 +47,15 @@ personal deck, and lets you practice with an AI that knows exactly what you've b
 ### Docker:
 
 ```bash
-docker compose up -d --build
-
+# Clone Repository
+git clone https://github.com/BurkhardtJan/Dengwa-AI.git
 # Configure environment
 cp .env.example .env
 # → Set DATABASE_URL, GROQ_API_KEY, GEMINI_API_KEY, etc.
+# Build Container
+docker compose up -d --build
+
+
 ```
 
 ### Manual:
