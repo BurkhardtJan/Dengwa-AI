@@ -83,7 +83,7 @@ export default function ChatHeader({
                                 setTitleDraft(title ?? displayTitle)
                                 setIsEditingTitle(true)
                             }}
-                            className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground"
+                            className="opacity-0 pointer-coarse:opacity-100 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground"
                             title={t('common:buttons.edit')}
                         >
                             <Pencil size={16}/>

@@ -152,7 +152,7 @@ pnpm dev
 ### Backend
 
 - [ ] Add default Vocab starter set (HSK, JLPT, ...)
-- [ ] Other Media Parsing
+- [ ] Video/Music Parsing
 - [ ] Add Multiple Choice & Free text entry to SRS
 - [ ] LiteLLM as LLM wrapper
 - [ ] Add LLM API Keys for users
@@ -163,6 +163,7 @@ pnpm dev
 ### Frontend
 
 - [ ] Add more Games
+- [ ] Full Media Player
 - [ ] Try WebLLM
 - [ ] Big uploads in background
 - [ ] Progress visualization
