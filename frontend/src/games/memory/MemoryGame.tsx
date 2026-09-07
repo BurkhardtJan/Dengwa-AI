@@ -32,7 +32,7 @@ export function MemoryGame({pairs, onComplete}: MemoryGameProps) {
                 </button>
             </div>
 
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                 {cards.map((card) => (
                     <MemoryCard
                         key={card.cardId}

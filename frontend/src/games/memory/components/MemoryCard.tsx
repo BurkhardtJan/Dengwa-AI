@@ -13,7 +13,7 @@ export function MemoryCard({ content, isFlipped, isMatched, onClick }: MemoryCar
       type="button"
       onClick={onClick}
       disabled={revealed}
-      className={`aspect-square rounded-lg flex items-center justify-center text-lg font-medium transition-colors
+      className={`aspect-square rounded-lg flex items-center justify-center p-1.5 text-center text-xs sm:text-sm md:text-lg font-medium leading-tight break-words overflow-hidden transition-colors
         ${revealed ? "bg-primary/10 border-primary" : "bg-muted hover:bg-muted/80"}
         ${isMatched ? "opacity-60" : ""} border`}
     >
