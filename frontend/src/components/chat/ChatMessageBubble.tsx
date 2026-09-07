@@ -60,7 +60,7 @@ export default function ChatMessageBubble({
     }
 
     return (
-        <div className={`group flex flex-col max-w-[80%] ${isAi ? 'mr-auto items-start' : 'ml-auto items-end'}`}>
+        <div className={`group flex flex-col max-w-[92%] sm:max-w-[80%] ${isAi ? 'mr-auto items-start' : 'ml-auto items-end'}`}>
             <span className="text-[10px] text-muted-foreground mb-0.5 px-1 uppercase tracking-wider">
                 {isAi ? t('aiLabel') : t('userLabel')}
                 {isAi && (message.model || message.provider) && (
@@ -104,7 +104,7 @@ export default function ChatMessageBubble({
                     {!isAi && (
                         <button
                             onClick={() => setIsEditing(true)}
-                            className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground p-1"
+                            className="opacity-0 pointer-coarse:opacity-100 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground p-1 pointer-coarse:p-2"
                             title={t('common:buttons.edit')}
                         >
                             <Pencil size={13}/>
@@ -123,7 +123,7 @@ export default function ChatMessageBubble({
                         <button
                             onClick={onRegenerate}
                             disabled={isRegenerating}
-                            className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground p-1 disabled:opacity-50"
+                            className="opacity-0 pointer-coarse:opacity-100 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground p-1 pointer-coarse:p-2 disabled:opacity-50"
                             title={t('regenerate')}
                         >
                             <RotateCw size={13} className={isRegenerating ? 'animate-spin' : ''}/>
@@ -132,7 +132,7 @@ export default function ChatMessageBubble({
                     {isAi && isTtsSupported && (
                         <button
                             onClick={() => isSpeaking ? stop() : speak(message.message, toBcp47(learningLanguage))}
-                            className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground p-1"
+                            className="opacity-0 pointer-coarse:opacity-100 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground p-1 pointer-coarse:p-2"
                             title={t(isSpeaking ? 'stopSpeaking' : 'readAloud')}
                         >
                             {isSpeaking ? <VolumeX size={13}/> : <Volume2 size={13}/>}

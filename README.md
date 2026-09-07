@@ -143,6 +143,9 @@ pnpm dev
 - [x] TTS & STT
 - [x] Added Games
 - [x] TTS for all components
+- [x] Monitoring Token
+- [x] Responsive design
+
 
 </details>
 
@@ -153,7 +156,6 @@ pnpm dev
 - [ ] Add Multiple Choice & Free text entry to SRS
 - [ ] LiteLLM as LLM wrapper
 - [ ] Add LLM API Keys for users
-- [ ] Monitoring Token
 - [ ] Alembic
 - [ ] Add License
 - [ ] Anki Compatibility
@@ -165,7 +167,6 @@ pnpm dev
 - [ ] Big uploads in background
 - [ ] Progress visualization
 - [ ] Error handling
-- [ ] Responsive design
 - [ ] PWA offline features
 
 ## Architecture
