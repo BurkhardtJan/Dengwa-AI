@@ -11,7 +11,7 @@ export async function fetchLanguages(): Promise<Language[]> {
 }
 
 export async function createLanguage(data: LanguageCreate): Promise<Language> {
-    const response = await api.post(`/languages/`, data)
+    const response = await api.post(`/languages`, data)
     return response.data
 }
 
