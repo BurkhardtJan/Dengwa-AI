@@ -143,6 +143,8 @@ pnpm dev
 - [x] TTS & STT
 - [x] Added Games
 - [x] TTS for all components
+- [x] Responsive design
+
 
 </details>
 
@@ -165,7 +167,6 @@ pnpm dev
 - [ ] Big uploads in background
 - [ ] Progress visualization
 - [ ] Error handling
-- [ ] Responsive design
 - [ ] PWA offline features
 
 ## Architecture
