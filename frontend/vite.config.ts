@@ -39,6 +39,13 @@ export default defineConfig({
         },
     },
     server: {
+        proxy: {
+            '/api': {
+                target: 'http://backend:8000',
+                changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/api/, ''),
+            },
+        },
         headers: {
             // Same reasoning as nginx.conf - enables SharedArrayBuffer so
             // onnxruntime-web (WASM TTS engine) can run multi-threaded.

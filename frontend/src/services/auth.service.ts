@@ -1,6 +1,7 @@
 import axios from 'axios'
+import {API_BASE_URL} from './api'
 
-const BASE_URL = 'http://localhost:8000'
+const BASE_URL = API_BASE_URL
 
 export async function login(username: string, password: string) {
     const formData = new URLSearchParams()
