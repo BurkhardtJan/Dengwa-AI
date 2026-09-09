@@ -12,6 +12,16 @@ interface Props {
 const DEFAULT_SIZE = {width: 320, height: 420}
 const MIN_SIZE = {width: 280, height: 360}
 
+/** Keeps a size within MIN_SIZE and the current viewport bounds. */
+function clampSize(width: number, height: number) {
+    const maxWidth = window.innerWidth - 24
+    const maxHeight = window.innerHeight - 96
+    return {
+        width: Math.min(maxWidth, Math.max(MIN_SIZE.width, width)),
+        height: Math.min(maxHeight, Math.max(MIN_SIZE.height, height)),
+    }
+}
+
 /**
  * Floating support-bot-style entry point for MiniChat: a circular button
  * fixed to the bottom-right corner that expands into the chat panel above
@@ -21,7 +31,7 @@ const MIN_SIZE = {width: 280, height: 360}
 export default function MiniChatLauncher({mediaId, instanceKey, title, getContext}: Props) {
     const [open, setOpen] = useState(false)
     const [size, setSize] = useState(DEFAULT_SIZE)
-    const dragState = useRef<{startX: number, startY: number, startWidth: number, startHeight: number} | null>(null)
+    const dragState = useRef<{ startX: number, startY: number, startWidth: number, startHeight: number } | null>(null)
 
     // Panel is anchored bottom-right, so growing it means expanding
     // upward/leftward — the resize handle sits at the top-left corner and
@@ -29,11 +39,10 @@ export default function MiniChatLauncher({mediaId, instanceKey, title, getContex
     const handlePointerMove = useCallback((e: PointerEvent) => {
         const drag = dragState.current
         if (!drag) return
-        const maxWidth = window.innerWidth - 24
-        const maxHeight = window.innerHeight - 96
-        const nextWidth = Math.min(maxWidth, Math.max(MIN_SIZE.width, drag.startWidth + (drag.startX - e.clientX)))
-        const nextHeight = Math.min(maxHeight, Math.max(MIN_SIZE.height, drag.startHeight + (drag.startY - e.clientY)))
-        setSize({width: nextWidth, height: nextHeight})
+        setSize(clampSize(
+            drag.startWidth + (drag.startX - e.clientX),
+            drag.startHeight + (drag.startY - e.clientY),
+        ))
     }, [])
 
     const handlePointerUp = useCallback(() => {
@@ -54,6 +63,16 @@ export default function MiniChatLauncher({mediaId, instanceKey, title, getContex
         window.removeEventListener('pointermove', handlePointerMove)
         window.removeEventListener('pointerup', handlePointerUp)
     }, [handlePointerMove, handlePointerUp])
+
+    // Re-clamp whenever the window itself shrinks (or grows) — otherwise a
+    // panel sized against a large window stays oversized and gets pushed
+    // off-screen once the window is made smaller.
+    useEffect(() => {
+        if (!open) return
+        const onResize = () => setSize(prev => clampSize(prev.width, prev.height))
+        window.addEventListener('resize', onResize)
+        return () => window.removeEventListener('resize', onResize)
+    }, [open])
 
     return (
         <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
