@@ -1,10 +1,11 @@
 import {useState} from 'react'
-import {register} from '../services/auth.service'
+import {register, login} from '../services/auth.service'
 import {useNavigate} from 'react-router-dom'
 import {LanguageSwitcher} from '../components/LanguageSwitcher'
 import LanguagePickerModal from '@/components/LanguagePickerModal'
 import {CURATED_LANGUAGE_CODES, getLanguageDisplayName} from '@/lib/languages'
 import {useTranslation} from 'react-i18next'
+import {authStorage} from '@/lib/authStorage'
 
 function SignInPage() {
     const [username, setUsername] = useState('')
@@ -20,7 +21,10 @@ function SignInPage() {
         setError('')
         try {
             await register(username, password, nativeLanguage)
-            navigate('/login')
+            const data = await login(username, password)
+            authStorage.setToken(data.access_token)
+            navigate('/dashboard')
+
         } catch {
             setError(t('registerError'))
         }

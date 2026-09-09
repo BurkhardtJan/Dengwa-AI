@@ -77,7 +77,7 @@ function LandingPage() {
                 <h2 className="text-2xl font-semibold text-center mb-12">
                     {t('howItWorks.title')}
                 </h2>
-                <div className="flex flex-col md:flex-row justify-center items-start gap-0 max-w-3xl mx-auto relative">
+                <div className="flex flex-col md:flex-row justify-center items-center md:items-start gap-8 md:gap-0 max-w-3xl mx-auto relative">
                     {(t('howItWorks.steps', {returnObjects: true}) as {step: string, label: string}[]).map((item, i, arr) => (
                         <div key={i} className="flex flex-col items-center text-center flex-1 relative">
                             {/* Connector line between steps */}
