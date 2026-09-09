@@ -46,7 +46,7 @@ export default function ChatMessageBubble({
 
     if (isContext) {
         return (
-            <div className="max-w-[80%] ml-auto mr-0 px-3 py-1 text-[11px] text-muted-foreground italic opacity-70">
+            <div className="max-w-[90%] ml-auto mr-0 px-3 py-1 text-[11px] text-muted-foreground italic opacity-70">
                 {message.message}
             </div>
         )
@@ -60,7 +60,7 @@ export default function ChatMessageBubble({
     }
 
     return (
-        <div className={`group flex flex-col max-w-[92%] sm:max-w-[80%] ${isAi ? 'mr-auto items-start' : 'ml-auto items-end'}`}>
+        <div className={`group flex flex-col max-w-full ${isAi ? 'mr-auto items-start' : 'ml-auto items-end'}`}>
             <span className="text-[10px] text-muted-foreground mb-0.5 px-1 uppercase tracking-wider">
                 {isAi ? t('aiLabel') : t('userLabel')}
                 {isAi && (message.model || message.provider) && (

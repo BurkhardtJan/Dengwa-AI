@@ -80,7 +80,7 @@ export default function MiniChat({mediaId, instanceKey, title, getContext}: Prop
     }
 
     return (
-        <div className="flex flex-col h-105 border rounded-lg bg-background p-3">
+        <div className="flex flex-col h-full border rounded-lg bg-background p-3">
             <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     {t('chat:miniChatTitle')}

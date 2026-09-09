@@ -70,7 +70,7 @@ export default function ChatMessageList({
     }, [messages, streamingText])
 
     return (
-        <div className="flex-1 border rounded-lg p-4 bg-muted/20 overflow-y-auto min-h-[350px] space-y-4 mb-4">
+        <div className="flex-1 border rounded-lg p-4 bg-muted/20 overflow-y-auto min-h-0 space-y-4 mb-4">
             {messages.length === 0 ? (
                 <p className="text-muted-foreground text-sm italic text-center mt-4">
                     {t('emptyHistory')}
