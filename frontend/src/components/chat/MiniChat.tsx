@@ -4,7 +4,7 @@ import {ExternalLink, VolumeX} from 'lucide-react'
 import {useQuery, useQueryClient} from '@tanstack/react-query'
 import {isAxiosError} from 'axios'
 import {useTranslation} from 'react-i18next'
-import {createChat} from '@/services/chat.service.ts'
+import {useChatAdapter} from '@/context/ChatAdapterContext'
 import {useChatTree} from '@/hooks/useChatTree'
 import ChatMessageList from '@/components/chat/ChatMessageList'
 import ChatMessageInput from '@/components/chat/ChatMessageInput'
@@ -32,6 +32,7 @@ interface Props {
 
 export default function MiniChat({mediaId, instanceKey, title, getContext}: Props) {
     const {t} = useTranslation(['common', 'chat'])
+    const chatAdapter = useChatAdapter()
     const cacheKey = instanceKey ?? mediaId
 
     // Creates its own chat as soon as it's mounted (i.e. once the host
@@ -44,7 +45,7 @@ export default function MiniChat({mediaId, instanceKey, title, getContext}: Prop
     // creates two chats instead of deduping to one.
     const {data: chat, isError: isCreateError, refetch: retryCreate} = useQuery({
         queryKey: ['miniChatCreate', cacheKey],
-        queryFn: () => createChat(mediaId, title),
+        queryFn: () => chatAdapter.createChat(mediaId, title),
         staleTime: Infinity,
         retry: false,
     })

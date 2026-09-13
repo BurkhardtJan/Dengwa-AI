@@ -1,7 +1,5 @@
 import {useTranslation} from 'react-i18next'
-import type {components} from '@/types/api'
-
-type ChatMessage = components['schemas']['ChatMessageResponse']
+import type {ChatMessage} from '@/components/chat/chat.types'
 
 interface Props {
     siblings: ChatMessage[]

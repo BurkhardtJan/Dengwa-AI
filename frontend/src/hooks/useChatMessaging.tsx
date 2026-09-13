@@ -1,14 +1,12 @@
 import {useEffect, useRef, useState} from 'react'
 import {useQueryClient} from '@tanstack/react-query'
-import {streamMessage, streamResponse, writeMessage} from '@/services/chat.service.ts'
+import {useChatAdapter} from '@/context/ChatAdapterContext'
 import {useSpeechSettings} from '@/context/SpeechSettingsContext'
 import {useChatDefaults} from '@/context/ChatDefaultsContext'
 import {getTtsEngine} from '@/lib/speech/registry'
 import {createStreamingSpeaker} from '@/lib/speech/streamingSpeaker'
 import {toBcp47} from '@/lib/speech/languageCodes'
-import type {components} from '@/types/api'
-
-type Chat = components['schemas']['ChatResponse']
+import type {Chat} from '@/components/chat/chat.types'
 
 export interface ModelChoice {
     provider: string | null
@@ -27,6 +25,7 @@ const SHOW_METADATA_KEY = 'dengwa-chat-show-metadata'
 
 export function useChatMessaging(chatId: string | undefined, onNewLeaf: (id: string) => void, learningLanguage: string) {
     const queryClient = useQueryClient()
+    const chatAdapter = useChatAdapter()
     const {ttsEngine, speakWhileStreaming} = useSpeechSettings()
     const {defaultProvider, defaultModel, defaultEmbeddingModel} = useChatDefaults()
     const defaultChoice = (): ModelChoice => ({
@@ -109,7 +108,7 @@ export function useChatMessaging(chatId: string | undefined, onNewLeaf: (id: str
         })
 
         async function runPrimary() {
-            for await (const event of streamMessage(
+            for await (const event of chatAdapter.streamMessage(
                 chatId!, message, parentId,
                 primary.provider, primary.model, primary.embeddingModel, primary.temperature, primary.maxTokens
             )) {
@@ -142,7 +141,7 @@ export function useChatMessaging(chatId: string | undefined, onNewLeaf: (id: str
         // to/compare - only the primary's reply becomes the new active leaf.
         async function runExtra(cfg: ModelChoice, slotIndex: number) {
             const userMessageId = await userMessageIdPromise
-            for await (const event of streamResponse(
+            for await (const event of chatAdapter.streamResponse(
                 chatId!, userMessageId, cfg.provider, cfg.model, cfg.embeddingModel, cfg.temperature, cfg.maxTokens
             )) {
                 if (event.type === 'chunk') {
@@ -168,7 +167,7 @@ export function useChatMessaging(chatId: string | undefined, onNewLeaf: (id: str
     }
 
     async function sendWithContext(message: string, context: string, parentId: string | null) {
-        const contextNode = await writeMessage(chatId!, context, 'context', parentId)
+        const contextNode = await chatAdapter.writeMessage(chatId!, context, 'context', parentId)
         await send(message, contextNode.id)
     }
 
@@ -181,7 +180,7 @@ export function useChatMessaging(chatId: string | undefined, onNewLeaf: (id: str
         setStreamingText('')
 
         try {
-            for await (const event of streamResponse(
+            for await (const event of chatAdapter.streamResponse(
                 chatId!, userMessageId,
                 primary.provider, primary.model, primary.embeddingModel, primary.temperature, primary.maxTokens
             )) {

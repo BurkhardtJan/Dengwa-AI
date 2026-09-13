@@ -1,12 +1,10 @@
 import {useState} from 'react'
 import {useTranslation} from 'react-i18next'
 import {ChevronLeft, ChevronRight, Pencil, RotateCw, Volume2, VolumeX} from 'lucide-react'
-import type {components} from '@/types/api'
+import type {ChatMessage} from '@/components/chat/chat.types'
 import MarkdownContent from '@/components/chat/MarkdownContent'
 import {useTextToSpeech} from '@/hooks/useTextToSpeech'
 import {toBcp47} from '@/lib/speech/languageCodes'
-
-type ChatMessage = components['schemas']['ChatMessageResponse']
 
 interface Props {
     message: ChatMessage

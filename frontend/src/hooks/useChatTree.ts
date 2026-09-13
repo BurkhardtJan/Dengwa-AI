@@ -1,19 +1,18 @@
 import {useMemo} from 'react'
 import {useQuery} from '@tanstack/react-query'
-import {fetchChatHistory} from '@/services/chat.service.ts'
+import {useChatAdapter} from '@/context/ChatAdapterContext'
 import {useChatBranches} from './useChatBranches'
 import {useChatMessaging} from './useChatMessaging'
 import {PENDING_USER_MESSAGE_ID} from '@/utils/tree.utils'
-import type {components} from '@/types/api'
+import type {ChatMessage} from '@/components/chat/chat.types'
 
 export type {ModelChoice, ViewMode} from './useChatMessaging'
 
-type ChatMessage = components['schemas']['ChatMessageResponse']
-
 export function useChatTree(chatId: string | undefined, learningLanguage: string) {
+    const chatAdapter = useChatAdapter()
     const {data: history, isLoading, isError, error} = useQuery({
         queryKey: ['chatHistory', chatId],
-        queryFn: () => fetchChatHistory(chatId!),
+        queryFn: () => chatAdapter.fetchChatHistory(chatId!),
         enabled: !!chatId
     })
 
@@ -34,6 +33,7 @@ export function useChatTree(chatId: string | undefined, learningLanguage: string
             provider: null,
             model: null,
             embedding_model: null,
+            estimated_cost_usd: null,
         }
         return [...branches.activePath, tempUser]
     }, [branches.activePath, messaging.pendingUserText])

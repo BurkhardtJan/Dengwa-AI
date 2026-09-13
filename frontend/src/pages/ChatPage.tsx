@@ -1,27 +1,26 @@
 import {useMemo} from 'react'
 import {useNavigate} from 'react-router-dom'
 import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query'
-import {fetchChats, createChat} from '@/services/chat.service.ts'
+import {useChatAdapter} from '@/context/ChatAdapterContext'
 import {fetchLanguages} from '@/services/language.service.ts'
 import {useLanguage} from '@/context/TargetLanguageContext.tsx'
 import {useMedium} from '@/context/MediumContext'
-import type {components} from '../types/api'
+import type {Chat} from '@/components/chat/chat.types'
 import {getLanguageDisplayName} from '@/lib/languages'
 import {PAGE_WIDTH, PAGE_PADDING} from '@/lib/layout'
 import {useTranslation} from 'react-i18next'
 
-type Chat = components['schemas']['ChatResponse']
-
 function ChatPage() {
     const navigate = useNavigate()
     const queryClient = useQueryClient()
+    const chatAdapter = useChatAdapter()
     const {selectedLan} = useLanguage()
     const {mediumId, medium} = useMedium()
     const {t, i18n} = useTranslation(['chat', 'common'])
 
     const {data: chat, isLoading: isChatsLoading, isError: isChatsError} = useQuery({
         queryKey: ['chat', selectedLan],
-        queryFn: () => fetchChats(selectedLan ?? undefined)
+        queryFn: () => chatAdapter.fetchChats(selectedLan ?? undefined)
     })
 
     // Reuses the same ['languages'] cache Sidebar.tsx already populates —
@@ -35,7 +34,7 @@ function ChatPage() {
     const currentLearning = languages?.find(l => l.learning_language === selectedLan)
 
     const createChatMutation = useMutation({
-        mutationFn: ({mediaId, title}: { mediaId: string; title?: string }) => createChat(mediaId, title),
+        mutationFn: ({mediaId, title}: { mediaId: string; title?: string }) => chatAdapter.createChat(mediaId, title),
         onSuccess: (newChat) => {
             queryClient.invalidateQueries({queryKey: ['chat']})
             navigate(`/chat/${newChat.id}`)

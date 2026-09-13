@@ -1,7 +1,7 @@
 import {useEffect} from "react";
 import {useParams, useNavigate} from 'react-router-dom'
 import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query'
-import {deleteChat, fetchChats, updateChatTitle} from '@/services/chat.service.ts'
+import {useChatAdapter} from '@/context/ChatAdapterContext'
 import {useChatTree} from '@/hooks/useChatTree'
 import ChatHeader from '@/components/chat/ChatHeader'
 import ChatSettings from '@/components/chat/ChatSettings'
@@ -16,17 +16,18 @@ export default function ChatDetailPage() {
     const {id} = useParams<{ id: string }>()
     const navigate = useNavigate()
     const queryClient = useQueryClient()
+    const chatAdapter = useChatAdapter()
     const {t} = useTranslation(['chat', 'common'])
 
     const {data: chatMeta} = useQuery({
         queryKey: ['chatMeta', id],
         queryFn: async () => {
-            const cached = queryClient.getQueryData<Awaited<ReturnType<typeof fetchChats>>>(['chat'])
+            const cached = queryClient.getQueryData<Awaited<ReturnType<typeof chatAdapter.fetchChats>>>(['chat'])
             if (cached) {
                 const found = cached.find(c => c.id === id)
                 if (found) return found
             }
-            const all = await fetchChats()
+            const all = await chatAdapter.fetchChats()
             return all.find(c => c.id === id) ?? null
         },
         enabled: !!id
@@ -44,7 +45,7 @@ export default function ChatDetailPage() {
 
 
     const deleteMutation = useMutation({
-        mutationFn: () => deleteChat(id!),
+        mutationFn: () => chatAdapter.deleteChat(id!),
         onSuccess: () => {
             void queryClient.invalidateQueries({queryKey: ['chat']})
             navigate('/chat')
@@ -52,7 +53,7 @@ export default function ChatDetailPage() {
     })
 
     const renameMutation = useMutation({
-        mutationFn: (title: string) => updateChatTitle(id!, title),
+        mutationFn: (title: string) => chatAdapter.updateChatTitle(id!, title),
         onSuccess: () => {
             void queryClient.invalidateQueries({queryKey: ['chatMeta', id]})
             void queryClient.invalidateQueries({queryKey: ['chat']})

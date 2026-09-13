@@ -1,6 +1,4 @@
-import type {components} from '../types/api'
-
-type ChatMessage = components['schemas']['ChatMessageResponse']
+import type {ChatMessage} from '@/components/chat/chat.types'
 
 export const PENDING_USER_MESSAGE_ID = '__pending_user__'
 

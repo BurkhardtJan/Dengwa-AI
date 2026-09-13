@@ -1,6 +1,7 @@
 import api, {API_BASE_URL} from './api'
 import {authStorage} from '@/lib/authStorage'
 import type {components} from '../types/api'
+import type {ChatAdapter, StreamEvent} from '@/components/chat/chat.types'
 
 type Chat = components['schemas']['ChatResponse']
 type ChatMessage = components['schemas']['ChatMessageResponse']
@@ -67,11 +68,6 @@ export async function deleteChat(chatId: string): Promise<void> {
     await api.delete(`/chats/${chatId}`)
 }
 
-export type StreamEvent =
-    | { type: 'user_message'; message: ChatMessage }
-    | { type: 'chunk'; content: string }
-    | { type: 'done'; message: ChatMessage }
-    | { type: 'title'; title: string }
 
 async function* readSSE(response: Response): AsyncGenerator<StreamEvent> {
     if (!response.body) throw new Error('No response body')
@@ -162,3 +158,8 @@ export async function updateChatTitle(chatId: string, title: string): Promise<Ch
     const response = await api.put(`/chats/${chatId}`, {title})
     return response.data
 }
+
+export const dengwaChatAdapter = {
+    fetchChats, createChat, fetchChatHistory, sendMessage, createResponse,
+    deleteChat, streamMessage, streamResponse, writeMessage, updateChatTitle,
+} satisfies ChatAdapter

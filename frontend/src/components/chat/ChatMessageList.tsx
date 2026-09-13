@@ -5,10 +5,8 @@ import CompareView from './CompareView'
 import PendingCompareView from './PendingCompareView'
 import LoadingBubble from './LoadingBubble'
 import {PENDING_USER_MESSAGE_ID} from '@/utils/tree.utils'
-import type {components} from '@/types/api'
+import type {ChatMessage} from '@/components/chat/chat.types'
 import type {ModelChoice, ViewMode} from '@/hooks/useChatTree'
-
-type ChatMessage = components['schemas']['ChatMessageResponse']
 
 interface Props {
     messages: ChatMessage[]

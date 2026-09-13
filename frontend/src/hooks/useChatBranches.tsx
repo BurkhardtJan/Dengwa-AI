@@ -1,8 +1,6 @@
 import {useState, useEffect, useMemo} from 'react'
 import {getActivePath, getSiblings, findDeepestLeaf, findGlobalLatestLeaf} from '@/utils/tree.utils'
-import type {components} from '@/types/api'
-
-type ChatMessage = components['schemas']['ChatMessageResponse']
+import type {ChatMessage} from '@/components/chat/chat.types'
 
 export function useChatBranches(history: ChatMessage[] | undefined) {
     const [activeLeafId, setActiveLeafId] = useState<string | null>(null)
