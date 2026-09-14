@@ -20,6 +20,7 @@ function DashboardPage() {
     const [editing, setEditing] = useState(false)
     const [proficiencyLevel, setProficiencyLevel] = useState('')
     const [userMotivation, setUserMotivation] = useState('')
+    const [llmPreferences, setLlmPreferences] = useState('')
     const [showCreate, setShowCreate] = useState(false)
     const {setMediumId} = useMedium()
 
@@ -38,7 +39,8 @@ function DashboardPage() {
     const updateMutation = useMutation({
         mutationFn: () => updateLanguage(selectedLan!.learning_language, {
             proficiency_level: proficiencyLevel,
-            user_motivation: userMotivation
+            user_motivation: userMotivation,
+            llm_preferences: llmPreferences
         }),
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['languages']})
@@ -99,6 +101,7 @@ function DashboardPage() {
                                 setSelectedLan(lan)
                                 setProficiencyLevel(lan.proficiency_level)
                                 setUserMotivation(lan.user_motivation ?? '')
+                                setLlmPreferences(lan.llm_preferences ?? '')
                             }}
                         >
                             <div>
@@ -140,6 +143,15 @@ function DashboardPage() {
                                 placeholder="Motivation"
                                 className="border rounded-lg px-3 py-2 bg-background text-sm"
                             />
+                            <label
+                                className="text-xs font-medium text-muted-foreground -mb-1">{t('dashboard:llmPreferencesLabel')}</label>
+                            <textarea
+                                value={llmPreferences}
+                                onChange={e => setLlmPreferences(e.target.value)}
+                                placeholder={t('dashboard:llmPreferencesLabel')}
+                                rows={3}
+                                className="border rounded-lg px-3 py-2 bg-background text-sm resize-none"
+                            />
                             <div className="flex gap-2 justify-end mt-2">
                                 <button
                                     onClick={() => setEditing(false)}
@@ -168,6 +180,13 @@ function DashboardPage() {
                                         <span
                                             className="text-muted-foreground block text-xs">{t('dashboard:motivation')}:</span>
                                         <span className="italic">"{selectedLan.user_motivation}"</span>
+                                    </p>
+                                )}
+                                {selectedLan.llm_preferences && (
+                                    <p className="text-sm">
+                                        <span
+                                            className="text-muted-foreground block text-xs">{t('dashboard:llmPreferences')}:</span>
+                                        <span className="italic">"{selectedLan.llm_preferences}"</span>
                                     </p>
                                 )}
                             </div>

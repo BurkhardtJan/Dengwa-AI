@@ -29,7 +29,7 @@ async def get_languages(db: Session = Depends(get_db), current_user=Depends(get_
 async def create_language(payload: LanguageLearningCreate, db: Session = Depends(get_db),
                           current_user=Depends(get_current_user)):
     learning = create_learning_record(db, payload.learning_language, current_user.id, payload.proficiency_level,
-                                      payload.user_motivation)
+                                      payload.user_motivation, payload.llm_preferences)
     return learning
 
 
@@ -48,6 +48,8 @@ async def update_language(lan: str, payload: LanguageLearningUpdate, db: Session
         learning.proficiency_level = payload.proficiency_level
     if payload.user_motivation is not None:
         learning.user_motivation = payload.user_motivation
+    if payload.llm_preferences is not None:
+        learning.llm_preferences = payload.llm_preferences
     db.commit()
     db.refresh(learning)
     return learning

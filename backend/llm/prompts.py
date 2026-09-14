@@ -19,13 +19,27 @@ def _build_language_context(media: Media) -> list[str]:
     learning = media.language_learning
     user = learning.user
 
-    return [
+    parts = [
         "",
         "## Lernkontext",
         f"Muttersprache: {user.native_language}",
         f"Lernsprache: {learning.learning_language}",
         f"CEFR-Niveau: {learning.proficiency_level}",
     ]
+
+    if learning.user_motivation:
+        parts.append(f"Motivation des Lernenden: {learning.user_motivation}")
+
+    if learning.llm_preferences:
+        parts += [
+            "",
+            "## Anweisungen des Nutzers an dich",
+            "Diese Anweisungen stammen direkt vom Lernenden und haben Vorrang vor generischen Stilentscheidungen,",
+            "solange sie den übrigen Anweisungen hier nicht widersprechen:",
+            learning.llm_preferences,
+        ]
+
+    return parts
 
 
 def _build_media_context(media: Media) -> list[str]:
@@ -153,6 +167,14 @@ def build_vocab_extract_prompt(media: Media, text: str) -> str:
         ]
 
     return "\n".join(parts)
+
+
+def build_vocab_extract_user_message() -> str:
+    """User message that triggers vocab extraction against the system
+    prompt built by build_vocab_extract_prompt(). Kept in prompts.py
+    rather than inline in media_service.py, like every other prompt
+    string."""
+    return "Gib zwischen 10 Vokabeln zurück"
 
 
 def build_chunk_summary_prompt() -> str:

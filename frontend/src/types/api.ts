@@ -163,7 +163,11 @@ export interface paths {
         put?: never;
         /**
          * Extract Media Vocabulary
-         * @description Extract vocabulary from a medium using LLM
+         * @description Kicks off vocabulary extraction for a medium as a BackgroundTask —
+         *     large media run one LLM call per chunk (see get_processing_chunks()),
+         *     which can take a while. Returns immediately; watch the backend logs
+         *     for progress, and GET /vocabularies to see words as they land (each
+         *     chunk is written to DB as soon as it's extracted, not batched).
          */
         post: operations["extract_media_vocabulary_media__media_id__vocabulary_post"];
         delete?: never;
@@ -681,6 +685,8 @@ export interface components {
             proficiency_level: string;
             /** User Motivation */
             user_motivation?: string | null;
+            /** Llm Preferences */
+            llm_preferences?: string | null;
         };
         /** LanguageLearningResponse */
         LanguageLearningResponse: {
@@ -700,6 +706,8 @@ export interface components {
             proficiency_level: string;
             /** User Motivation */
             user_motivation?: string | null;
+            /** Llm Preferences */
+            llm_preferences?: string | null;
         };
         /** LanguageLearningUpdate */
         LanguageLearningUpdate: {
@@ -707,6 +715,8 @@ export interface components {
             proficiency_level: string | null;
             /** User Motivation */
             user_motivation: string | null;
+            /** Llm Preferences */
+            llm_preferences?: string | null;
         };
         /** MediaResponse */
         MediaResponse: {

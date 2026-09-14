@@ -17,6 +17,7 @@ function CreateLanguageModal({onClose}: Props) {
     const [newLan, setNewLan] = useState('')
     const [lanLevel, setLanLevel] = useState('')
     const [lanMotivation, setLanMotivation] = useState('')
+    const [lanLlmPreferences, setLanLlmPreferences] = useState('')
     const [showPicker, setShowPicker] = useState(false)
     const {setSelectedLan} = useLanguage()
     const {setMediumId} = useMedium()
@@ -30,7 +31,8 @@ function CreateLanguageModal({onClose}: Props) {
         mutationFn: () => createLanguage({
             learning_language: newLan,
             proficiency_level: lanLevel || 'A1',
-            user_motivation: lanMotivation
+            user_motivation: lanMotivation,
+            llm_preferences: lanLlmPreferences
         }),
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['languages']})
@@ -79,6 +81,13 @@ function CreateLanguageModal({onClose}: Props) {
                 onChange={e => setLanMotivation(e.target.value)}
                 placeholder={t('dashboard:motivationLabel')}
                 className="border rounded-lg px-3 py-2 w-full mb-4"
+            />
+            <textarea
+                value={lanLlmPreferences}
+                onChange={e => setLanLlmPreferences(e.target.value)}
+                placeholder={t('dashboard:llmPreferencesLabel')}
+                rows={3}
+                className="border rounded-lg px-3 py-2 w-full mb-4 resize-none"
             />
             <button
                 onClick={() => createMutation.mutate()}

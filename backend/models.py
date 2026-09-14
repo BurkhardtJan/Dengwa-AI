@@ -28,6 +28,7 @@ class LanguageLearning(Base):
     learning_language = Column(String, nullable=False)
     proficiency_level = Column(String, default="A0")
     user_motivation = Column(String)
+    llm_preferences = Column(String, nullable=True)
 
     user = relationship("User", back_populates="language_learnings")
     media = relationship("Media", back_populates="language_learning", cascade="all, delete-orphan")

@@ -39,6 +39,7 @@ def create_learning_record(
         user_id: int,
         proficiency_level: str = "A0",
         user_motivation: str | None = None,
+        llm_preferences: str | None = None,
 ) -> LanguageLearning:
     """Creates learning record in database."""
     learning = LanguageLearning(
@@ -46,6 +47,7 @@ def create_learning_record(
         learning_language=lan,
         proficiency_level=proficiency_level,
         user_motivation=user_motivation,
+        llm_preferences=llm_preferences,
     )
     db.add(learning)
     db.commit()

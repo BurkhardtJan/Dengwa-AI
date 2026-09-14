@@ -9,6 +9,8 @@
   "levelPlaceholder": "Sprachniveau (z.B. A2, B1)",
   "motivation": "Motivation",
   "motivationLabel": "Deine Motivation",
+  "llmPreferences": "Anweisungen an die KI",
+  "llmPreferencesLabel": "Worauf soll die KI bei dir besonders achten? (optional)",
   "deleteConfirm": "Möchtest du diese Sprache wirklich unwiderruflich löschen? Alle verknüpften Medien, Chats und Vokabelzuordnungen könnten verloren gehen.",
   "delete": "Löschen",
   "edit": "Bearbeiten",

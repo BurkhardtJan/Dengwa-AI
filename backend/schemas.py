@@ -22,11 +22,13 @@ class LanguageLearningCreate(BaseModel):
     learning_language: str
     proficiency_level: str = "A0"
     user_motivation: Optional[str] = None
+    llm_preferences: Optional[str] = None
 
 
 class LanguageLearningUpdate(BaseModel):
     proficiency_level: Optional[str]
     user_motivation: Optional[str]
+    llm_preferences: Optional[str] = None
 
 
 class LanguageLearningResponse(BaseModel):
@@ -35,6 +37,7 @@ class LanguageLearningResponse(BaseModel):
     learning_language: str
     proficiency_level: str
     user_motivation: Optional[str] = None
+    llm_preferences: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
 

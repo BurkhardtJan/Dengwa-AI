@@ -9,6 +9,8 @@
   "levelPlaceholder": "Proficiency level (e.g. A2, B1)",
   "motivation": "Motivation",
   "motivationLabel": "Your motivation",
+  "llmPreferences": "Instructions for the AI",
+  "llmPreferencesLabel": "Anything specific you want the AI to keep in mind (optional)",
   "deleteConfirm": "Do you really want to permanently delete this language? All linked media, chats and vocabulary assignments may be lost.",
   "delete": "Delete",
   "edit": "Edit",

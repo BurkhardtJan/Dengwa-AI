@@ -8,6 +8,7 @@ from models import Media, MediaVocabulary, LanguageLearning, Chat
 from schemas import VocabularyExtraction, MediaMetadataExtraction
 from llm.prompts import (
     build_vocab_extract_prompt,
+    build_vocab_extract_user_message,
     build_media_metadata_prompt,
     build_media_metadata_reduce_input,
     build_chat_title_prompt,
@@ -260,7 +261,7 @@ def extract_and_save_vocabulary(db: Session, media: Media, provider, model) -> N
         logger.info("Vocab extraction for media %s: chunk %d/%d started", media.id, i, len(chunks))
 
         system_prompt = build_vocab_extract_prompt(media, chunk)
-        messages = [{"role": "user", "content": "Gib zwischen 10 Vokabeln zurück"}]
+        messages = [{"role": "user", "content": build_vocab_extract_user_message()}]
 
         response_structured = call_llm(
             messages=messages,
@@ -404,10 +405,12 @@ def _sample_excerpts(chunks: list[str], n: int = 4, excerpt_len: int = 400) -> l
 
 
 def _summarize_chunk(media_id: UUID, chunk: str, i: int, total: int) -> str:
-    """'Map' step: a short, cheap/fast mini-summary of a single chunk.
-    Hardcoded to Groq rather than the caller's chosen provider/model —
-    this runs once per chunk, so it should stay fast and cheap; only the
-    final reduce call uses the actually requested provider/model."""
+    """'Map' step: a short mini-summary of a single chunk. Uses the
+    default provider/model (call_llm's own fallback, e.g. via env config)
+    rather than whatever the caller requested for the final reduce call —
+    deliberately not hardcoded to a specific provider, since providers
+    like Groq change their available models often enough that a
+    hardcoded choice breaks silently and is hard to trace back."""
     logger.info("Metadata generation for media %s: chunk %d/%d started", media_id, i, total)
     summary = call_llm(
         messages=[{"role": "user", "content": chunk}],
