@@ -10,6 +10,13 @@ CHUNK_SIZE = 500
 CHUNK_OVERLAP = 50
 TOP_K = 5
 
+# Chunk size for map-reduce LLM processing (summarization, vocab
+# extraction) — deliberately much larger than CHUNK_SIZE above, since
+# those chunks are meant for retrieval granularity, not for giving an
+# LLM call as much natural context as it can comfortably take.
+PROCESSING_CHUNK_SIZE = 4000
+PROCESSING_CHUNK_OVERLAP = 200
+
 CHUNK_MODELS = build_chunk_model_registry()
 
 
@@ -43,6 +50,26 @@ def split_content(content: str, content_type: str | None = None) -> list[str]:
     if content_type == "application/x-subrip":
         return split_srt(content)
     return split_normal_text(content)
+
+
+def split_for_processing(
+        content: str,
+        chunk_size: int = PROCESSING_CHUNK_SIZE,
+        chunk_overlap: int = PROCESSING_CHUNK_OVERLAP,
+) -> list[str]:
+    """
+    Recursive Character Splitter sized for map-reduce LLM processing
+    (summarization, vocab extraction) rather than retrieval granularity.
+    Used as the generic fallback when no structural boundary (like an
+    epub's chapters) is available, and to further split any individual
+    chunk/chapter that's still too large on its own.
+    """
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap,
+        separators=["\n\n", "\n", ".", " ", ""],
+    )
+    return splitter.split_text(content)
 
 
 # ---------------------------------------------------------------------------

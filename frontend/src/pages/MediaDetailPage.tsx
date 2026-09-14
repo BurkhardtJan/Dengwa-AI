@@ -14,7 +14,7 @@ export default function MediaDetailPage() {
     const navigate = useNavigate()
     const queryClient = useQueryClient()
     const {t} = useTranslation(['media', 'common'])
-    const [extractSuccess, setExtractSuccess] = useState(false)
+    const [extractStarted, setExtractStarted] = useState(false)
     const {setMediumId} = useMedium()
 
     useEffect(() => {
@@ -37,8 +37,12 @@ export default function MediaDetailPage() {
     const extractMutation = useMutation({
         mutationFn: () => extractVocabulary(id!),
         onSuccess: () => {
-            setExtractSuccess(true)
-            queryClient.invalidateQueries({queryKey: ['vocabularies']})
+            // The endpoint only kicks off a BackgroundTask now — it
+            // hasn't actually extracted anything yet by the time this
+            // resolves. Words land in the vocab list gradually, chunk by
+            // chunk; check the backend logs for progress, or just revisit
+            // the vocab list after a bit.
+            setExtractStarted(true)
         }
     })
 
@@ -103,9 +107,9 @@ export default function MediaDetailPage() {
                 <div className="p-4 border rounded-lg">
                     <h2 className="text-sm font-semibold mb-1">{t('extractTitle')}</h2>
                     <p className="text-xs text-muted-foreground mb-3">{t('extractDescription')}</p>
-                    {extractSuccess ? (
-                        <p className="text-sm text-green-600 dark:text-green-400 font-medium">
-                            {t('extractSuccess')}
+                    {extractStarted ? (
+                        <p className="text-sm text-muted-foreground font-medium">
+                            {t('extractStarted')}
                         </p>
                     ) : (
                         <button

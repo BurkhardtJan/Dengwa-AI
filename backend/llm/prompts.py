@@ -106,8 +106,10 @@ def build_system_prompt_language_chat(
     return "\n".join(parts)
 
 
-def build_vocab_extract_prompt(media: Media) -> str:
-    """Build system prompt for extracting vocabulary"""
+def build_vocab_extract_prompt(media: Media, text: str) -> str:
+    """Build system prompt for extracting vocabulary from a chunk of text.
+    Takes the text explicitly (rather than reading media.extracted_content)
+    so callers can invoke this once per chunk in a map-reduce pipeline."""
     parts = []
 
     parts += _build_base_prompt()
@@ -141,14 +143,61 @@ def build_vocab_extract_prompt(media: Media) -> str:
         "- Ergänze bei Bedarf eine standardisierte Umschrift in Klammern.",
     ]
 
-    if media.extracted_content:
+    if text:
         parts += [
             "",
             "## Text",
             "---",
-            media.extracted_content,
+            text,
             "---",
         ]
+
+    return "\n".join(parts)
+
+
+def build_chunk_summary_prompt() -> str:
+    """System prompt for the cheap, fast per-chunk mini-summary used as
+    the 'map' step before the media-metadata reduce call in
+    generate_media_metadata()."""
+    return (
+        "Du bekommst einen Ausschnitt aus einem längeren Text.\n"
+        "Fasse ausschließlich den Inhalt dieses Ausschnitts in 2-3 Sätzen zusammen.\n"
+        "Schreibe in der Sprache des Ausschnitts.\n"
+        "Erfinde keine Informationen, die nicht im Ausschnitt stehen.\n"
+        "Gib nur die Zusammenfassung zurück, ohne Einleitung oder Kommentar."
+    )
+
+
+def build_media_metadata_reduce_input(chunk_summaries: list[str], raw_excerpts: list[str]) -> str:
+    """
+    Builds the user-message content for the 'reduce' step of
+    generate_media_metadata() when a medium was too large for a single
+    call. Combines two different kinds of evidence, since they answer
+    different parts of MediaMetadataExtraction:
+
+    - chunk_summaries (all of them, in order): full narrative coverage,
+      needed for summary/topics/genre so nothing from the middle of a
+      long work gets lost.
+    - raw_excerpts (a handful, evenly sampled): actual original text,
+      needed for detected_language/difficulty_estimate — a summary is
+      paraphrased text and loses exactly the grammar/vocabulary signal
+      those two fields need to judge.
+    """
+    parts = [
+        "## Zusammenfassungen der Abschnitte (in Original-Reihenfolge)",
+        "Nutze dies für Zusammenfassung, Themen und Genre.",
+        "",
+    ]
+    parts += [f"[Abschnitt {i + 1}] {s}" for i, s in enumerate(chunk_summaries)]
+
+    parts += [
+        "",
+        "## Textausschnitte im Original",
+        "Nutze ausschließlich dies für Spracherkennung und CEFR-Einschätzung — ",
+        "die Zusammenfassungen oben sind bereits umformuliert und eignen sich dafür nicht.",
+        "",
+    ]
+    parts += [f"--- Ausschnitt {chr(65 + i)} ---\n{excerpt}" for i, excerpt in enumerate(raw_excerpts)]
 
     return "\n".join(parts)
 

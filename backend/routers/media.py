@@ -10,10 +10,9 @@ from uuid import UUID
 from models import Media, LanguageLearning
 from schemas import (
     MediaResponse,
-    VocabularyExtraction
 )
 from services.media_service import get_media_or_404, create_media_record, save_uploaded_file, \
-    extract_and_save_vocabulary, generate_media_metadata, embed_media_safe, get_media_disk_path
+    run_vocabulary_extraction, generate_media_metadata, embed_media_safe, get_media_disk_path
 from services.language_service import get_learning_or_404, get_or_create_learning
 
 router = APIRouter(prefix="/media", tags=["Media"])
@@ -60,7 +59,7 @@ async def post_media(
 
     media = create_media_record(db, media_id, title, file, file_path, learning.id)
 
-    background_tasks.add_task(generate_media_metadata, db, media.id)
+    background_tasks.add_task(generate_media_metadata, media.id)
     background_tasks.add_task(embed_media_safe, db, media)
 
     return media
@@ -69,14 +68,22 @@ async def post_media(
 @router.post("/{media_id}/vocabulary")
 async def extract_media_vocabulary(
         media_id: UUID,
+        background_tasks: BackgroundTasks,
         provider: str | None = None,
         model: str | None = None,
         db: Session = Depends(get_db),
         current_user=Depends(get_current_user)
 ):
-    """Extract vocabulary from a medium using LLM"""
+    """
+    Kicks off vocabulary extraction for a medium as a BackgroundTask —
+    large media run one LLM call per chunk (see get_processing_chunks()),
+    which can take a while. Returns immediately; watch the backend logs
+    for progress, and GET /vocabularies to see words as they land (each
+    chunk is written to DB as soon as it's extracted, not batched).
+    """
     media = get_media_or_404(db, media_id, current_user.id)
-    return extract_and_save_vocabulary(db, media, provider, model)
+    background_tasks.add_task(run_vocabulary_extraction, media.id, provider, model)
+    return {"status": "started"}
 
 
 @router.get("/{media_id}", response_model=MediaResponse)

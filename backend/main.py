@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import logging
 import uvicorn
 from database import Base, engine
 from routers import system, users, languages, media, chats, vocabularies, llm_models, reviews
@@ -7,6 +8,16 @@ from sqlalchemy import text
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from rate_limit import limiter
+
+# Without this, only WARNING/ERROR ever reach the console (Python's
+# logging module falls back to a bare "last resort" stderr handler at
+# WARNING level when nothing is configured) — the logger.info() progress
+# lines added for background tasks (media_service.py) would otherwise
+# be invisible even though the code runs them.
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+)
 
 with engine.connect() as conn:
     conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
