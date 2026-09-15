@@ -171,10 +171,8 @@ def build_vocab_extract_prompt(media: Media, text: str) -> str:
 
 def build_vocab_extract_user_message() -> str:
     """User message that triggers vocab extraction against the system
-    prompt built by build_vocab_extract_prompt(). Kept in prompts.py
-    rather than inline in media_service.py, like every other prompt
-    string."""
-    return "Gib zwischen 10 Vokabeln zurück"
+    prompt built by build_vocab_extract_prompt()."""
+    return "Gib zwischen 10 und 20 Vokabeln zurück"
 
 
 def build_chunk_summary_prompt() -> str:

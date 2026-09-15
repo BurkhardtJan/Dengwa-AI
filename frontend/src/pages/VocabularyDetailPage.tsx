@@ -1,7 +1,7 @@
 import {useState} from 'react'
 import {useParams, useNavigate} from 'react-router-dom'
 import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query'
-import {fetchVocabulary, deleteVocabulary, updateVocabulary} from '../services/vocabulary.service'
+import {fetchVocabulary, deleteVocabulary, updateVocabulary, suspendVocabulary, unsuspendVocabulary} from '../services/vocabulary.service'
 import {useTranslation} from 'react-i18next'
 import MiniChatLauncher from '@/components/chat/MiniChatLauncher'
 import {PAGE_WIDTH, PAGE_PADDING} from '@/lib/layout'
@@ -46,6 +46,14 @@ export default function VocabularyDetailPage() {
         }
     })
 
+    const suspendMutation = useMutation({
+        mutationFn: () => data?.suspended ? unsuspendVocabulary(id!) : suspendVocabulary(id!),
+        onSuccess: (updated) => {
+            queryClient.setQueryData(['vocabulary', id], updated)
+            void queryClient.invalidateQueries({queryKey: ['vocabularies']})
+        }
+    })
+
     if (isLoading) return <p className="p-8">{t('common:loading')}</p>
     if (isError) return <p className="p-8 text-destructive">{t('common:errorLoading')}</p>
 
@@ -62,6 +70,12 @@ export default function VocabularyDetailPage() {
                     <div className="flex items-center gap-2">
                         <h1 className="text-3xl font-bold">{data?.word}</h1>
                         {data && <SpeakButton text={data.word} lang={data.language} size={18}/>}
+                        {data?.suspended && (
+                            <span
+                                className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
+                                {t('vocabulary:suspended')}
+                            </span>
+                        )}
                     </div>
                 </div>
 
@@ -153,7 +167,17 @@ export default function VocabularyDetailPage() {
                         >
                             {t('common:buttons.edit')}
                         </button>
+                        <button
+                            onClick={() => suspendMutation.mutate()}
+                            disabled={suspendMutation.isPending}
+                            className="px-4 py-2 border rounded-lg text-sm font-medium hover:bg-muted transition-colors disabled:opacity-50"
+                        >
+                            {data?.suspended ? t('vocabulary:unsuspendButton') : t('vocabulary:suspendButton')}
+                        </button>
                     </div>
+                    {data?.suspended && (
+                        <p className="text-xs text-muted-foreground mt-2">{t('vocabulary:suspendedHint')}</p>
+                    )}
                 </div>
             )}
 

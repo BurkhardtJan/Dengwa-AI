@@ -77,6 +77,7 @@ class VocabularyResponse(BaseModel):
     context_sentence: Optional[str] = None
     language: str = Field(validation_alias="resolved_language")
     created_at: datetime
+    suspended: bool = False
 
     model_config = ConfigDict(from_attributes=True)
 

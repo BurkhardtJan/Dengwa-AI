@@ -1,6 +1,6 @@
 import uuid
 from sqlalchemy import Column, String, Text, ForeignKey, DateTime, UniqueConstraint, Float, Integer, SmallInteger, UUID, \
-    BigInteger
+    BigInteger, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import ARRAY
 from pgvector.sqlalchemy import Vector
@@ -101,6 +101,13 @@ class Vocabulary(Base):
         language if set, otherwise the course's nominal learning language."""
         return self.language or self.language_learning.learning_language
 
+    @property
+    def suspended(self) -> bool:
+        """True if every card for this word is suspended (paused out of
+        SRS review). False if there are no cards at all, so a freshly
+        created word never shows as suspended by default."""
+        return bool(self.cards) and all(c.suspended for c in self.cards)
+
 
 class VocabularyCard(Base):
     __tablename__ = "vocabulary_cards"
@@ -110,6 +117,7 @@ class VocabularyCard(Base):
 
     template = Column(String, nullable=True)  # 'recognition' | 'production' | 'cloze' | None
     queue = Column(String, default="new")  # 'new' | 'learning' | 'review'
+    suspended = Column(Boolean, default=False, nullable=False)  # paused out of SRS, independent of queue
 
     due = Column(DateTime)
     interval_days = Column(Integer, default=0)

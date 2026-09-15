@@ -98,3 +98,14 @@ def get_or_create_vocab(
         context_sentence=context_sentence,
         language=language,
     )
+
+
+def set_vocab_suspended(db: Session, vocab: Vocabulary, suspended: bool) -> Vocabulary:
+    """Suspends/unsuspends every card belonging to a word together — from
+    the user's point of view this pauses or reactivates the whole word in
+    the SRS, not one specific card template."""
+    for card in vocab.cards:
+        card.suspended = suspended
+    db.commit()
+    db.refresh(vocab)
+    return vocab

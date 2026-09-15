@@ -30,3 +30,13 @@ export async function updateVocabulary(id: string, data: VocabularyUpdate): Prom
 export async function deleteVocabulary(id: string): Promise<void> {
     await api.delete(`/vocabularies/${id}`)
 }
+
+export async function suspendVocabulary(id: string): Promise<Vocabulary> {
+    const response = await api.post(`/vocabularies/${id}/suspend`)
+    return response.data
+}
+
+export async function unsuspendVocabulary(id: string): Promise<Vocabulary> {
+    const response = await api.post(`/vocabularies/${id}/unsuspend`)
+    return response.data
+}

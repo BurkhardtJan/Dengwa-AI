@@ -405,6 +405,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/vocabularies/{vocab_id}/suspend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Suspend Vocabulary
+         * @description Pauses a word out of the SRS — it won't come up for review until unsuspended.
+         */
+        post: operations["suspend_vocabulary_vocabularies__vocab_id__suspend_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/vocabularies/{vocab_id}/unsuspend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Unsuspend Vocabulary
+         * @description Reactivates a previously suspended word in the SRS.
+         */
+        post: operations["unsuspend_vocabulary_vocabularies__vocab_id__unsuspend_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/llm_models/chat": {
         parameters: {
             query?: never;
@@ -860,6 +900,11 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+            /**
+             * Suspended
+             * @default false
+             */
+            suspended: boolean;
         };
         /** VocabularyUpdate */
         VocabularyUpdate: {
@@ -1832,6 +1877,68 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    suspend_vocabulary_vocabularies__vocab_id__suspend_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                vocab_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VocabularyResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    unsuspend_vocabulary_vocabularies__vocab_id__unsuspend_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                vocab_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VocabularyResponse"];
                 };
             };
             /** @description Validation Error */

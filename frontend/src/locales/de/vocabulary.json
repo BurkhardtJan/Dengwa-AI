@@ -21,5 +21,9 @@
   "deleting": "Löscht...",
   "openChat": "Mini-Chat öffnen",
   "closeChat": "Mini-Chat schließen",
-  "notEnoughForMemory": "Zu wenig Vokabeln mit Übersetzung für dieses Spiel."
+  "notEnoughForMemory": "Zu wenig Vokabeln mit Übersetzung für dieses Spiel.",
+  "suspended": "Pausiert",
+  "suspendedHint": "Dieses Wort kommt aktuell nicht in der Wiederholung (SRS) vor.",
+  "suspendButton": "Aus SRS pausieren",
+  "unsuspendButton": "Wieder aktivieren"
 }

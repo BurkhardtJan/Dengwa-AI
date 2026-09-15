@@ -36,12 +36,15 @@ def scoped_card_query(
         template: str | None = None,
 ) -> Query:
     """Build a card query scoped to the user, optionally narrowed to a
-    language, a medium, and/or a card template."""
+    language, a medium, and/or a card template. Always excludes suspended
+    cards — they're paused out of the whole SRS flow (review queue, due
+    counts, stats), not just skipped for scheduling."""
     query = (
         db.query(VocabularyCard)
         .join(Vocabulary, VocabularyCard.vocabulary_id == Vocabulary.id)
         .join(LanguageLearning, Vocabulary.learning_id == LanguageLearning.id)
         .filter(LanguageLearning.user_id == user_id)
+        .filter(VocabularyCard.suspended.is_(False))
     )
     if learning_id:
         query = query.filter(Vocabulary.learning_id == learning_id)

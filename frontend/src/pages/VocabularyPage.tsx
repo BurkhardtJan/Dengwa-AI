@@ -79,6 +79,12 @@ function VocabularyPage() {
                             <div className="flex items-center gap-1">
                                 <p className="font-medium">{vocab.word}</p>
                                 <SpeakButton text={vocab.word} lang={vocab.language}/>
+                                {vocab.suspended && (
+                                    <span
+                                        className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
+                                        {t('vocabulary:suspended')}
+                                    </span>
+                                )}
                             </div>
                             <p className="text-muted-foreground">{vocab.translation}</p>
                             <p className="text-muted-foreground">{vocab.context_sentence}</p>

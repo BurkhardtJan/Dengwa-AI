@@ -8,7 +8,7 @@ from models import Vocabulary, LanguageLearning, MediaVocabulary
 from schemas import (
     VocabularyResponse, VocabularyCreate, VocabularyUpdate
 )
-from services.vocabulary_service import get_vocab_or_404, get_or_create_vocab
+from services.vocabulary_service import get_vocab_or_404, get_or_create_vocab, set_vocab_suspended
 from services.language_service import get_learning_or_404, get_or_create_learning
 
 router = APIRouter(prefix="/vocabularies", tags=["Vocabularies"])
@@ -81,3 +81,19 @@ async def delete_vocabulary(vocab_id: UUID, db: Session = Depends(get_db),
     db.commit()
 
     return {"status": "deleted"}
+
+
+@router.post("/{vocab_id}/suspend", response_model=VocabularyResponse)
+async def suspend_vocabulary(vocab_id: UUID, db: Session = Depends(get_db),
+                             current_user=Depends(get_current_user)):
+    """Pauses a word out of the SRS — it won't come up for review until unsuspended."""
+    vocab = get_vocab_or_404(db, vocab_id, current_user.id)
+    return set_vocab_suspended(db, vocab, True)
+
+
+@router.post("/{vocab_id}/unsuspend", response_model=VocabularyResponse)
+async def unsuspend_vocabulary(vocab_id: UUID, db: Session = Depends(get_db),
+                               current_user=Depends(get_current_user)):
+    """Reactivates a previously suspended word in the SRS."""
+    vocab = get_vocab_or_404(db, vocab_id, current_user.id)
+    return set_vocab_suspended(db, vocab, False)

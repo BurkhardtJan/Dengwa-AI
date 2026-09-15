@@ -1,4 +1,5 @@
 import {useState} from 'react'
+import {useNavigate} from 'react-router-dom'
 import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query'
 import {useTranslation} from 'react-i18next'
 import {useLanguage} from '@/context/TargetLanguageContext.tsx'
@@ -21,6 +22,7 @@ function ReviewPage() {
     const {selectedLan} = useLanguage()
     const {mediumId} = useMedium()
     const queryClient = useQueryClient()
+    const navigate = useNavigate()
     const [revealed, setRevealed] = useState(false)
     const {t} = useTranslation(['common', 'review', 'vocabulary'])
 
@@ -84,8 +86,16 @@ function ReviewPage() {
                 </div>
             ) : (
                 <div className="border rounded-lg p-10 text-center min-h-64 flex flex-col justify-center gap-4">
-                    <span
-                        className="text-xs uppercase tracking-wide text-muted-foreground">{t(`review:queue.${card.queue}`)}</span>
+                    <div className="flex items-center justify-center gap-3">
+                        <span
+                            className="text-xs uppercase tracking-wide text-muted-foreground">{t(`review:queue.${card.queue}`)}</span>
+                        <button
+                            onClick={() => navigate(`/vocabulary/${card.vocabulary_id}`)}
+                            className="text-xs text-muted-foreground hover:text-foreground hover:underline"
+                        >
+                            {t('review:viewVocabulary')}
+                        </button>
+                    </div>
                     <div className="flex items-center justify-center gap-1">
                         <p className="text-2xl font-bold">{card.word}</p>
                         <SpeakButton text={card.word} lang={card.language} size={18}/>

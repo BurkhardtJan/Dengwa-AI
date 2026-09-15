@@ -21,5 +21,9 @@
   "deleting": "Deleting...",
   "openChat": "Open mini chat",
   "closeChat": "Close mini chat",
-  "notEnoughForMemory": "Not enough vocabulary with translations for this game."
+  "notEnoughForMemory": "Not enough vocabulary with translations for this game.",
+  "suspended": "Suspended",
+  "suspendedHint": "This word is currently excluded from review (SRS).",
+  "suspendButton": "Suspend from SRS",
+  "unsuspendButton": "Reactivate"
 }
