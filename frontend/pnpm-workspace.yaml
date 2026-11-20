@@ -2,3 +2,6 @@ allowBuilds:
   onnxruntime-node: false
   protobufjs: false
   sharp: false
+  # Transitive dependencies of minimedi (via epubjs); postinstall only prints a funding message
+  core-js: false
+  es5-ext: false

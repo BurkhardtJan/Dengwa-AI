@@ -21,6 +21,7 @@
     "i18next-http-backend": "^4.0.0",
     "langs": "^2.0.0",
     "lucide-react": "^1.21.0",
+    "minimedi": "file:vendor/minimedi-0.1.0.tgz",
     "radix-ui": "^1.6.0",
     "react": "^19.2.6",
     "react-confetti": "^6.4.0",

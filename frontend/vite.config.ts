@@ -34,6 +34,8 @@ export default defineConfig({
         })
     ],
     resolve: {
+        // Keep a single React copy when minimedi is linked from outside this folder
+        dedupe: ['react', 'react-dom'],
         alias: {
             '@': path.resolve(__dirname, './src'),
         },

@@ -24,7 +24,7 @@ with engine.connect() as conn:
     conn.commit()
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
+app = FastAPI(title="Dengwa API")
 
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
