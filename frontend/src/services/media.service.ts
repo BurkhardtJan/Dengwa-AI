@@ -13,11 +13,11 @@ export async function fetchMedium(mediaId: string): Promise<Media> {
     return response.data
 }
 
-export async function fetchMediaFile(mediaId: string): Promise<string> {
+export async function fetchMediaBlob(mediaId: string): Promise<Blob> {
     const response = await api.get(`/media/${mediaId}/file`, {
         responseType: 'blob'
     })
-    return URL.createObjectURL(response.data)
+    return response.data
 }
 
 export async function uploadMedia(lan: string, file: File, title?: string): Promise<Media> {

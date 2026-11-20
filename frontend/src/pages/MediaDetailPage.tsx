@@ -100,7 +100,7 @@ export default function MediaDetailPage() {
 
             <div className="mb-8">
                 <p className="text-muted-foreground mb-1">{data?.content_type}</p>
-                <MediaViewer mediaId={id!} contentType={data?.content_type ?? null}/>
+                <MediaViewer key={id} mediaId={id!} contentType={data?.content_type ?? null}/>
             </div>
 
             <div className="flex flex-col gap-3">

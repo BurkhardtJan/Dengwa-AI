@@ -128,3 +128,40 @@
     @apply font-sans;
     }
 }
+
+/* MiniMedi ships its controls as plain <button>s without any CSS. Tailwind's preflight
+   strips the browser defaults, so Previous/Next would look like plain text. */
+:is(.minimedi-pdf-controls, .minimedi-epub-controls, .minimedi-book-controls,
+    .minimedi-comic-controls, .minimedi-comic-extras, .minimedi-comic-view,
+    .minimedi-ocr-search) button {
+    padding: 0.35rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) * 0.8);
+    background: var(--background);
+    color: var(--foreground);
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+:is(.minimedi-pdf-controls, .minimedi-epub-controls, .minimedi-book-controls,
+    .minimedi-comic-controls, .minimedi-comic-extras, .minimedi-comic-view,
+    .minimedi-ocr-search) button:hover:not(:disabled) {
+    background: var(--accent);
+}
+
+:is(.minimedi-pdf-controls, .minimedi-epub-controls, .minimedi-book-controls,
+    .minimedi-comic-controls, .minimedi-comic-extras, .minimedi-comic-view,
+    .minimedi-ocr-search) button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* PDF and EPUB bars have no layout of their own (the other viewers set it inline). */
+.minimedi-pdf-controls,
+.minimedi-epub-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.4rem;
+}
