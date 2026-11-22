@@ -56,6 +56,13 @@ class MediaResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class SubtitleResponse(BaseModel):
+    language: str  # ISO 639-1 code, also part of the file name: <media_id>_<language><extension>
+    file_extension: str
+    # True for the track whose text feeds the medium's extracted_content
+    is_source: bool = False
+
+
 class VocabularyCardResponse(BaseModel):
     id: UUID
     template: Optional[str] = None

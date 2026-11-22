@@ -458,3 +458,141 @@ def test_delete_dummy_medium_fails():
     learning_id = languages.json()[0]["id"]
     response = requests.delete(f"{BASE_URL}/media/{learning_id}", headers=auth_headers(token))
     assert response.status_code == 400
+
+
+# ---------------------------------------------------------------------------
+# Subtitles
+# ---------------------------------------------------------------------------
+
+SRT_ES = b"1\n00:00:01,000 --> 00:00:02,000\nHola, \xc2\xbfqu\xc3\xa9 tal?\n\n2\n00:00:03,000 --> 00:00:04,000\nMuy bien.\n"
+SRT_DE = b"1\n00:00:01,000 --> 00:00:02,000\nHallo, wie geht's?\n"
+VTT_ES = b"WEBVTT\n\n00:00:01.000 --> 00:00:02.000\nHola de nuevo.\n"
+
+
+def upload_test_video(token: str, language: str, title: str = "Test Video") -> requests.Response:
+    """Upload a tiny fake video (the backend stores it without inspecting the bytes)."""
+    return requests.post(
+        f"{BASE_URL}/media?lan={language}",
+        headers=auth_headers(token),
+        data={"title": title},
+        files={"file": ("clip.mp4", io.BytesIO(b"\x00\x00\x00\x18ftypmp42"), "video/mp4")}
+    )
+
+
+def upload_test_subtitle(token: str, media_id: str, content: bytes = SRT_ES, filename: str = "clip.srt",
+                         language: str | None = None) -> requests.Response:
+    data = {}
+    if language is not None:
+        data["language"] = language
+    return requests.post(
+        f"{BASE_URL}/media/{media_id}/subtitles",
+        headers=auth_headers(token),
+        data=data,
+        files={"file": (filename, io.BytesIO(content), "application/octet-stream")}
+    )
+
+
+def create_video_with_user(language: str = "es") -> tuple:
+    """Register user with a learning language (ISO code), upload a video, return (token, media_id)."""
+    token, language = create_test_user_with_language(language)
+    media_id = upload_test_video(token, language).json()["id"]
+    return token, media_id
+
+
+def test_upload_subtitle_defaults_to_medium_language_and_is_source():
+    """A subtitle without explicit language takes the medium's language and becomes the source track."""
+    token, media_id = create_video_with_user("es")
+    response = upload_test_subtitle(token, media_id)
+    assert response.status_code == 200
+    assert response.json() == {"language": "es", "file_extension": ".srt", "is_source": True}
+
+
+def test_subtitle_in_other_language_is_display_only():
+    """Only the track in the medium's language is the source; others are display-only."""
+    token, media_id = create_video_with_user("es")
+    de = upload_test_subtitle(token, media_id, SRT_DE, "de.srt", language="de").json()
+    es = upload_test_subtitle(token, media_id, SRT_ES, "es.srt", language="es").json()
+    assert de["is_source"] is False
+    assert es["is_source"] is True
+
+    listed = requests.get(f"{BASE_URL}/media/{media_id}/subtitles", headers=auth_headers(token)).json()
+    assert [s["language"] for s in listed] == ["de", "es"]
+    assert [s["is_source"] for s in listed] == [False, True]
+
+
+def test_second_upload_in_same_language_replaces_track():
+    """There is one track per language, even if the format differs."""
+    token, media_id = create_video_with_user("es")
+    upload_test_subtitle(token, media_id, SRT_ES, "a.srt")
+    response = upload_test_subtitle(token, media_id, VTT_ES, "b.vtt")
+    assert response.json()["file_extension"] == ".vtt"
+
+    listed = requests.get(f"{BASE_URL}/media/{media_id}/subtitles", headers=auth_headers(token)).json()
+    assert listed == [{"language": "es", "file_extension": ".vtt", "is_source": True}]
+    file_response = requests.get(f"{BASE_URL}/media/{media_id}/subtitles/es/file", headers=auth_headers(token))
+    assert file_response.content == VTT_ES
+
+
+def test_delete_subtitle_removes_only_that_language():
+    token, media_id = create_video_with_user("es")
+    upload_test_subtitle(token, media_id, SRT_ES, language="es")
+    upload_test_subtitle(token, media_id, SRT_DE, language="de")
+
+    response = requests.delete(f"{BASE_URL}/media/{media_id}/subtitles/es", headers=auth_headers(token))
+    assert response.status_code == 200
+
+    listed = requests.get(f"{BASE_URL}/media/{media_id}/subtitles", headers=auth_headers(token)).json()
+    assert [s["language"] for s in listed] == ["de"]
+    assert listed[0]["is_source"] is False
+    assert requests.get(f"{BASE_URL}/media/{media_id}/subtitles/es/file",
+                        headers=auth_headers(token)).status_code == 404
+
+
+def test_get_subtitle_file_returns_uploaded_content():
+    """The raw subtitle file can be downloaded again."""
+    token, media_id = create_video_with_user("es")
+    upload_test_subtitle(token, media_id)
+    response = requests.get(f"{BASE_URL}/media/{media_id}/subtitles/es/file", headers=auth_headers(token))
+    assert response.status_code == 200
+    assert response.content == SRT_ES
+
+
+def test_subtitle_for_text_medium_fails():
+    """Subtitles are only allowed for audio and video."""
+    token, language = create_test_user_with_language("es")
+    media_id = upload_test_media(token, language).json()["id"]
+    assert upload_test_subtitle(token, media_id).status_code == 400
+
+
+def test_subtitle_with_unsupported_extension_fails():
+    token, media_id = create_video_with_user("es")
+    assert upload_test_subtitle(token, media_id, SRT_ES, "clip.txt").status_code == 415
+
+
+def test_subtitle_without_cues_fails():
+    token, media_id = create_video_with_user("es")
+    assert upload_test_subtitle(token, media_id, b"just some words", "clip.srt").status_code == 422
+
+
+def test_subtitle_with_invalid_language_fails():
+    token, media_id = create_video_with_user("es")
+    assert upload_test_subtitle(token, media_id, language="Spanish").status_code == 422
+
+
+def test_subtitle_of_other_user_is_not_accessible():
+    """Another user gets 404 for listing, uploading and downloading."""
+    token, media_id = create_video_with_user("es")
+    upload_test_subtitle(token, media_id)
+    other_token = get_token(unique_username())
+
+    assert requests.get(f"{BASE_URL}/media/{media_id}/subtitles", headers=auth_headers(other_token)).status_code == 404
+    assert upload_test_subtitle(other_token, media_id).status_code == 404
+    assert requests.get(f"{BASE_URL}/media/{media_id}/subtitles/es/file",
+                        headers=auth_headers(other_token)).status_code == 404
+
+
+def test_deleting_medium_removes_its_subtitles():
+    token, media_id = create_video_with_user("es")
+    upload_test_subtitle(token, media_id)
+    assert requests.delete(f"{BASE_URL}/media/{media_id}", headers=auth_headers(token)).status_code == 200
+    assert requests.get(f"{BASE_URL}/media/{media_id}/subtitles", headers=auth_headers(token)).status_code == 404

@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import logging
 import uvicorn
 from database import Base, engine
-from routers import system, users, languages, media, chats, vocabularies, llm_models, reviews
+from routers import system, users, languages, media, subtitles, chats, vocabularies, llm_models, reviews
 from sqlalchemy import text
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
@@ -46,6 +46,7 @@ app.include_router(system.router)
 app.include_router(users.router)
 app.include_router(languages.router)
 app.include_router(media.router)
+app.include_router(subtitles.router)
 app.include_router(chats.router)
 app.include_router(vocabularies.router)
 app.include_router(llm_models.router)
