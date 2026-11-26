@@ -8,6 +8,7 @@ import {useMedium} from '@/context/MediumContext'
 import {PAGE_WIDTH, PAGE_PADDING} from '@/lib/layout'
 import SpeakButton from '@/components/SpeakButton'
 import MiniChatLauncher from '@/components/chat/MiniChatLauncher'
+import {createViewerContext, formatTime} from '@/lib/viewerContext'
 
 export default function MediaDetailPage() {
     const {id} = useParams<{ id: string }>()
@@ -16,6 +17,8 @@ export default function MediaDetailPage() {
     const {t} = useTranslation(['media', 'common'])
     const [extractStarted, setExtractStarted] = useState(false)
     const {setMediumId} = useMedium()
+    // What happens in the viewer (position, selection, subtitles); the mini-chat gets it as context
+    const [viewerContext] = useState(createViewerContext)
 
     useEffect(() => {
         if (id) setMediumId(id)
@@ -100,7 +103,13 @@ export default function MediaDetailPage() {
 
             <div className="mb-8">
                 <p className="text-muted-foreground mb-1">{data?.content_type}</p>
-                <MediaViewer key={id} mediaId={id!} contentType={data?.content_type ?? null}/>
+                <MediaViewer
+                    key={id}
+                    mediaId={id!}
+                    contentType={data?.content_type ?? null}
+                    fileExtension={data?.file_extension ?? null}
+                    onEvent={viewerContext.handleEvent}
+                />
             </div>
 
             <div className="flex flex-col gap-3">
@@ -128,6 +137,18 @@ export default function MediaDetailPage() {
                     mediaId={id!}
                     instanceKey={id}
                     title={data.title}
+                    getContext={() => viewerContext.build({
+                        position: t('chatContextPosition'),
+                        selection: t('chatContextSelection'),
+                        recentLines: t('chatContextRecentLines'),
+                        page: (page, total) => total
+                            ? t('chatContextPageOf', {page, total})
+                            : t('chatContextPage', {page}),
+                        time: seconds => t('chatContextTime', {time: formatTime(seconds)}),
+                        chapter: (chapter, progress) => progress === undefined
+                            ? t('chatContextChapter', {chapter})
+                            : t('chatContextChapterProgress', {chapter, percent: Math.round(progress * 100)}),
+                    })}
                 />
             )}
         </div>

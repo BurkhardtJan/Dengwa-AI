@@ -271,6 +271,17 @@ def test_upload_media_succeeds():
     assert "id" in data
 
 
+def test_media_response_contains_file_extension():
+    """The file extension of the upload is exposed, because the MIME type is unreliable for comics and e-books."""
+    token, language = create_test_user_with_language()
+    response = upload_test_media(token, language)
+    assert response.json()["file_extension"] == ".txt"
+
+    media_id = response.json()["id"]
+    detail = requests.get(f"{BASE_URL}/media/{media_id}", headers=auth_headers(token))
+    assert detail.json()["file_extension"] == ".txt"
+
+
 def test_get_media_returns_list():
     """GET /media returns a list containing the uploaded file."""
     token, language = create_test_user_with_language()

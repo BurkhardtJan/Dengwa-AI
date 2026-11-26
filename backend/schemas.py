@@ -46,6 +46,7 @@ class MediaResponse(BaseModel):
     id: UUID
     title: str
     content_type: str
+    file_extension: Optional[str] = None  # e.g. ".cbr"; the MIME type is unreliable for comics/e-books
     learning_id: UUID
     summary: Optional[str] = None
     topics: Optional[List[str]] = None

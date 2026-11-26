@@ -16,5 +16,13 @@
   "extractStarted": "Extraction started in the background — new words will appear in your vocabulary list gradually.",
   "noPreview": "No preview available",
   "downloadFile": "Download file",
-  "previewError": "Could not load preview"
+  "previewError": "Could not load preview",
+  "chatContextPosition": "Current position",
+  "chatContextSelection": "Selected text",
+  "chatContextRecentLines": "Subtitles shown most recently",
+  "chatContextPage": "Page {{page}}",
+  "chatContextPageOf": "Page {{page}} of {{total}}",
+  "chatContextTime": "Time {{time}}",
+  "chatContextChapter": "Chapter {{chapter}}",
+  "chatContextChapterProgress": "Chapter {{chapter}} ({{percent}} %)"
 }

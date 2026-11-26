@@ -16,5 +16,13 @@
   "extractStarted": "Extraktion läuft im Hintergrund — neue Vokabeln erscheinen nach und nach in deiner Vokabelliste.",
   "noPreview": "Keine Vorschau verfügbar",
   "downloadFile": "Datei herunterladen",
-  "previewError": "Vorschau konnte nicht geladen werden"
+  "previewError": "Vorschau konnte nicht geladen werden",
+  "chatContextPosition": "Aktuelle Position",
+  "chatContextSelection": "Markierter Text",
+  "chatContextRecentLines": "Zuletzt gezeigte Untertitel",
+  "chatContextPage": "Seite {{page}}",
+  "chatContextPageOf": "Seite {{page}} von {{total}}",
+  "chatContextTime": "Zeit {{time}}",
+  "chatContextChapter": "Kapitel {{chapter}}",
+  "chatContextChapterProgress": "Kapitel {{chapter}} ({{percent}} %)"
 }

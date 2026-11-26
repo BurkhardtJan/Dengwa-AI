@@ -1,6 +1,6 @@
 import {useState, useEffect} from 'react'
 import {useTranslation} from 'react-i18next'
-import {MiniMedi, type MediaType} from 'minimedi'
+import {MiniMedi, type MediaType, type MiniMediEvent} from 'minimedi'
 import 'minimedi/dist/style.css'
 import {fetchMediaBlob} from '../services/media.service'
 import {useMiniMediLabels} from '../hooks/useMiniMediLabels'
@@ -8,31 +8,65 @@ import {useMiniMediLabels} from '../hooks/useMiniMediLabels'
 interface Props {
     mediaId: string
     contentType: string | null
+    fileExtension: string | null
+    /** Receives all MiniMedi events (position, selection, subtitle cues, ...). */
+    onEvent?: (event: MiniMediEvent) => void
 }
 
 /**
- * Maps the stored MIME type to a MiniMedi viewer type.
+ * Formats MiniMedi opens whose MIME type is unreliable: browsers often send
+ * application/octet-stream or odd vendor types for these, so the extension wins.
+ */
+const TYPE_BY_EXTENSION: Record<string, MediaType> = {
+    '.cbz': 'comic', '.cbr': 'comic', '.cb7': 'comic', '.cbt': 'comic',
+    '.fb2': 'ebook', '.mobi': 'ebook', '.azw3': 'ebook',
+    '.epub': 'epub',
+    '.pdf': 'pdf',
+    '.srt': 'subtitle', '.vtt': 'subtitle', '.lrc': 'subtitle',
+    '.txt': 'text', '.md': 'text',
+}
+
+/** MIME types of comics and e-books, for media stored without a file extension. */
+const TYPE_BY_MIME: Record<string, MediaType> = {
+    'application/vnd.comicbook+zip': 'comic',
+    'application/vnd.comicbook-rar': 'comic',
+    'application/x-cbz': 'comic',
+    'application/x-cbr': 'comic',
+    'application/x-cb7': 'comic',
+    'application/x-cbt': 'comic',
+    'application/x-fictionbook+xml': 'ebook',
+    'application/x-mobipocket-ebook': 'ebook',
+    'application/vnd.amazon.ebook': 'ebook',
+    'application/epub+zip': 'epub',
+    'application/pdf': 'pdf',
+    'application/x-subrip': 'subtitle',
+    'text/vtt': 'subtitle',
+}
+
+/**
+ * Maps a medium to a MiniMedi viewer type: file extension first, then MIME type.
  * Returns undefined when MiniMedi has no viewer for it (download link instead).
  */
-function toMiniMediType(contentType: string): MediaType | undefined {
-    const mime = contentType.split(';')[0].trim().toLowerCase()
+function toMiniMediType(contentType: string | null, fileExtension: string | null): MediaType | undefined {
+    const byExtension = fileExtension ? TYPE_BY_EXTENSION[fileExtension.toLowerCase()] : undefined
+    if (byExtension) return byExtension
+    if (!contentType) return undefined
 
-    if (mime === 'application/x-subrip' || mime === 'text/vtt') return 'subtitle'
+    const mime = contentType.split(';')[0].trim().toLowerCase()
+    if (TYPE_BY_MIME[mime]) return TYPE_BY_MIME[mime]
     if (mime.startsWith('text/')) return 'text'
-    if (mime === 'application/pdf') return 'pdf'
-    if (mime === 'application/epub+zip') return 'epub'
     if (mime.startsWith('audio/')) return 'audio'
     if (mime.startsWith('video/')) return 'video'
     if (mime.startsWith('image/')) return 'image'
     return undefined
 }
 
-export function MediaViewer({mediaId, contentType}: Props) {
+export function MediaViewer({mediaId, contentType, fileExtension, onEvent}: Props) {
     const {t} = useTranslation(['media', 'common'])
     const labels = useMiniMediLabels()
     const [blobUrl, setBlobUrl] = useState<string | null>(null)
     const [error, setError] = useState(false)
-    const type = contentType ? toMiniMediType(contentType) : undefined
+    const type = toMiniMediType(contentType, fileExtension)
 
     // The parent keys this component by media id, so state starts fresh per medium.
     useEffect(() => {
@@ -76,6 +110,7 @@ export function MediaViewer({mediaId, contentType}: Props) {
             source={{type, url: blobUrl, scanEmbeddedSubtitles: false}}
             labels={labels}
             fullscreenButton
+            onEvent={onEvent}
         />
     )
 }

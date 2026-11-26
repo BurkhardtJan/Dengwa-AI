@@ -7,8 +7,8 @@ from langchain_ollama import ChatOllama, OllamaEmbeddings
 
 load_dotenv()
 
-DEFAULT_CHAT_PROVIDER = os.environ.get("LLM_PROVIDER", "openai")
-DEFAULT_EMBEDDING_KEY = os.environ.get("EMBEDDING_KEY", "text-embedding-3-small")
+DEFAULT_CHAT_PROVIDER = os.environ.get("LLM_PROVIDER", "gemini")
+DEFAULT_EMBEDDING_KEY = os.environ.get("EMBEDDING_KEY", "full-text")
 # ---------------------------------------------------------------------------
 # Chat
 # ---------------------------------------------------------------------------
