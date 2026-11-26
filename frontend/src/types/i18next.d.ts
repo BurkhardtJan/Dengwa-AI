@@ -8,6 +8,7 @@ import auth from '../locales/en/auth.json';
 import landing from '../locales/en/landing.json';
 import game from '../locales/en/game.json'
 import settings from '../locales/en/settings.json'
+import minimedi from '../locales/en/minimedi.json'
 
 declare module 'i18next' {
     interface CustomTypeOptions {
@@ -23,6 +24,7 @@ declare module 'i18next' {
             auth: typeof auth;
             landing: typeof landing;
             settings: typeof settings;
+            minimedi: typeof minimedi;
         };
     }
 }

@@ -3,6 +3,7 @@ import {useTranslation} from 'react-i18next'
 import {MiniMedi, type MediaType} from 'minimedi'
 import 'minimedi/dist/style.css'
 import {fetchMediaBlob} from '../services/media.service'
+import {useMiniMediLabels} from '../hooks/useMiniMediLabels'
 
 interface Props {
     mediaId: string
@@ -28,6 +29,7 @@ function toMiniMediType(contentType: string): MediaType | undefined {
 
 export function MediaViewer({mediaId, contentType}: Props) {
     const {t} = useTranslation(['media', 'common'])
+    const labels = useMiniMediLabels()
     const [blobUrl, setBlobUrl] = useState<string | null>(null)
     const [error, setError] = useState(false)
     const type = contentType ? toMiniMediType(contentType) : undefined
@@ -70,6 +72,10 @@ export function MediaViewer({mediaId, contentType}: Props) {
 
     return (
         // No embedded-subtitle scan: nothing here uses the detected tracks yet.
-        <MiniMedi source={{type, url: blobUrl, scanEmbeddedSubtitles: false}}/>
+        <MiniMedi
+            source={{type, url: blobUrl, scanEmbeddedSubtitles: false}}
+            labels={labels}
+            fullscreenButton
+        />
     )
 }
