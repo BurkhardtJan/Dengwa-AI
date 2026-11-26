@@ -42,8 +42,8 @@ importers:
         specifier: ^1.21.0
         version: 1.21.0(react@19.2.7)
       minimedi:
-        specifier: file:vendor/minimedi-0.1.0.tgz
-        version: file:vendor/minimedi-0.1.0.tgz(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        specifier: file:vendor/minimedi-0.2.0.tgz
+        version: file:vendor/minimedi-0.2.0.tgz(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       radix-ui:
         specifier: ^1.6.0
         version: 1.6.0(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -3997,13 +3997,13 @@ packages:
     resolution: {integrity: sha512-7o1wEA2RyMP7Iu7GNba9vc0RWWGACJOCZBJX2GJWip0ikV+wcOsgVuY9uE8CPiyQhkGFSlhuSkZPavN7u1c2Fw==}
     engines: {node: '>=10'}
 
-  minimedi@file:vendor/minimedi-0.1.0.tgz:
-    resolution: {integrity: sha512-xH8eDViRrDGjsRmVQIioNSBLJaKFMAzKenf5/9+KTt1HzX4PBCi4s6l/XgU1T8cj8a/+ds9kzhNo/kQq6pHKFw==, tarball: file:vendor/minimedi-0.1.0.tgz}
-    version: 0.1.0
+  minimedi@file:vendor/minimedi-0.2.0.tgz:
+    resolution: {integrity: sha512-5k1USgfC39jyab4zRu6C9enNkA9I1BXeGppQSEYTPSd9m/+JL32AsbRDpcFqaE/exZcwYYIjzSbdeyhVnRNpHA==, tarball: file:vendor/minimedi-0.2.0.tgz}
+    version: 0.2.0
     engines: {node: '>=22.12'}
     peerDependencies:
-      react: ^18.0.0
-      react-dom: ^18.0.0
+      react: ^18.0.0 || ^19.0.0
+      react-dom: ^18.0.0 || ^19.0.0
 
   minimist@1.2.8:
     resolution: {integrity: sha512-2yyAR8qBkN3YuheJanUpWC5U3bb5osDywNB8RzDVlDwDHbocAJveqqj1u8+SVD7jkWT4yvsHCpWqqWqAxb0zCA==}
@@ -6147,7 +6147,7 @@ snapshots:
     dependencies:
       '@hono/node-server': 1.19.14(hono@4.12.26)
       ajv: 8.20.0
-      ajv-formats: 3.0.1
+      ajv-formats: 3.0.1(ajv@8.20.0)
       content-type: 1.0.5
       cors: 2.8.6
       cross-spawn: 7.0.6
@@ -7468,12 +7468,12 @@ snapshots:
 
   agent-base@7.1.4: {}
 
-  ajv-formats@2.1.1:
-    dependencies:
+  ajv-formats@2.1.1(ajv@8.20.0):
+    optionalDependencies:
       ajv: 8.20.0
 
-  ajv-formats@3.0.1:
-    dependencies:
+  ajv-formats@3.0.1(ajv@8.20.0):
+    optionalDependencies:
       ajv: 8.20.0
 
   ajv@6.15.0:
@@ -7691,7 +7691,7 @@ snapshots:
   conf@10.2.0:
     dependencies:
       ajv: 8.20.0
-      ajv-formats: 2.1.1
+      ajv-formats: 2.1.1(ajv@8.20.0)
       atomically: 1.7.0
       debounce-fn: 4.0.0
       dot-prop: 6.0.1
@@ -9322,7 +9322,7 @@ snapshots:
     dependencies:
       brace-expansion: 2.1.1
 
-  minimedi@file:vendor/minimedi-0.1.0.tgz(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
+  minimedi@file:vendor/minimedi-0.2.0.tgz(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
     dependencies:
       ebml-stream: 1.0.3
       epubjs: 0.3.93
