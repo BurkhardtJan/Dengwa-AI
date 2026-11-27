@@ -19,10 +19,9 @@ from uuid import UUID
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
-from database import SessionLocal
-from llm.rag_service import CHUNK_MODELS
 from models import Media
-from services.media_service import embed_media_safe, get_media_disk_path
+from services.media_service import get_media_disk_path
+from services.media_text_service import set_extracted_text
 from services.subtitle_parser import (
     SUPPORTED_EXTENSIONS, decode_subtitle_bytes, normalize_language, pick_source_language, subtitle_to_text,
 )
@@ -135,29 +134,4 @@ def sync_media_text_from_subtitles(db: Session, media: Media) -> bool:
             logger.warning("Source subtitle file %s of media %s is missing", source.path, media.id)
             return False
 
-    if new_text == media.extracted_content:
-        return False
-
-    media.extracted_content = new_text
-    if new_text is None:
-        media.summary = None
-        media.topics = None
-        media.difficulty_estimate = None
-        media.genre = None
-        for chunk_model in CHUNK_MODELS.values():
-            if chunk_model is not None:
-                db.query(chunk_model).filter(chunk_model.media_id == media.id).delete()
-    db.commit()
-    return True
-
-
-def reindex_media(media_id: UUID) -> None:
-    """BackgroundTask: re-embeds a medium after its text changed. Opens its own
-    DB session, because the request's session is already closed by then."""
-    db = SessionLocal()
-    try:
-        media = db.get(Media, media_id)
-        if media:
-            embed_media_safe(db, media)
-    finally:
-        db.close()
+    return set_extracted_text(db, media, new_text)

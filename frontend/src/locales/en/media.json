@@ -36,5 +36,16 @@
   "subtitleDelete": "Delete",
   "subtitleDeleteConfirm": "Delete the {{language}} subtitles?",
   "subtitleReplaceHint": "If there already is a track for that language, it is replaced.",
-  "subtitleUploadError": "Subtitles could not be uploaded"
+  "subtitleUploadError": "Subtitles could not be uploaded",
+  "ocrTitle": "Text recognition (hOCR)",
+  "ocrDescription": "With an hOCR file (e.g. from Tesseract) words and sentences can be selected right on the picture. Pages are matched to the images by their file names. The recognized text also serves as the text for summary, vocabulary and chat.",
+  "ocrNone": "No text recognition yet.",
+  "ocrPresent": "Text recognition present ({{size}})",
+  "ocrChooseFile": "hOCR file",
+  "ocrUpload": "Upload",
+  "ocrReplace": "Replace",
+  "ocrUploading": "Uploading...",
+  "ocrDelete": "Delete",
+  "ocrDeleteConfirm": "Delete the text recognition?",
+  "ocrUploadError": "Text recognition could not be uploaded"
 }

@@ -64,6 +64,11 @@ class SubtitleResponse(BaseModel):
     is_source: bool = False
 
 
+class OcrResponse(BaseModel):
+    size: int  # bytes
+    modified: int  # milliseconds since the epoch; changes when the hOCR file is replaced
+
+
 class VocabularyCardResponse(BaseModel):
     id: UUID
     template: Optional[str] = None

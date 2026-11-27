@@ -1,12 +1,12 @@
 import {useState, useEffect, useMemo, type ComponentProps} from 'react'
-import {useQuery} from '@tanstack/react-query'
+import {keepPreviousData, useQuery} from '@tanstack/react-query'
 import {useTranslation} from 'react-i18next'
 import {MiniMedi, type MiniMediEvent, type SubtitleFile} from 'minimedi'
 import 'minimedi/dist/style.css'
-import {fetchMediaBlob, fetchSubtitleBlob, fetchSubtitles} from '../services/media.service'
+import {fetchMediaBlob, fetchOcrBlob, fetchOcrInfo, fetchSubtitleBlob, fetchSubtitles} from '../services/media.service'
 import {useMiniMediLabels} from '../hooks/useMiniMediLabels'
 import {getLanguageDisplayName} from '../lib/languages'
-import {supportsSubtitles, toMiniMediType} from '../lib/mediaType'
+import {supportsOcr, supportsSubtitles, toMiniMediType} from '../lib/mediaType'
 
 interface Props {
     mediaId: string
@@ -24,6 +24,7 @@ export function MediaViewer({mediaId, contentType, fileExtension, onEvent}: Prop
     const [subtitleFiles, setSubtitleFiles] = useState<SubtitleFile[] | null>(null)
     const type = toMiniMediType(contentType, fileExtension)
     const withSubtitles = supportsSubtitles(type)
+    const withOcr = supportsOcr(type)
 
     // The parent keys this component by media id, so state starts fresh per medium.
     useEffect(() => {
@@ -85,6 +86,23 @@ export function MediaViewer({mediaId, contentType, fileExtension, onEvent}: Prop
         }
     }, [mediaId, tracks, i18n.language])
 
+    // Recognized text (hOCR) for comics and images; same query key as the OCR manager on the page.
+    const {data: ocrInfo, isError: ocrInfoFailed} = useQuery({
+        queryKey: ['ocr', mediaId],
+        queryFn: () => fetchOcrInfo(mediaId),
+        enabled: withOcr,
+    })
+    // `modified` is part of the key, so a replaced hOCR file is fetched again. The previous
+    // file stays in place meanwhile, so the viewer isn't torn down (and loses its page).
+    const {data: ocrBlob, isError: ocrBlobFailed} = useQuery({
+        queryKey: ['ocr-file', mediaId, ocrInfo?.modified],
+        queryFn: () => fetchOcrBlob(mediaId),
+        enabled: withOcr && !!ocrInfo,
+        staleTime: Infinity,
+        placeholderData: keepPreviousData,
+    })
+    const ocr = ocrInfo ? ocrBlob : undefined
+
     const source = useMemo<ComponentProps<typeof MiniMedi>['source'] | null>(() => {
         if (!blobUrl || !type) return null
         return {
@@ -93,14 +111,17 @@ export function MediaViewer({mediaId, contentType, fileExtension, onEvent}: Prop
             // No embedded-subtitle scan: nothing here uses the detected tracks yet.
             scanEmbeddedSubtitles: false,
             ...(subtitleFiles && subtitleFiles.length > 0 ? {subtitleUrls: subtitleFiles} : {}),
+            ...(ocr ? {ocr} : {}),
         }
-    }, [blobUrl, type, subtitleFiles])
+    }, [blobUrl, type, subtitleFiles, ocr])
 
     // Start audio/video only once the subtitles are there, so the player isn't set up twice.
     const subtitlesReady = !withSubtitles || tracksFailed || subtitleFiles !== null
+    // Same for comics and images: wait for the hOCR file if there is one
+    const ocrReady = !withOcr || ocrInfoFailed || ocrInfo === null || ocrBlob !== undefined || ocrBlobFailed
 
     if (error) return <p className="text-sm text-destructive">{t('media:previewError')}</p>
-    if (!blobUrl || !subtitlesReady) return <p className="text-sm text-muted-foreground">{t('common:loading')}</p>
+    if (!blobUrl || !subtitlesReady || !ocrReady) return <p className="text-sm text-muted-foreground">{t('common:loading')}</p>
     if (!contentType) return <p className="text-sm text-muted-foreground">{t('media:noPreview')}</p>
 
     if (!source) {

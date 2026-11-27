@@ -36,5 +36,16 @@
   "subtitleDelete": "Löschen",
   "subtitleDeleteConfirm": "Untertitel „{{language}}“ löschen?",
   "subtitleReplaceHint": "Gibt es für die Sprache schon eine Spur, wird sie ersetzt.",
-  "subtitleUploadError": "Untertitel konnten nicht hochgeladen werden"
+  "subtitleUploadError": "Untertitel konnten nicht hochgeladen werden",
+  "ocrTitle": "Texterkennung (hOCR)",
+  "ocrDescription": "Mit einer hOCR-Datei (z. B. von Tesseract) lassen sich Wörter und Sätze direkt im Bild markieren. Die Seiten werden über die Dateinamen der Bilder zugeordnet. Der erkannte Text dient außerdem als Text für Zusammenfassung, Vokabeln und Chat.",
+  "ocrNone": "Noch keine Texterkennung.",
+  "ocrPresent": "Texterkennung vorhanden ({{size}})",
+  "ocrChooseFile": "hOCR-Datei",
+  "ocrUpload": "Hochladen",
+  "ocrReplace": "Ersetzen",
+  "ocrUploading": "Lädt hoch...",
+  "ocrDelete": "Löschen",
+  "ocrDeleteConfirm": "Texterkennung löschen?",
+  "ocrUploadError": "Texterkennung konnte nicht hochgeladen werden"
 }

@@ -607,3 +607,87 @@ def test_deleting_medium_removes_its_subtitles():
     upload_test_subtitle(token, media_id)
     assert requests.delete(f"{BASE_URL}/media/{media_id}", headers=auth_headers(token)).status_code == 200
     assert requests.get(f"{BASE_URL}/media/{media_id}/subtitles", headers=auth_headers(token)).status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# OCR (hOCR) for comics and images
+# ---------------------------------------------------------------------------
+
+HOCR = (b"<html><body><div class='ocr_page' title='image \"page1.png\"; bbox 0 0 100 100'>"
+        b"<span class='ocr_line'><span class='ocrx_word'>Bonjour</span></span></div></body></html>")
+
+
+def create_comic_with_user(language: str = "fr") -> tuple:
+    """Register user with a learning language, upload a (fake) CBR, return (token, media_id)."""
+    token, language = create_test_user_with_language(language)
+    response = requests.post(
+        f"{BASE_URL}/media?lan={language}",
+        headers=auth_headers(token),
+        data={"title": "Test Comic"},
+        files={"file": ("comic.cbr", io.BytesIO(b"Rar!\x1a\x07\x00"), "application/octet-stream")}
+    )
+    return token, response.json()["id"]
+
+
+def put_test_ocr(token: str, media_id: str, content: bytes = HOCR) -> requests.Response:
+    return requests.put(
+        f"{BASE_URL}/media/{media_id}/ocr",
+        headers=auth_headers(token),
+        files={"file": ("pages.hocr", io.BytesIO(content), "text/html")}
+    )
+
+
+def test_ocr_missing_returns_404():
+    token, media_id = create_comic_with_user()
+    assert requests.get(f"{BASE_URL}/media/{media_id}/ocr", headers=auth_headers(token)).status_code == 404
+
+
+def test_upload_ocr_for_comic_and_download_it_again():
+    token, media_id = create_comic_with_user()
+    response = put_test_ocr(token, media_id)
+    assert response.status_code == 200
+    assert response.json()["size"] == len(HOCR)
+
+    info = requests.get(f"{BASE_URL}/media/{media_id}/ocr", headers=auth_headers(token))
+    assert info.json() == response.json()
+    file_response = requests.get(f"{BASE_URL}/media/{media_id}/ocr/file", headers=auth_headers(token))
+    assert file_response.status_code == 200
+    assert file_response.content == HOCR
+
+
+def test_second_ocr_upload_replaces_the_first():
+    token, media_id = create_comic_with_user()
+    put_test_ocr(token, media_id)
+    newer = HOCR + b"<!-- newer -->"
+    assert put_test_ocr(token, media_id, newer).json()["size"] == len(newer)
+    file_response = requests.get(f"{BASE_URL}/media/{media_id}/ocr/file", headers=auth_headers(token))
+    assert file_response.content == newer
+
+
+def test_delete_ocr():
+    token, media_id = create_comic_with_user()
+    put_test_ocr(token, media_id)
+    assert requests.delete(f"{BASE_URL}/media/{media_id}/ocr", headers=auth_headers(token)).status_code == 200
+    assert requests.get(f"{BASE_URL}/media/{media_id}/ocr", headers=auth_headers(token)).status_code == 404
+    assert requests.delete(f"{BASE_URL}/media/{media_id}/ocr", headers=auth_headers(token)).status_code == 404
+
+
+def test_ocr_that_is_not_hocr_fails():
+    token, media_id = create_comic_with_user()
+    assert put_test_ocr(token, media_id, b"<html><body>hello</body></html>").status_code == 422
+
+
+def test_ocr_for_text_medium_fails():
+    """hOCR is only for comics and images."""
+    token, language = create_test_user_with_language("fr")
+    media_id = upload_test_media(token, language).json()["id"]
+    assert put_test_ocr(token, media_id).status_code == 400
+
+
+def test_ocr_of_other_user_is_not_accessible():
+    token, media_id = create_comic_with_user()
+    put_test_ocr(token, media_id)
+    other_token = get_token(unique_username())
+    assert requests.get(f"{BASE_URL}/media/{media_id}/ocr", headers=auth_headers(other_token)).status_code == 404
+    assert put_test_ocr(other_token, media_id).status_code == 404
+    assert requests.get(f"{BASE_URL}/media/{media_id}/ocr/file", headers=auth_headers(other_token)).status_code == 404

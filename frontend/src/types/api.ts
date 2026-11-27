@@ -787,6 +787,13 @@ export interface components {
             /** Language */
             language: string;
         };
+        /** OcrResponse */
+        OcrResponse: {
+            /** Size */
+            size: number;
+            /** Modified */
+            modified: number;
+        };
         /**
          * ProviderModelsResponse
          * @description Provider -> Liste of available models.

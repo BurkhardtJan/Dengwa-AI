@@ -8,10 +8,11 @@ from uuid import UUID
 
 from database import get_db
 from schemas import SubtitleResponse
-from services.media_service import get_media_or_404, generate_media_metadata
+from services.media_service import get_media_or_404
+from services.media_text_service import regenerate_media_derived_data
 from services.subtitle_parser import SUPPORTED_EXTENSIONS, decode_subtitle_bytes, normalize_language, subtitle_to_text
 from services.subtitle_service import (
-    MAX_SUBTITLE_BYTES, SubtitleTrack, get_subtitle_track_or_404, list_subtitle_tracks, reindex_media,
+    MAX_SUBTITLE_BYTES, SubtitleTrack, get_subtitle_track_or_404, list_subtitle_tracks,
     remove_subtitle_files, save_subtitle, source_language, sync_media_text_from_subtitles,
 )
 from services.user_service import get_current_user
@@ -24,14 +25,6 @@ MEDIA_TYPES = {".srt": "application/x-subrip", ".vtt": "text/vtt", ".lrc": "text
 def _to_response(track: SubtitleTrack, source: Optional[str]) -> SubtitleResponse:
     return SubtitleResponse(language=track.language, file_extension=track.file_extension,
                             is_source=track.language == source)
-
-
-def _regenerate_if_text_present(background_tasks: BackgroundTasks, media) -> None:
-    """Summary/topics/etc. and embeddings are derived from extracted_content, so they
-    have to be rebuilt after it changed (there is nothing to rebuild if it was cleared)."""
-    if media.extracted_content:
-        background_tasks.add_task(generate_media_metadata, media.id)
-        background_tasks.add_task(reindex_media, media.id)
 
 
 @router.get("", response_model=List[SubtitleResponse])
@@ -84,7 +77,7 @@ async def upload_subtitle(
 
     track = save_subtitle(media, lang, ext, data)
     if sync_media_text_from_subtitles(db, media):
-        _regenerate_if_text_present(background_tasks, media)
+        regenerate_media_derived_data(background_tasks, media)
     return _to_response(track, source_language(media, list_subtitle_tracks(media)))
 
 
@@ -111,5 +104,5 @@ async def delete_subtitle(media_id: UUID, language: str, background_tasks: Backg
 
     remove_subtitle_files([track])
     if sync_media_text_from_subtitles(db, media):
-        _regenerate_if_text_present(background_tasks, media)
+        regenerate_media_derived_data(background_tasks, media)
     return {"status": "Subtitle deleted"}

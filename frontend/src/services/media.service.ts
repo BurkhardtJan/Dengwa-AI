@@ -1,8 +1,10 @@
+import {isAxiosError} from 'axios'
 import api from './api'
 import type {components} from '../types/api'
 
 type Media = components['schemas']['MediaResponse']
 type Subtitle = components['schemas']['SubtitleResponse']
+type Ocr = components['schemas']['OcrResponse']
 
 export async function fetchMedia(lan?: string): Promise<Media[]> {
     const response = await api.get('/media', {params: lan ? {lan} : {}})
@@ -67,4 +69,36 @@ export async function uploadSubtitle(mediaId: string, file: File, language: stri
 
 export async function deleteSubtitle(mediaId: string, language: string): Promise<void> {
     await api.delete(`/media/${mediaId}/subtitles/${language}`)
+}
+
+/** Info about the recognized text (hOCR) of a medium, or null if it has none. */
+export async function fetchOcrInfo(mediaId: string): Promise<Ocr | null> {
+    try {
+        const response = await api.get(`/media/${mediaId}/ocr`)
+        return response.data
+    } catch (error) {
+        if (isAxiosError(error) && error.response?.status === 404) return null
+        throw error
+    }
+}
+
+export async function fetchOcrBlob(mediaId: string): Promise<Blob> {
+    const response = await api.get(`/media/${mediaId}/ocr/file`, {
+        responseType: 'blob'
+    })
+    return response.data
+}
+
+/** Sets the hOCR file of a comic or image; an existing one is replaced. */
+export async function uploadOcr(mediaId: string, file: File): Promise<Ocr> {
+    const formData = new FormData()
+    formData.append('file', file)
+    const response = await api.put(`/media/${mediaId}/ocr`, formData, {
+        headers: {'Content-Type': 'multipart/form-data'}
+    })
+    return response.data
+}
+
+export async function deleteOcr(mediaId: string): Promise<void> {
+    await api.delete(`/media/${mediaId}/ocr`)
 }

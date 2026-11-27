@@ -14,6 +14,7 @@ from schemas import (
 from services.media_service import get_media_or_404, create_media_record, save_uploaded_file, \
     run_vocabulary_extraction, generate_media_metadata, embed_media_safe, get_media_disk_path
 from services.language_service import get_learning_or_404, get_or_create_learning
+from services.ocr_service import get_ocr_path, remove_ocr_file
 from services.subtitle_service import list_subtitle_tracks, remove_subtitle_files
 
 router = APIRouter(prefix="/media", tags=["Media"])
@@ -125,7 +126,9 @@ async def delete_medium(media_id: UUID, db: Session = Depends(get_db), current_u
         raise HTTPException(status_code=400, detail="Das Sprach-Dummy-Medium kann nicht gelöscht werden")
 
     subtitle_tracks = list_subtitle_tracks(media)
+    ocr_path = get_ocr_path(media)
     db.delete(media)
     db.commit()
     remove_subtitle_files(subtitle_tracks)
+    remove_ocr_file(ocr_path)
     return {"status": "Media deleted"}

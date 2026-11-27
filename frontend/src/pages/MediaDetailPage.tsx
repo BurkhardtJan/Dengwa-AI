@@ -8,7 +8,8 @@ import {useMedium} from '@/context/MediumContext'
 import {PAGE_WIDTH, PAGE_PADDING} from '@/lib/layout'
 import SpeakButton from '@/components/SpeakButton'
 import SubtitleManager from '@/components/SubtitleManager'
-import {supportsSubtitles, toMiniMediType} from '@/lib/mediaType'
+import OcrManager from '@/components/OcrManager'
+import {supportsOcr, supportsSubtitles, toMiniMediType} from '@/lib/mediaType'
 import MiniChatLauncher from '@/components/chat/MiniChatLauncher'
 import {createViewerContext, formatTime} from '@/lib/viewerContext'
 
@@ -117,6 +118,12 @@ export default function MediaDetailPage() {
             {data && supportsSubtitles(toMiniMediType(data.content_type, data.file_extension ?? null)) && (
                 <div className="mb-8">
                     <SubtitleManager key={id} mediaId={id!} mediaLanguage={data.language}/>
+                </div>
+            )}
+
+            {data && supportsOcr(toMiniMediType(data.content_type, data.file_extension ?? null)) && (
+                <div className="mb-8">
+                    <OcrManager key={id} mediaId={id!}/>
                 </div>
             )}
 

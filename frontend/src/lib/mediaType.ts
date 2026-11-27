@@ -52,3 +52,8 @@ export function toMiniMediType(contentType: string | null, fileExtension: string
 export function supportsSubtitles(type: MediaType | undefined): boolean {
     return type === 'audio' || type === 'video'
 }
+
+/** Recognized text (hOCR) can be laid over comic pages and single images. */
+export function supportsOcr(type: MediaType | undefined): boolean {
+    return type === 'comic' || type === 'image'
+}
