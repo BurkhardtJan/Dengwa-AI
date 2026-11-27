@@ -7,6 +7,8 @@ import {useTranslation} from 'react-i18next'
 import {useMedium} from '@/context/MediumContext'
 import {PAGE_WIDTH, PAGE_PADDING} from '@/lib/layout'
 import SpeakButton from '@/components/SpeakButton'
+import SubtitleManager from '@/components/SubtitleManager'
+import {supportsSubtitles, toMiniMediType} from '@/lib/mediaType'
 import MiniChatLauncher from '@/components/chat/MiniChatLauncher'
 import {createViewerContext, formatTime} from '@/lib/viewerContext'
 
@@ -111,6 +113,12 @@ export default function MediaDetailPage() {
                     onEvent={viewerContext.handleEvent}
                 />
             </div>
+
+            {data && supportsSubtitles(toMiniMediType(data.content_type, data.file_extension ?? null)) && (
+                <div className="mb-8">
+                    <SubtitleManager key={id} mediaId={id!} mediaLanguage={data.language}/>
+                </div>
+            )}
 
             <div className="flex flex-col gap-3">
                 <div className="p-4 border rounded-lg">

@@ -24,5 +24,17 @@
   "chatContextPageOf": "Page {{page}} of {{total}}",
   "chatContextTime": "Time {{time}}",
   "chatContextChapter": "Chapter {{chapter}}",
-  "chatContextChapterProgress": "Chapter {{chapter}} ({{percent}} %)"
+  "chatContextChapterProgress": "Chapter {{chapter}} ({{percent}} %)",
+  "subtitlesTitle": "Subtitles",
+  "subtitlesDescription": "Subtitles (.srt, .vtt, .lrc) appear in the player. The track in the medium's language also serves as the text for summary, vocabulary and chat.",
+  "subtitlesEmpty": "No subtitles yet.",
+  "subtitleSource": "Text source",
+  "subtitleSourceHint": "This text is used for summary, vocabulary and chat",
+  "subtitleLanguage": "Subtitle language",
+  "subtitleUpload": "Upload",
+  "subtitleUploading": "Uploading...",
+  "subtitleDelete": "Delete",
+  "subtitleDeleteConfirm": "Delete the {{language}} subtitles?",
+  "subtitleReplaceHint": "If there already is a track for that language, it is replaced.",
+  "subtitleUploadError": "Subtitles could not be uploaded"
 }

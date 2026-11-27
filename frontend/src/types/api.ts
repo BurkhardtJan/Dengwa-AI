@@ -843,6 +843,21 @@ export interface components {
             /** Ease */
             ease: number;
         };
+        /** SubtitleResponse */
+        SubtitleResponse: {
+            /**
+             * Language
+             * @description ISO 639-1 code, also part of the file name: <media_id>_<language><extension>
+             */
+            language: string;
+            /** File Extension */
+            file_extension: string;
+            /**
+             * Is Source
+             * @default false
+             */
+            is_source: boolean;
+        };
         /** UserRegister */
         UserRegister: {
             /** Username */

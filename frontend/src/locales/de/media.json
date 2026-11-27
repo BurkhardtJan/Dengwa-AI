@@ -24,5 +24,17 @@
   "chatContextPageOf": "Seite {{page}} von {{total}}",
   "chatContextTime": "Zeit {{time}}",
   "chatContextChapter": "Kapitel {{chapter}}",
-  "chatContextChapterProgress": "Kapitel {{chapter}} ({{percent}} %)"
+  "chatContextChapterProgress": "Kapitel {{chapter}} ({{percent}} %)",
+  "subtitlesTitle": "Untertitel",
+  "subtitlesDescription": "Untertitel (.srt, .vtt, .lrc) erscheinen im Player. Die Spur in der Sprache des Mediums dient außerdem als Text für Zusammenfassung, Vokabeln und Chat.",
+  "subtitlesEmpty": "Noch keine Untertitel.",
+  "subtitleSource": "Textquelle",
+  "subtitleSourceHint": "Dieser Text wird für Zusammenfassung, Vokabeln und Chat verwendet",
+  "subtitleLanguage": "Sprache der Untertitel",
+  "subtitleUpload": "Hochladen",
+  "subtitleUploading": "Lädt hoch...",
+  "subtitleDelete": "Löschen",
+  "subtitleDeleteConfirm": "Untertitel „{{language}}“ löschen?",
+  "subtitleReplaceHint": "Gibt es für die Sprache schon eine Spur, wird sie ersetzt.",
+  "subtitleUploadError": "Untertitel konnten nicht hochgeladen werden"
 }

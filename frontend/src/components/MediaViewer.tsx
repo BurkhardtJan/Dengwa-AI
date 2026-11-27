@@ -1,9 +1,12 @@
-import {useState, useEffect} from 'react'
+import {useState, useEffect, useMemo, type ComponentProps} from 'react'
+import {useQuery} from '@tanstack/react-query'
 import {useTranslation} from 'react-i18next'
-import {MiniMedi, type MediaType, type MiniMediEvent} from 'minimedi'
+import {MiniMedi, type MiniMediEvent, type SubtitleFile} from 'minimedi'
 import 'minimedi/dist/style.css'
-import {fetchMediaBlob} from '../services/media.service'
+import {fetchMediaBlob, fetchSubtitleBlob, fetchSubtitles} from '../services/media.service'
 import {useMiniMediLabels} from '../hooks/useMiniMediLabels'
+import {getLanguageDisplayName} from '../lib/languages'
+import {supportsSubtitles, toMiniMediType} from '../lib/mediaType'
 
 interface Props {
     mediaId: string
@@ -13,60 +16,14 @@ interface Props {
     onEvent?: (event: MiniMediEvent) => void
 }
 
-/**
- * Formats MiniMedi opens whose MIME type is unreliable: browsers often send
- * application/octet-stream or odd vendor types for these, so the extension wins.
- */
-const TYPE_BY_EXTENSION: Record<string, MediaType> = {
-    '.cbz': 'comic', '.cbr': 'comic', '.cb7': 'comic', '.cbt': 'comic',
-    '.fb2': 'ebook', '.mobi': 'ebook', '.azw3': 'ebook',
-    '.epub': 'epub',
-    '.pdf': 'pdf',
-    '.srt': 'subtitle', '.vtt': 'subtitle', '.lrc': 'subtitle',
-    '.txt': 'text', '.md': 'text',
-}
-
-/** MIME types of comics and e-books, for media stored without a file extension. */
-const TYPE_BY_MIME: Record<string, MediaType> = {
-    'application/vnd.comicbook+zip': 'comic',
-    'application/vnd.comicbook-rar': 'comic',
-    'application/x-cbz': 'comic',
-    'application/x-cbr': 'comic',
-    'application/x-cb7': 'comic',
-    'application/x-cbt': 'comic',
-    'application/x-fictionbook+xml': 'ebook',
-    'application/x-mobipocket-ebook': 'ebook',
-    'application/vnd.amazon.ebook': 'ebook',
-    'application/epub+zip': 'epub',
-    'application/pdf': 'pdf',
-    'application/x-subrip': 'subtitle',
-    'text/vtt': 'subtitle',
-}
-
-/**
- * Maps a medium to a MiniMedi viewer type: file extension first, then MIME type.
- * Returns undefined when MiniMedi has no viewer for it (download link instead).
- */
-function toMiniMediType(contentType: string | null, fileExtension: string | null): MediaType | undefined {
-    const byExtension = fileExtension ? TYPE_BY_EXTENSION[fileExtension.toLowerCase()] : undefined
-    if (byExtension) return byExtension
-    if (!contentType) return undefined
-
-    const mime = contentType.split(';')[0].trim().toLowerCase()
-    if (TYPE_BY_MIME[mime]) return TYPE_BY_MIME[mime]
-    if (mime.startsWith('text/')) return 'text'
-    if (mime.startsWith('audio/')) return 'audio'
-    if (mime.startsWith('video/')) return 'video'
-    if (mime.startsWith('image/')) return 'image'
-    return undefined
-}
-
 export function MediaViewer({mediaId, contentType, fileExtension, onEvent}: Props) {
-    const {t} = useTranslation(['media', 'common'])
+    const {t, i18n} = useTranslation(['media', 'common'])
     const labels = useMiniMediLabels()
     const [blobUrl, setBlobUrl] = useState<string | null>(null)
     const [error, setError] = useState(false)
+    const [subtitleFiles, setSubtitleFiles] = useState<SubtitleFile[] | null>(null)
     const type = toMiniMediType(contentType, fileExtension)
+    const withSubtitles = supportsSubtitles(type)
 
     // The parent keys this component by media id, so state starts fresh per medium.
     useEffect(() => {
@@ -92,11 +49,61 @@ export function MediaViewer({mediaId, contentType, fileExtension, onEvent}: Prop
         }
     }, [mediaId, type])
 
+    // Same query key as the subtitle manager on the page, so uploads/deletes arrive here too.
+    // react-query keeps `tracks` referentially stable while the list itself doesn't change.
+    const {data: tracks, isError: tracksFailed} = useQuery({
+        queryKey: ['subtitles', mediaId],
+        queryFn: () => fetchSubtitles(mediaId),
+        enabled: withSubtitles,
+    })
+
+    // MiniMedi gets the subtitle files as blob URLs (it can't send our auth header).
+    useEffect(() => {
+        if (!tracks) return
+        let cancelled = false
+        const urls: string[] = []
+        const revokeAll = () => urls.forEach(url => URL.revokeObjectURL(url))
+
+        Promise.all(tracks.map(async track => {
+            const blob = await fetchSubtitleBlob(mediaId, track.language)
+            const url = URL.createObjectURL(blob)
+            urls.push(url)
+            return {url, label: getLanguageDisplayName(track.language, i18n.language), lang: track.language}
+        }))
+            .then(files => {
+                if (cancelled) return revokeAll()
+                setSubtitleFiles(files)
+            })
+            .catch(() => {
+                revokeAll()
+                if (!cancelled) setSubtitleFiles([])
+            })
+
+        return () => {
+            cancelled = true
+            revokeAll()
+        }
+    }, [mediaId, tracks, i18n.language])
+
+    const source = useMemo<ComponentProps<typeof MiniMedi>['source'] | null>(() => {
+        if (!blobUrl || !type) return null
+        return {
+            type,
+            url: blobUrl,
+            // No embedded-subtitle scan: nothing here uses the detected tracks yet.
+            scanEmbeddedSubtitles: false,
+            ...(subtitleFiles && subtitleFiles.length > 0 ? {subtitleUrls: subtitleFiles} : {}),
+        }
+    }, [blobUrl, type, subtitleFiles])
+
+    // Start audio/video only once the subtitles are there, so the player isn't set up twice.
+    const subtitlesReady = !withSubtitles || tracksFailed || subtitleFiles !== null
+
     if (error) return <p className="text-sm text-destructive">{t('media:previewError')}</p>
-    if (!blobUrl) return <p className="text-sm text-muted-foreground">{t('common:loading')}</p>
+    if (!blobUrl || !subtitlesReady) return <p className="text-sm text-muted-foreground">{t('common:loading')}</p>
     if (!contentType) return <p className="text-sm text-muted-foreground">{t('media:noPreview')}</p>
 
-    if (!type) {
+    if (!source) {
         return (
             <a href={blobUrl} download className="text-sm underline hover:text-foreground">
                 {t('media:downloadFile')}
@@ -105,9 +112,8 @@ export function MediaViewer({mediaId, contentType, fileExtension, onEvent}: Prop
     }
 
     return (
-        // No embedded-subtitle scan: nothing here uses the detected tracks yet.
         <MiniMedi
-            source={{type, url: blobUrl, scanEmbeddedSubtitles: false}}
+            source={source}
             labels={labels}
             fullscreenButton
             onEvent={onEvent}
