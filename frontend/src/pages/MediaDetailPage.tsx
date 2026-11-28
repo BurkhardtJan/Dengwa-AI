@@ -111,17 +111,18 @@ export default function MediaDetailPage() {
                     mediaId={id!}
                     contentType={data?.content_type ?? null}
                     fileExtension={data?.file_extension ?? null}
+                    originalFilename={data?.original_filename ?? null}
                     onEvent={viewerContext.handleEvent}
                 />
             </div>
 
-            {data && supportsSubtitles(toMiniMediType(data.content_type, data.file_extension ?? null)) && (
+            {data && supportsSubtitles(toMiniMediType(data.content_type, data.file_extension ?? null, data.original_filename ?? null)) && (
                 <div className="mb-8">
                     <SubtitleManager key={id} mediaId={id!} mediaLanguage={data.language}/>
                 </div>
             )}
 
-            {data && supportsOcr(toMiniMediType(data.content_type, data.file_extension ?? null)) && (
+            {data && supportsOcr(toMiniMediType(data.content_type, data.file_extension ?? null, data.original_filename ?? null)) && (
                 <div className="mb-8">
                     <OcrManager key={id} mediaId={id!}/>
                 </div>

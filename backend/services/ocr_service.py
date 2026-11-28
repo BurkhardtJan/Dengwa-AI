@@ -34,9 +34,12 @@ class OcrFile:
 
 
 def supports_ocr(media: Media) -> bool:
-    """hOCR can be laid over comic pages and single images."""
+    """hOCR can be laid over comic pages and single images. A ".zip" counts as page scans
+    (archive.org's "*_jp2.zip"), except an FB2 book, which travels as ".fb2.zip"."""
     extension = (media.file_extension or "").lower()
-    return extension in COMIC_EXTENSIONS or media.content_type.startswith("image/")
+    if extension in COMIC_EXTENSIONS or media.content_type.startswith("image/"):
+        return True
+    return extension == ".zip" and not (media.original_filename or "").lower().endswith(".fb2.zip")
 
 
 def get_ocr_path(media: Media) -> str:

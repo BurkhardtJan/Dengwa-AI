@@ -691,3 +691,36 @@ def test_ocr_of_other_user_is_not_accessible():
     assert requests.get(f"{BASE_URL}/media/{media_id}/ocr", headers=auth_headers(other_token)).status_code == 404
     assert put_test_ocr(other_token, media_id).status_code == 404
     assert requests.get(f"{BASE_URL}/media/{media_id}/ocr/file", headers=auth_headers(other_token)).status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# ZIP archives: page scans or FB2 book? (told apart by the original file name)
+# ---------------------------------------------------------------------------
+
+def upload_test_zip(token: str, language: str, filename: str) -> dict:
+    response = requests.post(
+        f"{BASE_URL}/media?lan={language}",
+        headers=auth_headers(token),
+        data={"title": "Zip"},
+        files={"file": (filename, io.BytesIO(b"PK\x05\x06" + b"\x00" * 18), "application/zip")}
+    )
+    return response.json()
+
+
+def test_media_response_contains_original_filename():
+    token, language = create_test_user_with_language("fr")
+    created = upload_test_zip(token, language, "book_jp2.zip")
+    assert created["file_extension"] == ".zip"
+    assert created["original_filename"] == "book_jp2.zip"
+
+    detail = requests.get(f"{BASE_URL}/media/{created['id']}", headers=auth_headers(token)).json()
+    assert detail["original_filename"] == "book_jp2.zip"
+
+
+def test_ocr_is_allowed_for_zip_of_page_scans_but_not_for_fb2_zip():
+    token, language = create_test_user_with_language("fr")
+    comic = upload_test_zip(token, language, "book_jp2.zip")
+    assert put_test_ocr(token, comic["id"]).status_code == 200
+
+    ebook = upload_test_zip(token, language, "novel.fb2.zip")
+    assert put_test_ocr(token, ebook["id"]).status_code == 400

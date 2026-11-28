@@ -6,6 +6,7 @@ import type {MediaType} from 'minimedi'
  */
 const TYPE_BY_EXTENSION: Record<string, MediaType> = {
     '.cbz': 'comic', '.cbr': 'comic', '.cb7': 'comic', '.cbt': 'comic',
+    '.zip': 'comic', // archive.org's "*_jp2.zip"; an FB2 book (".fb2.zip") is told apart by the file name
     '.fb2': 'ebook', '.mobi': 'ebook', '.azw3': 'ebook',
     '.epub': 'epub',
     '.pdf': 'pdf',
@@ -31,10 +32,17 @@ const TYPE_BY_MIME: Record<string, MediaType> = {
 }
 
 /**
- * Maps a medium to a MiniMedi viewer type: file extension first, then MIME type.
+ * Maps a medium to a MiniMedi viewer type: the original file name for `.fb2.zip`, then the
+ * file extension, then the MIME type.
  * Returns undefined when MiniMedi has no viewer for it (download link instead).
  */
-export function toMiniMediType(contentType: string | null, fileExtension: string | null): MediaType | undefined {
+export function toMiniMediType(
+    contentType: string | null,
+    fileExtension: string | null,
+    originalFilename: string | null = null,
+): MediaType | undefined {
+    // The extension of an FB2 book is just ".zip"; only the original file name says ".fb2.zip"
+    if (originalFilename?.toLowerCase().endsWith('.fb2.zip')) return 'ebook'
     const byExtension = fileExtension ? TYPE_BY_EXTENSION[fileExtension.toLowerCase()] : undefined
     if (byExtension) return byExtension
     if (!contentType) return undefined

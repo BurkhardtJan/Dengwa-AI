@@ -771,6 +771,8 @@ export interface components {
             content_type: string;
             /** File Extension */
             file_extension?: string | null;
+            /** Original Filename */
+            original_filename?: string | null;
             /**
              * Learning Id
              * Format: uuid

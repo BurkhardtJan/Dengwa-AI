@@ -12,17 +12,19 @@ interface Props {
     mediaId: string
     contentType: string | null
     fileExtension: string | null
+    /** Needed for ZIPs: ".fb2.zip" is an e-book, other ZIPs are read as page scans. */
+    originalFilename: string | null
     /** Receives all MiniMedi events (position, selection, subtitle cues, ...). */
     onEvent?: (event: MiniMediEvent) => void
 }
 
-export function MediaViewer({mediaId, contentType, fileExtension, onEvent}: Props) {
+export function MediaViewer({mediaId, contentType, fileExtension, originalFilename, onEvent}: Props) {
     const {t, i18n} = useTranslation(['media', 'common'])
     const labels = useMiniMediLabels()
     const [blobUrl, setBlobUrl] = useState<string | null>(null)
     const [error, setError] = useState(false)
     const [subtitleFiles, setSubtitleFiles] = useState<SubtitleFile[] | null>(null)
-    const type = toMiniMediType(contentType, fileExtension)
+    const type = toMiniMediType(contentType, fileExtension, originalFilename)
     const withSubtitles = supportsSubtitles(type)
     const withOcr = supportsOcr(type)
 
