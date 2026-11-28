@@ -40,6 +40,13 @@ export async function extractVocabulary(mediaId: string): Promise<void> {
     await api.post(`/media/${mediaId}/vocabulary`)
 }
 
+/** Starts creating summary, topics, genre and difficulty again; provider/model are optional. */
+export async function generateMetadata(mediaId: string, provider: string | null, model: string | null): Promise<void> {
+    await api.post(`/media/${mediaId}/metadata`, null, {
+        params: {provider: provider ?? undefined, model: model ?? undefined}
+    })
+}
+
 export async function deleteMedia(mediaId: string): Promise<void> {
     await api.delete(`/media/${mediaId}`)
 }

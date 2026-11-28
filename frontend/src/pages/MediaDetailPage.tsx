@@ -9,6 +9,7 @@ import {PAGE_WIDTH, PAGE_PADDING} from '@/lib/layout'
 import SpeakButton from '@/components/SpeakButton'
 import SubtitleManager from '@/components/SubtitleManager'
 import OcrManager from '@/components/OcrManager'
+import SummaryRegenerator from '@/components/SummaryRegenerator'
 import {supportsOcr, supportsSubtitles, toMiniMediType} from '@/lib/mediaType'
 import MiniChatLauncher from '@/components/chat/MiniChatLauncher'
 import {createViewerContext, formatTime} from '@/lib/viewerContext'
@@ -129,6 +130,7 @@ export default function MediaDetailPage() {
             )}
 
             <div className="flex flex-col gap-3">
+                <SummaryRegenerator key={id} mediaId={id!}/>
                 <div className="p-4 border rounded-lg">
                     <h2 className="text-sm font-semibold mb-1">{t('extractTitle')}</h2>
                     <p className="text-xs text-muted-foreground mb-3">{t('extractDescription')}</p>

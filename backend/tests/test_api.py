@@ -724,3 +724,30 @@ def test_ocr_is_allowed_for_zip_of_page_scans_but_not_for_fb2_zip():
 
     ebook = upload_test_zip(token, language, "novel.fb2.zip")
     assert put_test_ocr(token, ebook["id"]).status_code == 400
+
+
+# ---------------------------------------------------------------------------
+# Regenerate summary / topics / genre / difficulty
+# ---------------------------------------------------------------------------
+
+def test_regenerate_metadata_starts_for_medium_with_text():
+    token, language = create_test_user_with_language("es")
+    media_id = upload_test_media(token, language).json()["id"]
+    response = requests.post(f"{BASE_URL}/media/{media_id}/metadata", headers=auth_headers(token))
+    assert response.status_code == 200
+    assert response.json() == {"status": "started"}
+
+
+def test_regenerate_metadata_without_text_fails():
+    """A video without subtitles has no text to summarize."""
+    token, media_id = create_video_with_user("es")
+    response = requests.post(f"{BASE_URL}/media/{media_id}/metadata", headers=auth_headers(token))
+    assert response.status_code == 400
+
+
+def test_regenerate_metadata_of_other_user_fails():
+    token, language = create_test_user_with_language("es")
+    media_id = upload_test_media(token, language).json()["id"]
+    other_token = get_token(unique_username())
+    response = requests.post(f"{BASE_URL}/media/{media_id}/metadata", headers=auth_headers(other_token))
+    assert response.status_code == 404

@@ -47,5 +47,12 @@
   "ocrUploading": "Lädt hoch...",
   "ocrDelete": "Löschen",
   "ocrDeleteConfirm": "Texterkennung löschen?",
-  "ocrUploadError": "Texterkennung konnte nicht hochgeladen werden"
+  "ocrUploadError": "Texterkennung konnte nicht hochgeladen werden",
+  "summaryTitle": "Zusammenfassung",
+  "summaryDescription": "Erstellt Zusammenfassung, Themen, Genre und Schwierigkeit aus dem Text dieses Mediums neu. Anbieter und Modell kannst du wählen, falls der Standard gerade nicht geht (zum Beispiel Tageslimit erreicht).",
+  "summaryButton": "Neu erstellen",
+  "summaryRunning": "Wird gestartet...",
+  "summaryStarted": "Läuft im Hintergrund, das Ergebnis erscheint oben, sobald es fertig ist.",
+  "summaryTimeout": "Bisher kam nichts Neues. Lange Texte brauchen etwas Zeit; kommt gar nichts, steht der Grund im Backend-Log (zum Beispiel ein erreichtes Tageslimit des Anbieters).",
+  "summaryError": "Konnte nicht gestartet werden"
 }

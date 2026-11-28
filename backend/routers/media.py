@@ -88,6 +88,28 @@ async def extract_media_vocabulary(
     return {"status": "started"}
 
 
+@router.post("/{media_id}/metadata")
+async def regenerate_media_metadata(
+        media_id: UUID,
+        background_tasks: BackgroundTasks,
+        provider: str | None = None,
+        model: str | None = None,
+        db: Session = Depends(get_db),
+        current_user=Depends(get_current_user)
+):
+    """
+    Creates summary, topics, genre and difficulty of a medium again from its text, as a
+    BackgroundTask (long texts need one LLM call per chunk). Returns immediately; the new
+    values show up on the medium once the task is done. Needed when the first run failed,
+    e.g. because the LLM provider's quota was used up; `provider` and `model` pick another one.
+    """
+    media = get_media_or_404(db, media_id, current_user.id)
+    if not media.extracted_content:
+        raise HTTPException(status_code=400, detail="Dieses Medium hat noch keinen Text")
+    background_tasks.add_task(generate_media_metadata, media.id, provider, model)
+    return {"status": "started"}
+
+
 @router.get("/{media_id}", response_model=MediaResponse)
 async def get_single_medium(media_id: UUID, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     """Returns single medium by its UUID."""

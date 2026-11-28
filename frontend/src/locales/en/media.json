@@ -47,5 +47,12 @@
   "ocrUploading": "Uploading...",
   "ocrDelete": "Delete",
   "ocrDeleteConfirm": "Delete the text recognition?",
-  "ocrUploadError": "Text recognition could not be uploaded"
+  "ocrUploadError": "Text recognition could not be uploaded",
+  "summaryTitle": "Summary",
+  "summaryDescription": "Creates summary, topics, genre and difficulty from the text of this medium again. You can pick provider and model if the default doesn't work right now (for example its daily limit is reached).",
+  "summaryButton": "Create again",
+  "summaryRunning": "Starting...",
+  "summaryStarted": "Running in the background, the result appears above as soon as it is done.",
+  "summaryTimeout": "Nothing new so far. Long texts take a while; if nothing arrives at all, the reason is in the backend log (for example the provider's daily limit was reached).",
+  "summaryError": "Could not be started"
 }
